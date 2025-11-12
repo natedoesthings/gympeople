@@ -6,13 +6,35 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FE0A9C822EC4533B00CDDA6E /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = FE0A9C812EC4533B00CDDA6E /* Supabase */; };
+		FE3C2F692EC44F0500429BA0 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = FE3C2F682EC44F0500429BA0 /* Auth */; };
+		FE3C2F6B2EC44F0500429BA0 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = FE3C2F6A2EC44F0500429BA0 /* Functions */; };
+		FE3C2F6D2EC44F0500429BA0 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = FE3C2F6C2EC44F0500429BA0 /* PostgREST */; };
+		FE3C2F6F2EC44F0500429BA0 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = FE3C2F6E2EC44F0500429BA0 /* Realtime */; };
+		FE3C2F712EC44F0500429BA0 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = FE3C2F702EC44F0500429BA0 /* Storage */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		FE3C2F592EC448EE00429BA0 /* gympeople.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gympeople.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FE92F83D2EC476F3006DCD66 /* Exceptions for "gympeople" folder in "gympeople" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FE3C2F582EC448EE00429BA0 /* gympeople */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FE3C2F5B2EC448EE00429BA0 /* gympeople */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FE92F83D2EC476F3006DCD66 /* Exceptions for "gympeople" folder in "gympeople" target */,
+			);
 			path = gympeople;
 			sourceTree = "<group>";
 		};
@@ -23,16 +45,30 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE3C2F6D2EC44F0500429BA0 /* PostgREST in Frameworks */,
+				FE3C2F6B2EC44F0500429BA0 /* Functions in Frameworks */,
+				FE0A9C822EC4533B00CDDA6E /* Supabase in Frameworks */,
+				FE3C2F692EC44F0500429BA0 /* Auth in Frameworks */,
+				FE3C2F712EC44F0500429BA0 /* Storage in Frameworks */,
+				FE3C2F6F2EC44F0500429BA0 /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		FE0A9C802EC4533100CDDA6E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		FE3C2F502EC448EE00429BA0 = {
 			isa = PBXGroup;
 			children = (
 				FE3C2F5B2EC448EE00429BA0 /* gympeople */,
+				FE0A9C802EC4533100CDDA6E /* Frameworks */,
 				FE3C2F5A2EC448EE00429BA0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +101,12 @@
 			);
 			name = gympeople;
 			packageProductDependencies = (
+				FE3C2F682EC44F0500429BA0 /* Auth */,
+				FE3C2F6A2EC44F0500429BA0 /* Functions */,
+				FE3C2F6C2EC44F0500429BA0 /* PostgREST */,
+				FE3C2F6E2EC44F0500429BA0 /* Realtime */,
+				FE3C2F702EC44F0500429BA0 /* Storage */,
+				FE0A9C812EC4533B00CDDA6E /* Supabase */,
 			);
 			productName = gympeople;
 			productReference = FE3C2F592EC448EE00429BA0 /* gympeople.app */;
@@ -94,6 +136,9 @@
 			);
 			mainGroup = FE3C2F502EC448EE00429BA0;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FE3C2F672EC44EDF00429BA0 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FE3C2F5A2EC448EE00429BA0 /* Products */;
 			projectDirPath = "";
@@ -256,11 +301,13 @@
 				DEVELOPMENT_TEAM = P766MMY3WN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = gympeople/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -288,11 +335,13 @@
 				DEVELOPMENT_TEAM = P766MMY3WN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = gympeople/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -332,6 +381,50 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FE3C2F672EC44EDF00429BA0 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase-community/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FE0A9C812EC4533B00CDDA6E /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE3C2F672EC44EDF00429BA0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		FE3C2F682EC44F0500429BA0 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE3C2F672EC44EDF00429BA0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		FE3C2F6A2EC44F0500429BA0 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE3C2F672EC44EDF00429BA0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		FE3C2F6C2EC44F0500429BA0 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE3C2F672EC44EDF00429BA0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		FE3C2F6E2EC44F0500429BA0 /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE3C2F672EC44EDF00429BA0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		FE3C2F702EC44F0500429BA0 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE3C2F672EC44EDF00429BA0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FE3C2F512EC448EE00429BA0 /* Project object */;
 }
