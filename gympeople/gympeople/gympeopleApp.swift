@@ -10,11 +10,13 @@ import SwiftUI
 @main
 struct gympeopleApp: App {
     @StateObject var authVM = AuthViewModel()
-    
     var body: some Scene {
         WindowGroup {
             LoginView()
-                .environmentObject(authVM)
+                .environmentObject(authVM) 
+                .onOpenURL { url in
+                    Task { await authVM.handleAuthCallback(url: url) }
+                }
         }
     }
 }
