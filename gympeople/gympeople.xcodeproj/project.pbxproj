@@ -15,8 +15,19 @@
 		FE3C2F712EC44F0500429BA0 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = FE3C2F702EC44F0500429BA0 /* Storage */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		FE92F86B2EC5BFDD006DCD66 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE3C2F512EC448EE00429BA0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FE3C2F582EC448EE00429BA0;
+			remoteInfo = gympeople;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		FE3C2F592EC448EE00429BA0 /* gympeople.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gympeople.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE92F8672EC5BFDD006DCD66 /* gympeopleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = gympeopleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -38,6 +49,11 @@
 			path = gympeople;
 			sourceTree = "<group>";
 		};
+		FE92F8682EC5BFDD006DCD66 /* gympeopleTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = gympeopleTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +67,13 @@
 				FE3C2F692EC44F0500429BA0 /* Auth in Frameworks */,
 				FE3C2F712EC44F0500429BA0 /* Storage in Frameworks */,
 				FE3C2F6F2EC44F0500429BA0 /* Realtime in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE92F8642EC5BFDD006DCD66 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				FE3C2F5B2EC448EE00429BA0 /* gympeople */,
+				FE92F8682EC5BFDD006DCD66 /* gympeopleTests */,
 				FE0A9C802EC4533100CDDA6E /* Frameworks */,
 				FE3C2F5A2EC448EE00429BA0 /* Products */,
 			);
@@ -77,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				FE3C2F592EC448EE00429BA0 /* gympeople.app */,
+				FE92F8672EC5BFDD006DCD66 /* gympeopleTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -113,6 +138,29 @@
 			productReference = FE3C2F592EC448EE00429BA0 /* gympeople.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FE92F8662EC5BFDD006DCD66 /* gympeopleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE92F86D2EC5BFDD006DCD66 /* Build configuration list for PBXNativeTarget "gympeopleTests" */;
+			buildPhases = (
+				FE92F8632EC5BFDD006DCD66 /* Sources */,
+				FE92F8642EC5BFDD006DCD66 /* Frameworks */,
+				FE92F8652EC5BFDD006DCD66 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE92F86C2EC5BFDD006DCD66 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FE92F8682EC5BFDD006DCD66 /* gympeopleTests */,
+			);
+			name = gympeopleTests;
+			packageProductDependencies = (
+			);
+			productName = gympeopleTests;
+			productReference = FE92F8672EC5BFDD006DCD66 /* gympeopleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -125,6 +173,10 @@
 				TargetAttributes = {
 					FE3C2F582EC448EE00429BA0 = {
 						CreatedOnToolsVersion = 26.1;
+					};
+					FE92F8662EC5BFDD006DCD66 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = FE3C2F582EC448EE00429BA0;
 					};
 				};
 			};
@@ -146,12 +198,20 @@
 			projectRoot = "";
 			targets = (
 				FE3C2F582EC448EE00429BA0 /* gympeople */,
+				FE92F8662EC5BFDD006DCD66 /* gympeopleTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		FE3C2F572EC448EE00429BA0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE92F8652EC5BFDD006DCD66 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -189,7 +249,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FE92F8632EC5BFDD006DCD66 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FE92F86C2EC5BFDD006DCD66 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FE3C2F582EC448EE00429BA0 /* gympeople */;
+			targetProxy = FE92F86B2EC5BFDD006DCD66 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		FE3C2F622EC448F000429BA0 /* Debug */ = {
@@ -393,6 +468,50 @@
 			};
 			name = Release;
 		};
+		FE92F86E2EC5BFDD006DCD66 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P766MMY3WN;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = natedoesthings.gympeopleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/gympeople.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/gympeople";
+			};
+			name = Debug;
+		};
+		FE92F86F2EC5BFDD006DCD66 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P766MMY3WN;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = natedoesthings.gympeopleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/gympeople.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/gympeople";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -410,6 +529,15 @@
 			buildConfigurations = (
 				FE3C2F652EC448F000429BA0 /* Debug */,
 				FE3C2F662EC448F000429BA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FE92F86D2EC5BFDD006DCD66 /* Build configuration list for PBXNativeTarget "gympeopleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE92F86E2EC5BFDD006DCD66 /* Debug */,
+				FE92F86F2EC5BFDD006DCD66 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

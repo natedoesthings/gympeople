@@ -13,10 +13,7 @@ struct LoginView: View {
     
     var body: some View {
         VStack(spacing: 24) {
-            if authVM.isSignedIn {
-                HomeView()
-                
-            } else {
+            if !authVM.isSignedIn {
                 VStack(spacing: 20) {
                     Text(isCreatingAccount ? "Sign Up" : "Sign In")
                         .font(.title)
@@ -84,8 +81,10 @@ struct LoginView: View {
                     
                 }
                 .padding(.horizontal, 10)
-                
-                
+            } else if authVM.needsOnboarding {
+                OnboardingView(fullName: $authVM.userName, email: $authVM.userEmail)
+            } else { // signed in and passed onboarding
+                HomeView()
             }
         }
         .alert(item: $authVM.loginError) { loginError in
@@ -100,7 +99,4 @@ struct LoginView: View {
     }
 }
 
-#Preview {
-    LoginView()
-}
 
