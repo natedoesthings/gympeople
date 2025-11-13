@@ -61,8 +61,37 @@ extension SupabaseManager {
         
         let data = response.data
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ" // handles full timestamps
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let dateString = try container.decode(String.self)
+
+            // Try full ISO8601 first
+            if let date = ISO8601DateFormatter().date(from: dateString) {
+                return date
+            }
+            // Try yyyy-MM-dd
+            if let date = formatter.date(from: dateString) {
+                return date
+            }
+            // Try yyyy-MM-dd (date-only)
+            let shortFormatter = DateFormatter()
+            shortFormatter.dateFormat = "yyyy-MM-dd"
+            if let date = shortFormatter.date(from: dateString) {
+                return date
+            }
+
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unrecognized date format: \(dateString)"
+            )
+        }
+
         let profile = try decoder.decode(UserProfile.self, from: data)
         return profile
     }

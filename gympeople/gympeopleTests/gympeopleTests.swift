@@ -8,110 +8,215 @@
 import XCTest
 @testable import gympeople
 import Supabase
+import CoreLocation
 
-final class SupabaseTests: XCTestCase {
-
-    let manager = SupabaseManager.shared
-
-    // Generate unique credentials so the test can run repeatedly
-    private var testEmail: String {
-        "test+\(UUID().uuidString.prefix(8))@example.com"
-    }
-    private let testPassword = "Password123!"
-
-    // Store created user ID for reference
-    private var userID: UUID?
+final class AuthViewModelTests: XCTestCase {
+    
+    private var authVM: AuthViewModel!
 
     override func setUp() async throws {
         try await super.setUp()
+        authVM = await AuthViewModel()
     }
 
-    func testFullUserLifecycle() async throws {
+    override func tearDown() async throws {
+        authVM = nil
+        try await super.tearDown()
+    }
+
+    private var validTestEmail: String {
+        "test+\(UUID().uuidString.prefix(8))@example.com"
+    }
+    private let validTestPassword = "Password123!"
+    private var inValidTestEmail: String {
+        "test+\(UUID().uuidString.prefix(8))example.com"
+    }
+    private let inValidTestPassword = "Password123"
+    private var userID: UUID?
+    
+    // MARK: Test Cases
+    func testValidEmailSignUp () async throws {
+        var testEmail: String {
+            "test+\(UUID().uuidString.prefix(8))@example.com"
+        }
+        let testPassword = "Password123!"
+        
         do {
+            await authVM.signUpWithEmail(email: testEmail, password: testPassword, name: "Test User")
+            
+            // 5 seconds
+            try await Task.sleep(nanoseconds: 5_000_000_000)
+
+            // Read MainActor-isolated properties on the MainActor first
+            let isSignedIn = await MainActor.run { authVM.isSignedIn }
+            let userName = await MainActor.run { authVM.userName }
+            let needsOnboarding = await MainActor.run { authVM.needsOnboarding }
+
+            // Now assert on plain values (non-isolated)
+            XCTAssertTrue(isSignedIn, "User should be signed in after sign up")
+            XCTAssertFalse(userName.isEmpty, "User name should not be empty")
+            XCTAssertTrue(needsOnboarding, "New user should require onboarding")
+            
+            await authVM.signOut()
+            
+        } catch {
+            XCTFail("Failed to save profile: \(error)")
+        }
+    }
+
+    func testInValidPasswordSignUp () async throws {
+        do {
+            
+            await authVM.signUpWithEmail(email: validTestEmail, password: inValidTestPassword, name: "Test User")
+            
+            // 5 seconds
+            try await Task.sleep(nanoseconds: 5_000_000_000)
+
+            // Read MainActor-isolated properties on the MainActor first
+            let isSignedIn = await MainActor.run { authVM.isSignedIn }
+            let userName = await MainActor.run { authVM.userName }
+            let needsOnboarding = await MainActor.run { authVM.needsOnboarding }
+            let loginError = await MainActor.run { authVM.loginError }
+
+            // deafult values, should not change
+            XCTAssertNotNil(loginError, "there should be an error")
+            XCTAssertFalse(isSignedIn, "user should not be signed in")
+            XCTAssertTrue(userName.isEmpty, "User name should be empty")
+            XCTAssertTrue(needsOnboarding, "onboarding status does not change")
+            
+        } catch {
+            XCTFail("Failed to save profile: \(error)")
+        }
+    }
+    
+    func testInValidEmailSignUp () async throws {
+        do {
+            
+            await authVM.signUpWithEmail(email: inValidTestEmail, password: validTestPassword, name: "Test User")
+            
+            // 5 seconds
+            try await Task.sleep(nanoseconds: 5_000_000_000)
+
+            // Read MainActor-isolated properties on the MainActor first
+            let isSignedIn = await MainActor.run { authVM.isSignedIn }
+            let userName = await MainActor.run { authVM.userName }
+            let needsOnboarding = await MainActor.run { authVM.needsOnboarding }
+            let loginError = await MainActor.run { authVM.loginError }
+
+            // deafult values, should not change
+            XCTAssertNotNil(loginError, "there should be an error")
+            XCTAssertFalse(isSignedIn, "user should not be signed in")
+            XCTAssertTrue(userName.isEmpty, "User name should be empty")
+            XCTAssertTrue(needsOnboarding, "onboarding status does not change")
+            
+        } catch {
+            XCTFail("Failed to save profile: \(error)")
+        }
+    }
+}
+
+
+final class SupabaseTests: XCTestCase {
+    let manager = SupabaseManager.shared
+
+    private var testEmail: String {
+        "test\(UUID().uuidString.prefix(8))@example.com"
+    }
+    
+    private let testPassword = "Password123!"
+    
+    override func setUp() async throws {
+        print("Setting up...")
+        try await super.setUp()
+        try await manager.client.auth.signOut()
+    }
+    
+    override func tearDown() async throws {
+        print("Tearing down...")
+        
+        defer { super.tearDown() }
+        
+        do {
+            if let userID = await manager.client.auth.currentUser?.id {
+                print("Cleaning up test user:", userID)
+                
+                try await manager.client
+                    .from("user_profiles")
+                    .delete()
+                    .eq("id", value: userID)
+                    .execute()
+                
+                try await manager.client.auth.signOut()
+            }
+        } catch {
+            print("Cleanup failed:", error)
+        }
+    }
+    
+    // MARK: Test cases
+    func testSavingFetchingProfile() async throws {
+        do {
+            print("Before signing up", testEmail)
+            
             let signUpResult = try await manager.client.auth.signUp(
                 email: testEmail,
                 password: testPassword
             )
             
-            let user = signUpResult.user
-            userID = user.id
-            print("Created test user with id:", user.id)
-
-            let dummyProfile = UserProfile(
-                id: user.id,
-                full_name: "Test User",
-                email: testEmail,
-                date_of_birth: Date(timeIntervalSince1970: 0),
-                phone_number: "1234567890",
-                location_lat: 36.1627,
-                location_lng: -86.7816,
-                manual_location: "Nashville, TN",
-                gym_memberships: ["Planet Fitness", "YMCA"],
-                created_at: Date()
-            )
+            try await Task.sleep(nanoseconds: 500_000_000)
             
-            let data: [String: AnyEncodable] = [
-                "id": AnyEncodable(user.id),
-                "full_name": AnyEncodable(dummyProfile.full_name),
-                "email": AnyEncodable(dummyProfile.email),
-                "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: dummyProfile.date_of_birth)),
-                "phone_number": AnyEncodable(dummyProfile.phone_number),
-                "location_lat": AnyEncodable(dummyProfile.location_lat),
-                "location_lng": AnyEncodable(dummyProfile.location_lng),
-                "manual_location": AnyEncodable(dummyProfile.manual_location ?? ""),
-                "gym_memberships": AnyEncodable(dummyProfile.gym_memberships ?? [])
-            ]
-
-            try await manager.client.from("user_profiles").insert(data).execute()
-            
-            print("Inserted profile for \(dummyProfile.full_name)")
-
-            let fetched = try await manager.client
-                .from("user_profiles")
-                .select()
-                .eq("id", value: user.id)
-                .single()
-                .execute()
-
-            let decoder = JSONDecoder()
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ" // handles full timestamps
-            formatter.calendar = Calendar(identifier: .iso8601)
-            formatter.timeZone = TimeZone(secondsFromGMT: 0)
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-
-            decoder.dateDecodingStrategy = .custom { decoder in
-                let container = try decoder.singleValueContainer()
-                let dateString = try container.decode(String.self)
-
-                // Try full ISO8601 first
-                if let date = ISO8601DateFormatter().date(from: dateString) {
-                    return date
-                }
-                // Try yyyy-MM-dd
-                if let date = formatter.date(from: dateString) {
-                    return date
-                }
-                // Try yyyy-MM-dd (date-only)
-                let shortFormatter = DateFormatter()
-                shortFormatter.dateFormat = "yyyy-MM-dd"
-                if let date = shortFormatter.date(from: dateString) {
-                    return date
-                }
-
-                throw DecodingError.dataCorruptedError(
-                    in: container,
-                    debugDescription: "Unrecognized date format: \(dateString)"
-                )
+            if let session = signUpResult.session {
+                try await manager.client.auth.setSession(accessToken: session.accessToken, refreshToken: session.refreshToken)
+            } else {
+                print("No session returned by signUp, reauthenticating manually...")
+                try await manager.client.auth.signIn(email: testEmail, password: testPassword)
             }
+            
+            let user = signUpResult.user
+            print("Created test user with id:", user.id)
+            print("Created test email with email:", testEmail)
+            
+            guard let user = await manager.client.auth.currentUser else {
+                XCTFail("No authenticated user found")
+                return
+            }
+                
+            let userEmail = user.email ?? ""
+            print("Current user", user.id)
+            print("Current email", userEmail)
+            
+            
+            let location = CLLocationCoordinate2D(latitude: 36.1627, longitude: -86.7816)
+            do {
+                try await manager.saveUserProfile(
+                    name: "Test User",
+                    email: userEmail,
+                    dob: Date(timeIntervalSince1970: 0),
+                    phone: "1234567890",
+                    location: location,
+                    manualLocation: "Nashville, TN",
+                    gyms: ["Planet Fitness", "YMCA"]
+                )
+            } catch {
+                XCTFail("Failed to save profile: \(error)")
+            }
+            
+            print("Inserted profile for \(userEmail)")
 
-            let fetchedProfile = try decoder.decode(UserProfile.self, from: fetched.data)
-
-            XCTAssertEqual(fetchedProfile.full_name, dummyProfile.full_name)
-            XCTAssertEqual(fetchedProfile.phone_number, dummyProfile.phone_number)
-            XCTAssertEqual(fetchedProfile.email, dummyProfile.email)
-            print("Verified fetched profile matches inserted data:", fetchedProfile)
-
+            let fetchedProfile = try await manager.fetchUserProfile()
+            XCTAssertNotNil(fetchedProfile, "Expected fetched profile to exist")
+            
+            guard let profile = fetchedProfile else {
+                XCTFail("No profile returned from fetchUserProfile()")
+                return
+            }
+            
+            XCTAssertEqual(profile.full_name, "Test User")
+            XCTAssertEqual(profile.phone_number, "1234567890")
+            XCTAssertEqual(profile.manual_location, "Nashville, TN")
+            XCTAssertEqual(profile.gym_memberships ?? [], ["Planet Fitness", "YMCA"])
+        
+            
         } catch {
             XCTFail("Test failed: \(error)")
         }

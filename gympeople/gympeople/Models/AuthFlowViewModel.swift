@@ -88,6 +88,10 @@ class AuthViewModel: ObservableObject {
             let loginErr = LoginError.from(error)
             print("Sign-in failed:", loginErr.message)
             self.loginError = loginErr
+            self.isSignedIn = false
+            self.userName = ""
+            self.userEmail = ""
+            self.needsOnboarding = true
         }
     }
 
@@ -117,7 +121,7 @@ class AuthViewModel: ObservableObject {
 
             // Check if the user has completed onboarding
             do {
-                let response = try await client
+                let _ = try await client
                     .from("user_profiles")
                     .select()
                     .eq("id", value: user.id)
@@ -137,7 +141,7 @@ class AuthViewModel: ObservableObject {
             self.isSignedIn = false
             self.userName = ""
             self.userEmail = ""
-            self.needsOnboarding = false
+            self.needsOnboarding = true
         }
     }
 
@@ -147,6 +151,7 @@ class AuthViewModel: ObservableObject {
             isSignedIn = false
             userName = ""
             userEmail = ""
+            needsOnboarding = true
         } catch {
             print("Sign-out error: \(error)")
         }
