@@ -8,6 +8,19 @@
 import SwiftUI
 
 struct HomeView: View {
+    var body: some View {
+        TabView {
+            NavigationStack { WelcomeView() }
+                .tabItem { Label("Home", systemImage: "house") }
+
+            NavigationStack { ProfileView() }
+                .tabItem { Label("Profile", systemImage: "person") }
+        }
+        
+    }
+}
+
+struct WelcomeView: View {
     @EnvironmentObject var authVM: AuthViewModel
     
     var body: some View {
