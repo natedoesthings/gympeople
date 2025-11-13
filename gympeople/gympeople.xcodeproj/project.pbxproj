@@ -91,6 +91,7 @@
 				FE3C2F552EC448EE00429BA0 /* Sources */,
 				FE3C2F562EC448EE00429BA0 /* Frameworks */,
 				FE3C2F572EC448EE00429BA0 /* Resources */,
+				FE92F8522EC50DB1006DCD66 /* Run SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -158,6 +159,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		FE92F8522EC50DB1006DCD66 /* Run SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run SwiftLint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\n\nif command -v swiftlint >/dev/null 2>&1\nthen\n    swiftlint\nelse\n    echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FE3C2F552EC448EE00429BA0 /* Sources */ = {
@@ -307,6 +329,7 @@
 				DEVELOPMENT_TEAM = P766MMY3WN;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = gympeople/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -344,6 +367,7 @@
 				DEVELOPMENT_TEAM = P766MMY3WN;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_TESTABILITY = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = gympeople/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

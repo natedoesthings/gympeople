@@ -9,49 +9,98 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject var authVM: AuthViewModel
+    @State private var isCreatingAccount = false
     
     var body: some View {
         VStack(spacing: 24) {
             if authVM.isSignedIn {
-                VStack(spacing: 12) {
-                    Text("Welcome, \(authVM.userName)")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    Button("Sign Out") {
-                        Task { await authVM.signOut() }
-                    }
-                    .foregroundColor(.red)
-                }
-            } else {
+                HomeView()
                 
+            } else {
                 VStack(spacing: 20) {
-                    Button {
-                        Task { await authVM.signInWithGoogle() }
-                    } label: {
-                        Label("Continue with Google", systemImage: "globe")
-                            .frame(maxWidth: .infinity)
+                    Text(isCreatingAccount ? "Sign Up" : "Sign In")
+                        .font(.title)
+                        .fontWeight(.heavy)
+                    
+                    Text("Find your GymPeople today.")
+                        .font(.subheadline)
+                    
+                    HStack {
+                        Button {
+                            Task { await authVM.signInWithGoogle() }
+                        } label: {
+                            Label {
+                                Text("Google")
+                            } icon: {
+                                Image("google_logo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 20)
+                            }
+                            .font(.system(size: 16))
                             .padding()
-                            .background(Color.blue.opacity(0.9))
-                            .foregroundColor(.white)
+                            .foregroundColor(.black)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                            )
                             .cornerRadius(10)
+                        }
+                        
+                        Button {
+                            Task { await authVM.signInWithGoogle() }
+                        } label: {
+                            Label("Apple", systemImage: "apple.logo")
+                                .font(.system(size: 16))
+                                .padding()
+                                .foregroundColor(.black)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                                )
+                                .cornerRadius(10)
+                        }
                     }
-                    
-                    Divider().padding(.vertical)
+                    .padding(.horizontal, 5)
 
-                    EmailAuthView()
                     
-
+                    HStack {
+                        Rectangle()
+                            .frame(height: 1)
+                            .foregroundColor(.gray.opacity(0.4))
+                        
+                        Text("or")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        
+                        Rectangle()
+                            .frame(height: 1)
+                            .foregroundColor(.gray.opacity(0.4))
+                    }
+                    .padding(.vertical)
+                    .padding(.horizontal, 20)
+                    
+                    EmailAuthView(isCreatingAccount: $isCreatingAccount)
+                    
                 }
-                .padding(.horizontal, 40)
+                .padding(.horizontal, 10)
                 
                 
             }
         }
-        .onOpenURL { url in
-            Task {
-                await authVM.handleAuthCallback(url: url)
-            }
+        .alert(item: $authVM.loginError) { loginError in
+            Alert(
+                title: Text("Login Error"),
+                message: Text(loginError.message),
+                dismissButton: .default(Text("OK")) {
+                    authVM.loginError = nil
+                }
+            )
         }
     }
+}
+
+#Preview {
+    LoginView()
 }
 

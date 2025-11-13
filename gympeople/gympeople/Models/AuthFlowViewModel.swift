@@ -14,6 +14,8 @@ import Combine
 class AuthViewModel: ObservableObject {
     @Published var isSignedIn: Bool = false
     @Published var userName: String = ""
+    @Published var loginError: LoginError? = nil
+
 
     private let client = SupabaseManager.shared.client
     private var authStateTask: Task<Void, Never>?
@@ -68,7 +70,9 @@ class AuthViewModel: ObservableObject {
             print("Signed up: \(result.user.email ?? "")")
             await updateUserFromSession()
         } catch {
-            print("Sign-up failed: \(error)")
+            let loginErr = LoginError.from(error)
+            print("Sign-in failed:", loginErr.message)
+            self.loginError = loginErr
         }
     }
 
@@ -78,7 +82,9 @@ class AuthViewModel: ObservableObject {
             try await client.auth.signIn(email: email, password: password)
             await updateUserFromSession()
         } catch {
-            print("Sign-in failed: \(error)")
+            let loginErr = LoginError.from(error)
+            print("Sign-in failed:", loginErr.message)
+            self.loginError = loginErr
         }
     }
 

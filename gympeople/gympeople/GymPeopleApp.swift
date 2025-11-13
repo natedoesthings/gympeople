@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct gympeopleApp: App {
+struct GymPeopleApp: App {
     @StateObject var authVM = AuthViewModel()
     var body: some Scene {
         WindowGroup {
@@ -17,6 +17,7 @@ struct gympeopleApp: App {
                 .onOpenURL { url in
                     Task { await authVM.handleAuthCallback(url: url) }
                 }
+                .preferredColorScheme(.light)
         }
     }
 }

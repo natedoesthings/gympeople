@@ -11,7 +11,7 @@ struct EmailAuthView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var name = ""
-    @State private var isCreatingAccount = false
+    @Binding var isCreatingAccount: Bool
 
     var body: some View {
         VStack(spacing: 16) {
@@ -48,6 +48,6 @@ struct EmailAuthView: View {
             }
             .font(.footnote)
         }
-        .padding()
+        .padding(.horizontal, 20)
     }
 }
