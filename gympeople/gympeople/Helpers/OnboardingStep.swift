@@ -9,8 +9,9 @@ import SwiftUI
 import CoreLocation
 
 enum OnboardingStep: Hashable {
-    case name
-    case email
+    case firstName
+    case lastName
+    case userName
     case dob
     case phone
     case location

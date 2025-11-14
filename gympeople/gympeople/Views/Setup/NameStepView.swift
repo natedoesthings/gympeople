@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-struct NameStepView: View {
-    @Binding var fullName: String
+struct FirstNameStepView: View {
+    @Binding var firstName: String
     var next: () -> Void
 
     var body: some View {
         VStack(spacing: 20) {
             Text("Confirm your name")
                 .font(.title2)
-            TextField("Full name", text: $fullName)
+            TextField("First name", text: $firstName)
                 .textFieldStyle(.roundedBorder)
                 .padding()
             
@@ -23,7 +23,51 @@ struct NameStepView: View {
                 next()
             }
             .buttonStyle(.borderedProminent)
-            .disabled(fullName.isEmpty)
+            .disabled(firstName.isEmpty)
+        }
+        .padding()
+    }
+}
+
+struct LastNameStepView: View {
+    @Binding var lastName: String
+    var next: () -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Confirm your name")
+                .font(.title2)
+            TextField("Last name", text: $lastName)
+                .textFieldStyle(.roundedBorder)
+                .padding()
+            
+            Button("Next") {
+                next()
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(lastName.isEmpty)
+        }
+        .padding()
+    }
+}
+
+struct UserNameStepView: View {
+    @Binding var userName: String
+    var next: () -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Confirm your name")
+                .font(.title2)
+            TextField("Unique User Name", text: $userName)
+                .textFieldStyle(.roundedBorder)
+                .padding()
+            
+            Button("Next") {
+                next()
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(userName.isEmpty)
         }
         .padding()
     }

@@ -24,7 +24,9 @@ class SupabaseManager {
 
 extension SupabaseManager {
     func saveUserProfile(
-        name: String,
+        firstName: String,
+        lastName: String,
+        userName: String,
         email: String,
         dob: Date,
         phone: String,
@@ -34,7 +36,9 @@ extension SupabaseManager {
     ) async throws {
         let data: [String: AnyEncodable] = [
             "id": AnyEncodable(client.auth.currentUser?.id),
-            "full_name": AnyEncodable(name),
+            "first_name": AnyEncodable(firstName),
+            "last_name": AnyEncodable(lastName),
+            "user_name": AnyEncodable(userName),
             "email": AnyEncodable(email),
             "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: dob)),
             "phone_number": AnyEncodable(phone),
@@ -94,6 +98,19 @@ extension SupabaseManager {
 
         let profile = try decoder.decode(UserProfile.self, from: data)
         return profile
+    }
+    
+    func updateUserName(newUserName: String) async throws {
+        guard let userID = client.auth.currentUser?.id else {
+            print("No authenticated user found")
+            return
+        }
+
+        try await client
+            .from("user_profiles")
+            .update(["user_name": newUserName])
+            .eq("id", value: userID)
+            .execute()
     }
 
 }

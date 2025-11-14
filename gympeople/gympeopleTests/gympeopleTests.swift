@@ -42,19 +42,19 @@ final class AuthViewModelTests: XCTestCase {
         let testPassword = "Password123!"
         
         do {
-            await authVM.signUpWithEmail(email: testEmail, password: testPassword, name: "Test User")
+            await authVM.signUpWithEmail(email: validTestEmail, password: validTestEmail, firstName: "Test", lastName: "User")
             
             // 5 seconds
             try await Task.sleep(nanoseconds: 5_000_000_000)
 
             // Read MainActor-isolated properties on the MainActor first
             let isSignedIn = await MainActor.run { authVM.isSignedIn }
-            let userName = await MainActor.run { authVM.userName }
+            let firstName = await MainActor.run { authVM.firstName }
             let needsOnboarding = await MainActor.run { authVM.needsOnboarding }
 
             // Now assert on plain values (non-isolated)
             XCTAssertTrue(isSignedIn, "User should be signed in after sign up")
-            XCTAssertFalse(userName.isEmpty, "User name should not be empty")
+            XCTAssertFalse(firstName.isEmpty, "User name should not be empty")
             XCTAssertTrue(needsOnboarding, "New user should require onboarding")
             
             await authVM.signOut()
@@ -67,21 +67,21 @@ final class AuthViewModelTests: XCTestCase {
     func testInValidPasswordSignUp () async throws {
         do {
             
-            await authVM.signUpWithEmail(email: validTestEmail, password: inValidTestPassword, name: "Test User")
+            await authVM.signUpWithEmail(email: validTestEmail, password: inValidTestPassword, firstName: "Test", lastName: "User")
             
             // 5 seconds
             try await Task.sleep(nanoseconds: 5_000_000_000)
 
             // Read MainActor-isolated properties on the MainActor first
             let isSignedIn = await MainActor.run { authVM.isSignedIn }
-            let userName = await MainActor.run { authVM.userName }
+            let firstName = await MainActor.run { authVM.firstName }
             let needsOnboarding = await MainActor.run { authVM.needsOnboarding }
             let loginError = await MainActor.run { authVM.loginError }
 
             // deafult values, should not change
             XCTAssertNotNil(loginError, "there should be an error")
             XCTAssertFalse(isSignedIn, "user should not be signed in")
-            XCTAssertTrue(userName.isEmpty, "User name should be empty")
+            XCTAssertTrue(firstName.isEmpty, "User name should be empty")
             XCTAssertTrue(needsOnboarding, "onboarding status does not change")
             
         } catch {
@@ -92,21 +92,21 @@ final class AuthViewModelTests: XCTestCase {
     func testInValidEmailSignUp () async throws {
         do {
             
-            await authVM.signUpWithEmail(email: inValidTestEmail, password: validTestPassword, name: "Test User")
+            await authVM.signUpWithEmail(email: inValidTestEmail, password: validTestPassword, firstName: "Test", lastName: "User")
             
             // 5 seconds
             try await Task.sleep(nanoseconds: 5_000_000_000)
 
             // Read MainActor-isolated properties on the MainActor first
             let isSignedIn = await MainActor.run { authVM.isSignedIn }
-            let userName = await MainActor.run { authVM.userName }
+            let firstName = await MainActor.run { authVM.firstName }
             let needsOnboarding = await MainActor.run { authVM.needsOnboarding }
             let loginError = await MainActor.run { authVM.loginError }
 
             // deafult values, should not change
             XCTAssertNotNil(loginError, "there should be an error")
             XCTAssertFalse(isSignedIn, "user should not be signed in")
-            XCTAssertTrue(userName.isEmpty, "User name should be empty")
+            XCTAssertTrue(firstName.isEmpty, "User name should be empty")
             XCTAssertTrue(needsOnboarding, "onboarding status does not change")
             
         } catch {
@@ -189,7 +189,9 @@ final class SupabaseTests: XCTestCase {
             let location = CLLocationCoordinate2D(latitude: 36.1627, longitude: -86.7816)
             do {
                 try await manager.saveUserProfile(
-                    name: "Test User",
+                    firstName: "Test",
+                    lastName: "User",
+                    userName: "testuser123",
                     email: userEmail,
                     dob: Date(timeIntervalSince1970: 0),
                     phone: "1234567890",
@@ -211,7 +213,8 @@ final class SupabaseTests: XCTestCase {
                 return
             }
             
-            XCTAssertEqual(profile.full_name, "Test User")
+            XCTAssertEqual(profile.first_name, "Test")
+            XCTAssertEqual(profile.last_name, "User")
             XCTAssertEqual(profile.phone_number, "1234567890")
             XCTAssertEqual(profile.manual_location, "Nashville, TN")
             XCTAssertEqual(profile.gym_memberships ?? [], ["Planet Fitness", "YMCA"])

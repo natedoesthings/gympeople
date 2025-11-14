@@ -25,7 +25,7 @@ struct WelcomeView: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            Text("Welcome, \(authVM.userName)")
+            Text("Welcome, \(authVM.firstName) \(authVM.lastName)")
                 .font(.title)
                 .fontWeight(.bold)
             Button("Sign Out") {

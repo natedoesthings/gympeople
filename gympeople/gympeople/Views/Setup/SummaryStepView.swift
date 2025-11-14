@@ -11,7 +11,9 @@ import CoreLocation
 struct SummaryStepView: View {
     @EnvironmentObject var authVM: AuthViewModel
 
-    let name: String
+    let firstName: String
+    let lastName: String
+    let userName: String
     let email: String
     let dob: Date
     let phone: String
@@ -30,7 +32,9 @@ struct SummaryStepView: View {
                     .bold()
 
                 Group {
-                    Text("Name: \(name)")
+                    Text("First Name: \(firstName)")
+                    Text("Last Name: \(lastName)")
+                    Text("User Name: \(userName)")
                     Text("Email: \(email)")
                     Text("DOB: \(dob.formatted(date: .long, time: .omitted))")
                     Text("Phone: \(phone)")
@@ -64,7 +68,9 @@ struct SummaryStepView: View {
         submissionError = nil
         do {
             try await SupabaseManager.shared.saveUserProfile(
-                name: name,
+                firstName: firstName,
+                lastName: lastName,
+                userName: userName,
                 email: email,
                 dob: dob,
                 phone: phone,
@@ -72,10 +78,10 @@ struct SummaryStepView: View {
                 manualLocation: manualLocation,
                 gyms: gyms
             )
-            print("✅ Profile saved successfully")
+            print("Profile saved successfully")
             authVM.needsOnboarding = false
         } catch {
-            print("💥 Error saving profile:", error)
+            print("Error saving profile:", error)
             submissionError = error.localizedDescription
         }
         isSubmitting = false
@@ -83,14 +89,14 @@ struct SummaryStepView: View {
 }
 
 
-#Preview {
-    SummaryStepView(
-        name: "Nathanael Tesfaye",
-        email: "nathanael@example.com",
-        dob: Date(),
-        phone: "615-555-9999",
-        location: CLLocationCoordinate2D(latitude: 36.1627, longitude: -86.7816),
-        manualLocation: "Nashville, TN",
-        gyms: ["YMCA"],
-    )
-}
+//#Preview {
+//    SummaryStepView(
+//        name: "Nathanael Tesfaye",
+//        email: "nathanael@example.com",
+//        dob: Date(),
+//        phone: "615-555-9999",
+//        location: CLLocationCoordinate2D(latitude: 36.1627, longitude: -86.7816),
+//        manualLocation: "Nashville, TN",
+//        gyms: ["YMCA"],
+//    )
+//}

@@ -12,8 +12,10 @@ struct OnboardingView: View {
     @State private var path: [OnboardingStep] = []
     
     // Collected data
-    @Binding var fullName: String
+    @Binding var firstName: String
+    @Binding var lastName: String
     @Binding var email: String
+    @State private var userName: String = ""
     @State private var dob: Date = Date()
     @State private var phone: String = ""
     @State private var location: CLLocationCoordinate2D?
@@ -22,11 +24,13 @@ struct OnboardingView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            NameStepView(fullName: $fullName, next: { path.append(.email) })
+            FirstNameStepView(firstName: $firstName, next: { path.append(.lastName) })
                 .navigationDestination(for: OnboardingStep.self) { step in
                     switch step {
-                    case .email:
-                        EmailStepView(email: $email, next: { path.append(.dob) })
+                    case .lastName:
+                        LastNameStepView(lastName: $lastName, next: { path.append(.userName) })
+                    case .userName:
+                        UserNameStepView(userName: $userName, next: { path.append(.dob) })
                     case .dob:
                         DOBStepView(dob: $dob, next: { path.append(.phone) })
                     case .phone:
@@ -37,7 +41,9 @@ struct OnboardingView: View {
                         GymStepView(selectedGyms: $gymMemberships, next: { path.append(.summary) })
                     case .summary:
                         SummaryStepView(
-                            name: fullName,
+                            firstName: firstName,
+                            lastName: lastName,
+                            userName: userName,
                             email: email,
                             dob: dob,
                             phone: phone,

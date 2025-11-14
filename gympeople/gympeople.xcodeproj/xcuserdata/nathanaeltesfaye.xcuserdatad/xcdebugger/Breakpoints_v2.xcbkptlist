@@ -14,8 +14,8 @@
             filePath = "gympeople/Models/AuthFlowViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
             landmarkName = "signInWithEmail(email:password:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "gympeople/Models/AuthFlowViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "88"
-            endingLineNumber = "88"
+            startingLineNumber = "87"
+            endingLineNumber = "87"
             landmarkName = "signInWithEmail(email:password:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -110,40 +110,10 @@
             filePath = "gympeople/Services/SupabaseManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "49"
-            endingLineNumber = "49"
+            startingLineNumber = "53"
+            endingLineNumber = "53"
             landmarkName = "fetchUserProfile()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "233CC6A0-96E6-4111-894B-02F1A6B7D651 - 82b4efa280f3f840"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gympeople.SupabaseManager.fetchUserProfile() async throws -&gt; Swift.Optional&lt;gympeople.UserProfile&gt;"
-                  moduleName = "gympeople.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nathanaeltesfaye/Desktop/gympeople/gympeople/gympeople/Services/SupabaseManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "49"
-                  endingLineNumber = "49">
-               </Location>
-               <Location
-                  uuid = "233CC6A0-96E6-4111-894B-02F1A6B7D651 - 3f8658d91c6f8f6c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for gympeople.SupabaseManager.fetchUserProfile() async throws -&gt; Swift.Optional&lt;gympeople.UserProfile&gt;"
-                  moduleName = "gympeople.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nathanaeltesfaye/Desktop/gympeople/gympeople/gympeople/Services/SupabaseManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "49"
-                  endingLineNumber = "49">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -172,8 +142,8 @@
             filePath = "gympeople/Models/AuthFlowViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "106"
-            endingLineNumber = "106"
+            startingLineNumber = "102"
+            endingLineNumber = "102"
             landmarkName = "updateUserFromSession()"
             landmarkType = "7">
          </BreakpointContent>
@@ -182,7 +152,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "C0141A4F-C086-482B-8468-A5CC87084FEF"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "gympeopleTests/gympeopleTests.swift"
@@ -192,36 +162,6 @@
             endingLineNumber = "176"
             landmarkName = "testSavingFetchingProfile()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "C0141A4F-C086-482B-8468-A5CC87084FEF - 2e18d844dc29daae"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(10) suspend resume partial function for gympeopleTests.SupabaseTests.testSavingFetchingProfile() async throws -&gt; ()"
-                  moduleName = "gympeopleTests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nathanaeltesfaye/Desktop/gympeople/gympeople/gympeopleTests/gympeopleTests.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "176"
-                  endingLineNumber = "176">
-               </Location>
-               <Location
-                  uuid = "C0141A4F-C086-482B-8468-A5CC87084FEF - 19d5a259f7376e52"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(14) suspend resume partial function for gympeopleTests.SupabaseTests.testSavingFetchingProfile() async throws -&gt; ()"
-                  moduleName = "gympeopleTests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nathanaeltesfaye/Desktop/gympeople/gympeople/gympeopleTests/gympeopleTests.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "176"
-                  endingLineNumber = "176">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

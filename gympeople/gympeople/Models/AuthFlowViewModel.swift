@@ -13,7 +13,8 @@ import Combine
 @MainActor
 class AuthViewModel: ObservableObject {
     @Published var isSignedIn: Bool = false
-    @Published var userName: String = ""
+    @Published var firstName: String = ""
+    @Published var lastName: String = ""
     @Published var userEmail: String = ""
     @Published var loginError: LoginError? = nil
     @Published var needsOnboarding: Bool = true
@@ -32,9 +33,7 @@ class AuthViewModel: ObservableObject {
                 case .signedIn, .tokenRefreshed:
                     await self.updateUserFromSession()
                 case .signedOut, .userDeleted:
-                    self.isSignedIn = false
-                    self.userName = ""
-                    self.userEmail = ""
+                    resetState()
                 default:
                     break
                 }
@@ -63,12 +62,12 @@ class AuthViewModel: ObservableObject {
     }
     
     // MARK: - Email + Password Sign Up
-    func signUpWithEmail(email: String, password: String, name: String? = nil) async {
+    func signUpWithEmail(email: String, password: String, firstName: String? = nil, lastName: String? = nil) async {
         do {
             let result = try await client.auth.signUp(
                 email: email,
                 password: password,
-                data: name != nil ? ["name": .string(name!)] : nil
+                data: firstName != nil && lastName != nil ? ["name": .string(firstName! + " " + lastName!)] : nil
             )
             print("Signed up: \(result.user.email ?? "")")
             await updateUserFromSession()
@@ -88,10 +87,7 @@ class AuthViewModel: ObservableObject {
             let loginErr = LoginError.from(error)
             print("Sign-in failed:", loginErr.message)
             self.loginError = loginErr
-            self.isSignedIn = false
-            self.userName = ""
-            self.userEmail = ""
-            self.needsOnboarding = true
+            resetState()
         }
     }
 
@@ -111,9 +107,11 @@ class AuthViewModel: ObservableObject {
             // Update basic user info
             if let nameField = user.userMetadata["name"],
                case .string(let name) = nameField {
-                self.userName = name
+                let fullname = name.components(separatedBy: " ")
+                self.firstName = fullname[0]
+                self.lastName = fullname[1]
             } else {
-                self.userName = user.email ?? "Unknown"
+                self.firstName = user.email ?? "Unknown"
             }
             
             self.userEmail = user.email ?? ""
@@ -138,20 +136,21 @@ class AuthViewModel: ObservableObject {
 
         } catch {
             print("Error getting session:", error)
-            self.isSignedIn = false
-            self.userName = ""
-            self.userEmail = ""
-            self.needsOnboarding = true
+            resetState()
         }
+    }
+    
+    private func resetState() {
+        isSignedIn = false
+        firstName = ""
+        userEmail = ""
+        needsOnboarding = true
     }
 
     func signOut() async {
         do {
             try await client.auth.signOut()
-            isSignedIn = false
-            userName = ""
-            userEmail = ""
-            needsOnboarding = true
+            resetState()
         } catch {
             print("Sign-out error: \(error)")
         }

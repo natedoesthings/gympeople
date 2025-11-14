@@ -10,13 +10,17 @@ struct EmailAuthView: View {
     @EnvironmentObject var authVM: AuthViewModel
     @State private var email = ""
     @State private var password = ""
-    @State private var name = ""
+    @State private var firstName = ""
+    @State private var lastName = ""
     @Binding var isCreatingAccount: Bool
 
     var body: some View {
         VStack(spacing: 16) {
             if isCreatingAccount {
-                TextField("Name", text: $name)
+                TextField("First Name", text: $firstName)
+                    .textFieldStyle(.roundedBorder)
+                
+                TextField("Last Name", text: $lastName)
                     .textFieldStyle(.roundedBorder)
             }
 
@@ -31,7 +35,7 @@ struct EmailAuthView: View {
             Button(isCreatingAccount ? "Create Account" : "Sign In") {
                 Task {
                     if isCreatingAccount {
-                        await authVM.signUpWithEmail(email: email, password: password, name: name)
+                        await authVM.signUpWithEmail(email: email, password: password, firstName: firstName, lastName: lastName)
                     } else {
                         await authVM.signInWithEmail(email: email, password: password)
                     }

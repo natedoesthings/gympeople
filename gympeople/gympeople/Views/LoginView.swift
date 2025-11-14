@@ -82,7 +82,7 @@ struct LoginView: View {
                 }
                 .padding(.horizontal, 10)
             } else if authVM.needsOnboarding {
-                OnboardingView(fullName: $authVM.userName, email: $authVM.userEmail)
+                OnboardingView(firstName: $authVM.firstName, lastName: $authVM.lastName, email: $authVM.userEmail)
             } else { // signed in and passed onboarding
                 HomeView()
             }

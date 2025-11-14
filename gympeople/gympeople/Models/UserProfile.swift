@@ -10,7 +10,9 @@ import CoreLocation
 
 struct UserProfile: Codable, Identifiable {
     let id: UUID
-    let full_name: String
+    let first_name: String
+    let last_name: String
+    let user_name: String
     let email: String
     let date_of_birth: Date
     let phone_number: String
