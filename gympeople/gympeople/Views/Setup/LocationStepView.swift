@@ -9,6 +9,8 @@ import SwiftUI
 import CoreLocation
 
 struct LocationStepView: View {
+    @StateObject private var locationVM = LocationViewModel()
+    
     @Binding var location: CLLocationCoordinate2D?
     @Binding var manualLocation: String
     var next: () -> Void
@@ -39,11 +41,8 @@ struct LocationStepView: View {
     }
 
     private func fetchCurrentLocation() {
-        let manager = CLLocationManager()
-        manager.requestWhenInUseAuthorization()
-        if let loc = manager.location?.coordinate {
-            self.location = loc
-        }
+        self.location = locationVM.location
+        self.manualLocation = ""
     }
 }
 
