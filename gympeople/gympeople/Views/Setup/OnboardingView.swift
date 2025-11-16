@@ -9,6 +9,7 @@ import SwiftUI
 import CoreLocation
 
 struct OnboardingView: View {
+    @EnvironmentObject var authVM: AuthViewModel
     @State private var path: [OnboardingStep] = []
     
     // Collected data
@@ -57,6 +58,10 @@ struct OnboardingView: View {
                 }
                 .navigationTitle("Onboarding")
         }
+        Button("Sign Out") {
+            Task { await authVM.signOut() }
+        }
+        .foregroundColor(.red)
     }
     
     

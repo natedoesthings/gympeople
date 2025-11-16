@@ -13,6 +13,7 @@ import Combine
 @MainActor
 class AuthViewModel: ObservableObject {
     @Published var isSignedIn: Bool = false
+    @Published var isLoading: Bool = false
     @Published var firstName: String = ""
     @Published var lastName: String = ""
     @Published var userEmail: String = ""
@@ -63,6 +64,9 @@ class AuthViewModel: ObservableObject {
     
     // MARK: - Email + Password Sign Up
     func signUpWithEmail(email: String, password: String, firstName: String? = nil, lastName: String? = nil) async {
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
             let result = try await client.auth.signUp(
                 email: email,
@@ -70,7 +74,6 @@ class AuthViewModel: ObservableObject {
                 data: firstName != nil && lastName != nil ? ["name": .string(firstName! + " " + lastName!)] : nil
             )
             print("Signed up: \(result.user.email ?? "")")
-            await updateUserFromSession()
         } catch {
             let loginErr = LoginError.from(error)
             print("Sign-in failed:", loginErr.message)
@@ -80,9 +83,11 @@ class AuthViewModel: ObservableObject {
 
     // MARK: - Email + Password Sign In
     func signInWithEmail(email: String, password: String) async {
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
             try await client.auth.signIn(email: email, password: password)
-            await updateUserFromSession()
         } catch {
             let loginErr = LoginError.from(error)
             print("Sign-in failed:", loginErr.message)
@@ -92,6 +97,9 @@ class AuthViewModel: ObservableObject {
     }
 
     func handleAuthCallback(url: URL) async {
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
             try await client.auth.session(from: url)
         } catch {
@@ -100,6 +108,9 @@ class AuthViewModel: ObservableObject {
     }
 
     private func updateUserFromSession() async {
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
             let session = try await client.auth.session
             let user = session.user
@@ -145,6 +156,7 @@ class AuthViewModel: ObservableObject {
         firstName = ""
         userEmail = ""
         needsOnboarding = true
+        isLoading = false
     }
 
     func signOut() async {
