@@ -7,12 +7,12 @@
 
 import SwiftUI
 import CoreLocation
+import MapKit
 
 struct LocationStepView: View {
     @StateObject private var locationVM = LocationViewModel()
+    @Binding var location: String
     
-    @Binding var location: CLLocationCoordinate2D?
-    @Binding var manualLocation: String
     var next: () -> Void
     
     @State private var showLocationAlert: Bool = false
@@ -23,12 +23,14 @@ struct LocationStepView: View {
                 .font(.title2)
                 .bold()
 
-            TextField("Enter city or zip", text: $manualLocation)
+            TextField("Enter city or zip", text: $location)
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
 
             Button("Use My Location") {
-                fetchCurrentLocation()
+                Task  {
+                    await fetchCurrentLocation()
+                }
             }
             .buttonStyle(.bordered)
             .padding(.bottom)
@@ -37,7 +39,7 @@ struct LocationStepView: View {
                 next()
             }
             .buttonStyle(.borderedProminent)
-            .disabled(location == nil && manualLocation.isEmpty)
+            .disabled(locationVM.address == nil && location.isEmpty)
         }
         .padding()
         .alert(isPresented: $showLocationAlert) {
@@ -50,20 +52,18 @@ struct LocationStepView: View {
 
     }
 
-    private func fetchCurrentLocation() {
-        self.location = locationVM.location
-        if self.location == nil {
+    private func fetchCurrentLocation() async {
+        await locationVM.reverseGeoCode()
+        
+        if let address = locationVM.address {
+            // TODO: set manuallocation to reversegeocoded city
+            print("full", address.fullAddress)
+            print("short", address.shortAddress)
+            self.location = ""
+        } else {
             // show alert if location isn't available
             showLocationAlert = true
-        } else {
-            print("Latitude:", self.location?.latitude ?? 0)
-            print("Longitude:", self.location?.longitude ?? 0)
-            // TODO: set manuallocation to reversegeocoded city
-            self.manualLocation = ""
         }
     }
 }
 
-#Preview {
-    LocationStepView(location: .constant(nil), manualLocation: .constant(""), next: { print("Next") })
-}

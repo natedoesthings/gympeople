@@ -16,16 +16,7 @@ struct UserProfile: Codable, Identifiable {
     let email: String
     let date_of_birth: Date
     let phone_number: String
-    let location_lat: Double?
-    let location_lng: Double?
-    let manual_location: String?
+    let location: String?
     let gym_memberships: [String]?
     let created_at: Date?
-    
-    var coordinate: CLLocationCoordinate2D? {
-        if let lat = location_lat, let lng = location_lng {
-            return CLLocationCoordinate2D(latitude: lat, longitude: lng)
-        }
-        return nil
-    }
 }

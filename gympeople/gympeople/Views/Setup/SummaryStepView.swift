@@ -17,8 +17,7 @@ struct SummaryStepView: View {
     let email: String
     let dob: Date
     let phone: String
-    let location: CLLocationCoordinate2D?
-    let manualLocation: String
+    let location: String
     let gyms: [String]
 
     @State private var isSubmitting = false
@@ -38,11 +37,7 @@ struct SummaryStepView: View {
                     Text("Email: \(email)")
                     Text("DOB: \(dob.formatted(date: .long, time: .omitted))")
                     Text("Phone: \(phone)")
-                    if let loc = location {
-                        Text("Location: \(loc.latitude), \(loc.longitude)")
-                    } else {
-                        Text("Location: \(manualLocation)")
-                    }
+                    Text("Location: \(location)")
                     Text("Gyms: \(gyms.isEmpty ? "None" : gyms.joined(separator: ", "))")
                 }
                 .padding(.vertical, 2)
@@ -75,7 +70,6 @@ struct SummaryStepView: View {
                 dob: dob,
                 phone: phone,
                 location: location,
-                manualLocation: manualLocation,
                 gyms: gyms
             )
             print("Profile saved successfully")

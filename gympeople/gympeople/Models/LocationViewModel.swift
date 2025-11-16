@@ -8,10 +8,11 @@
 import SwiftUI
 import CoreLocation
 import Combine
+import MapKit
 
 class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
-    @Published var location: CLLocationCoordinate2D?
-
+    @Published var address: MKAddress?
+    private var location: CLLocation?
     private let manager = CLLocationManager()
 
     override init() {
@@ -24,7 +25,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     // Delegate method called when location updates arrive
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let loc = locations.last?.coordinate {
+        if let loc = locations.last {
             DispatchQueue.main.async {
                 self.location = loc
             }
@@ -33,5 +34,21 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Location error: \(error.localizedDescription)")
+    }
+    
+    func reverseGeoCode() async {
+        if let location = self.location {
+            if let request = MKReverseGeocodingRequest(location: location) {
+                do {
+                    let mapItems = try await request.mapItems
+                    let mapItem = mapItems.first
+                    self.address = mapItem?.address ?? nil
+                    
+                } catch  {
+                    print("Reverse Geocoding Error:", error)
+                }
+            }
+        }
+        
     }
 }

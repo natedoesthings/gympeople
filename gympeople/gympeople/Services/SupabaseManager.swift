@@ -30,8 +30,7 @@ extension SupabaseManager {
         email: String,
         dob: Date,
         phone: String,
-        location: CLLocationCoordinate2D?,
-        manualLocation: String,
+        location: String,
         gyms: [String]
     ) async throws {
         let data: [String: AnyEncodable] = [
@@ -42,9 +41,7 @@ extension SupabaseManager {
             "email": AnyEncodable(email),
             "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: dob)),
             "phone_number": AnyEncodable(phone),
-            "location_lat": AnyEncodable(location?.latitude),
-            "location_lng": AnyEncodable(location?.longitude),
-            "manual_location": AnyEncodable(manualLocation.isEmpty ? nil : manualLocation),
+            "location": AnyEncodable(location.isEmpty ? nil : location),
             "gym_memberships": AnyEncodable(gyms)
         ]
         try await client.from("user_profiles").insert(data).execute()

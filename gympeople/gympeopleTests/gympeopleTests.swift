@@ -185,8 +185,6 @@ final class SupabaseTests: XCTestCase {
             print("Current user", user.id)
             print("Current email", userEmail)
             
-            
-            let location = CLLocationCoordinate2D(latitude: 36.1627, longitude: -86.7816)
             do {
                 try await manager.saveUserProfile(
                     firstName: "Test",
@@ -195,8 +193,7 @@ final class SupabaseTests: XCTestCase {
                     email: userEmail,
                     dob: Date(timeIntervalSince1970: 0),
                     phone: "1234567890",
-                    location: location,
-                    manualLocation: "Nashville, TN",
+                    location: "Nashville, TN",
                     gyms: ["Planet Fitness", "YMCA"]
                 )
             } catch {
@@ -216,7 +213,7 @@ final class SupabaseTests: XCTestCase {
             XCTAssertEqual(profile.first_name, "Test")
             XCTAssertEqual(profile.last_name, "User")
             XCTAssertEqual(profile.phone_number, "1234567890")
-            XCTAssertEqual(profile.manual_location, "Nashville, TN")
+            XCTAssertEqual(profile.location, "Nashville, TN")
             XCTAssertEqual(profile.gym_memberships ?? [], ["Planet Fitness", "YMCA"])
         
             
