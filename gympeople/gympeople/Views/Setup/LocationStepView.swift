@@ -14,6 +14,8 @@ struct LocationStepView: View {
     @Binding var location: CLLocationCoordinate2D?
     @Binding var manualLocation: String
     var next: () -> Void
+    
+    @State private var showLocationAlert: Bool = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -38,11 +40,27 @@ struct LocationStepView: View {
             .disabled(location == nil && manualLocation.isEmpty)
         }
         .padding()
+        .alert(isPresented: $showLocationAlert) {
+            Alert(
+                title: Text("Location Not Enabled"),
+                message: Text("Please enable location access for this app in Settings, or enter your city or zip manually."),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+
     }
 
     private func fetchCurrentLocation() {
         self.location = locationVM.location
-        self.manualLocation = ""
+        if self.location == nil {
+            // show alert if location isn't available
+            showLocationAlert = true
+        } else {
+            print("Latitude:", self.location?.latitude ?? 0)
+            print("Longitude:", self.location?.longitude ?? 0)
+            // TODO: set manuallocation to reversegeocoded city
+            self.manualLocation = ""
+        }
     }
 }
 
