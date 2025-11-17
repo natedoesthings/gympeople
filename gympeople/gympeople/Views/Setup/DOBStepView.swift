@@ -30,7 +30,3 @@ struct DOBStepView: View {
         .padding()
     }
 }
-
-#Preview {
-    DOBStepView(dob: .constant(Date()), next: { print("Next") })
-}

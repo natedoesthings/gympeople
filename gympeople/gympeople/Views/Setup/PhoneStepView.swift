@@ -31,8 +31,3 @@ struct PhoneStepView: View {
         .padding()
     }
 }
-
-#Preview {
-    PhoneStepView(phone: .constant(""), next: { print("Next") })
-}
-

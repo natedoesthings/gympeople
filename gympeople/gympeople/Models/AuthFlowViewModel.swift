@@ -58,7 +58,7 @@ class AuthViewModel: ObservableObject {
             )
             
         } catch {
-            print("Google sign-in failed: \(error)")
+            LOG.error("Google sign-in failed: \(error)")
         }
     }
     
@@ -73,10 +73,10 @@ class AuthViewModel: ObservableObject {
                 password: password,
                 data: firstName != nil && lastName != nil ? ["name": .string(firstName! + " " + lastName!)] : nil
             )
-            print("Signed up: \(result.user.email ?? "")")
+            LOG.info("Signed up: \(result.user.email ?? "")")
         } catch {
             let loginErr = LoginError.from(error)
-            print("Sign-in failed:", loginErr.message)
+            LOG.error("Sign-in failed: \(loginErr.message)")
             self.loginError = loginErr
         }
     }
@@ -90,7 +90,7 @@ class AuthViewModel: ObservableObject {
             try await client.auth.signIn(email: email, password: password)
         } catch {
             let loginErr = LoginError.from(error)
-            print("Sign-in failed:", loginErr.message)
+            LOG.error("Sign-in failed: \(loginErr.message)")
             self.loginError = loginErr
             resetState()
         }
@@ -103,7 +103,7 @@ class AuthViewModel: ObservableObject {
         do {
             try await client.auth.session(from: url)
         } catch {
-            print("Auth callback failed: \(error)")
+            LOG.error("Auth callback failed: \(error)")
         }
     }
 
@@ -138,15 +138,15 @@ class AuthViewModel: ObservableObject {
                     .execute()
 
                 self.needsOnboarding = false
-                print("User already onboarded")
+                LOG.info("User already onboarded")
 
             } catch {
-                print("Error checking onboarding status:", error)
+                LOG.error("Error checking onboarding status: \(error)")
                 self.needsOnboarding = true
             }
 
         } catch {
-            print("Error getting session:", error)
+            LOG.error("Error getting session: \(error)")
             resetState()
         }
     }
@@ -164,7 +164,7 @@ class AuthViewModel: ObservableObject {
             try await client.auth.signOut()
             resetState()
         } catch {
-            print("Sign-out error: \(error)")
+            LOG.error("Sign-out error: \(error)")
         }
     }
     

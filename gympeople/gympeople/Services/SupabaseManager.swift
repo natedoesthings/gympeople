@@ -49,7 +49,7 @@ extension SupabaseManager {
 
     func fetchUserProfile() async throws -> UserProfile? {
         guard let userID = client.auth.currentUser?.id else {
-            print("No authenticated user found")
+            LOG.notice("No authenticated user found")
             return nil
         }
         
@@ -99,7 +99,7 @@ extension SupabaseManager {
     
     func updateUserName(newUserName: String) async throws {
         guard let userID = client.auth.currentUser?.id else {
-            print("No authenticated user found")
+            LOG.notice("No authenticated user found")
             return
         }
 

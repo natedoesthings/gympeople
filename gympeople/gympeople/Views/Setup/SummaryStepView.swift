@@ -72,10 +72,10 @@ struct SummaryStepView: View {
                 location: location,
                 gyms: gyms
             )
-            print("Profile saved successfully")
+            LOG.info("Profile saved successfully for \(email)")
             authVM.needsOnboarding = false
         } catch {
-            print("Error saving profile:", error)
+            LOG.error("Error saving profile: \(error)")
             submissionError = error.localizedDescription
         }
         isSubmitting = false

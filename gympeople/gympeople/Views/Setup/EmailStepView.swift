@@ -29,11 +29,3 @@ struct EmailStepView: View {
         .padding()
     }
 }
-
-#Preview {
-    EmailStepView(
-        email: .constant(""),
-        next: { print("Next tapped") }
-    )
-}
-

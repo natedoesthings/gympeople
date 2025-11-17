@@ -126,19 +126,19 @@ final class SupabaseTests: XCTestCase {
     private let testPassword = "Password123!"
     
     override func setUp() async throws {
-        print("Setting up...")
+        LOG.info("Setting up...")
         try await super.setUp()
         try await manager.client.auth.signOut()
     }
     
     override func tearDown() async throws {
-        print("Tearing down...")
+        LOG.info("Tearing down...")
         
         defer { super.tearDown() }
         
         do {
             if let userID = await manager.client.auth.currentUser?.id {
-                print("Cleaning up test user:", userID)
+                LOG.info("Cleaning up test user: \(userID)")
                 
                 try await manager.client
                     .from("user_profiles")
@@ -149,14 +149,14 @@ final class SupabaseTests: XCTestCase {
                 try await manager.client.auth.signOut()
             }
         } catch {
-            print("Cleanup failed:", error)
+            LOG.error("Cleanup failed: \(error)")
         }
     }
     
     // MARK: Test cases
     func testSavingFetchingProfile() async throws {
         do {
-            print("Before signing up", testEmail)
+            LOG.debug("Before signing up \(testEmail)")
             
             let signUpResult = try await manager.client.auth.signUp(
                 email: testEmail,
@@ -168,13 +168,13 @@ final class SupabaseTests: XCTestCase {
             if let session = signUpResult.session {
                 try await manager.client.auth.setSession(accessToken: session.accessToken, refreshToken: session.refreshToken)
             } else {
-                print("No session returned by signUp, reauthenticating manually...")
+                LOG.notice("No session returned by signUp, reauthenticating manually...")
                 try await manager.client.auth.signIn(email: testEmail, password: testPassword)
             }
             
             let user = signUpResult.user
-            print("Created test user with id:", user.id)
-            print("Created test email with email:", testEmail)
+            LOG.info("Created test user with id: \(user.id)")
+            LOG.info("Created test email with email: \(testEmail)")
             
             guard let user = await manager.client.auth.currentUser else {
                 XCTFail("No authenticated user found")
@@ -182,8 +182,8 @@ final class SupabaseTests: XCTestCase {
             }
                 
             let userEmail = user.email ?? ""
-            print("Current user", user.id)
-            print("Current email", userEmail)
+            LOG.debug("Current user \(user.id)")
+            LOG.debug("Current email \(userEmail)")
             
             do {
                 try await manager.saveUserProfile(
@@ -200,7 +200,7 @@ final class SupabaseTests: XCTestCase {
                 XCTFail("Failed to save profile: \(error)")
             }
             
-            print("Inserted profile for \(userEmail)")
+            LOG.info("Inserted profile for \(userEmail)")
 
             let fetchedProfile = try await manager.fetchUserProfile()
             XCTAssertNotNil(fetchedProfile, "Expected fetched profile to exist")

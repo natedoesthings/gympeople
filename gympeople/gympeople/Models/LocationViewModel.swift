@@ -33,7 +33,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Location error: \(error.localizedDescription)")
+        LOG.error("Location error: \(error.localizedDescription)")
     }
     
     func reverseGeoCode() async {
@@ -45,7 +45,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                     self.mapItem = mapItem ?? nil
                     
                 } catch  {
-                    print("Reverse Geocoding Error:", error)
+                    LOG.error("Reverse Geocoding Error: \(error)")
                 }
             }
         }

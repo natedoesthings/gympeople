@@ -63,5 +63,5 @@ struct GymStepView: View {
 }
 
 #Preview {
-    GymStepView(selectedGyms: .constant([]), next: { print("Next") })
+    GymStepView(selectedGyms: .constant([]), next: { LOG.debug("Next") })
 }
