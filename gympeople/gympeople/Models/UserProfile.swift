@@ -18,5 +18,6 @@ struct UserProfile: Codable, Identifiable {
     let phone_number: String
     let location: String?
     let gym_memberships: [String]?
+    let pfp_url: String?
     let created_at: Date?
 }

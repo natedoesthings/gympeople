@@ -8,10 +8,10 @@
 import Foundation
 import Supabase
 import CoreLocation
+import PhotosUI
 
 class SupabaseManager {
     static let shared = SupabaseManager()
-
     let client: SupabaseClient
 
     private init() {
@@ -97,7 +97,7 @@ extension SupabaseManager {
         return profile
     }
     
-    func updateUserName(newUserName: String) async throws {
+    func updateUserProfile(fields: [String: AnyEncodable]) async throws {
         guard let userID = client.auth.currentUser?.id else {
             LOG.notice("No authenticated user found")
             return
@@ -105,9 +105,56 @@ extension SupabaseManager {
 
         try await client
             .from("user_profiles")
-            .update(["user_name": newUserName])
+            .update(fields)
             .eq("id", value: userID)
             .execute()
     }
+    
+    func uploadProfilePicture(_ image: UIImage) async throws {
+        LOG.info("Updating Profile Picture...")
+        
+        guard let userID = client.auth.currentUser?.id else {
+            LOG.notice("No authenticated user found")
+            return
+        }
+        
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            throw NSError(domain: "ImageError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to JPEG."])
+        }
+
+        let fileName = "\(userID.uuidString).jpg"
+        let bucket = "profile_pictures"
+
+        // 1. Upload to storage
+        do {
+            try await client.storage
+                .from(bucket)
+                .upload(fileName, data: imageData, options: FileOptions(contentType: "image/jpeg", upsert: true))
+            
+            do {
+                // 2. Get public URL
+                let publicURL = try client.storage
+                    .from(bucket)
+                    .getPublicURL(path: fileName)
+                
+                do {
+                    // Save the profile picture
+                    try await updateUserProfile(fields: ["pfp_url": AnyEncodable(publicURL.absoluteString)])
+                } catch {
+                    LOG.error("Error updating profile with url \(error)")
+                }
+                
+            } catch {
+                LOG.error("Error grabbing public url \(error)")
+            }
+            
+        } catch {
+            LOG.error("Error uploading to storage \(error)")
+        }
+        
+        LOG.info("Profile Picture Updated!")
+    }
+    
+    
 
 }
