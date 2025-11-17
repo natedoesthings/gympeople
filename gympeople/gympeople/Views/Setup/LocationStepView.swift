@@ -39,7 +39,7 @@ struct LocationStepView: View {
                 next()
             }
             .buttonStyle(.borderedProminent)
-            .disabled(locationVM.address == nil && location.isEmpty)
+            .disabled(location.isEmpty)
         }
         .padding()
         .alert(isPresented: $showLocationAlert) {
@@ -55,11 +55,9 @@ struct LocationStepView: View {
     private func fetchCurrentLocation() async {
         await locationVM.reverseGeoCode()
         
-        if let address = locationVM.address {
+        if let mapItem = locationVM.mapItem {
             // TODO: set manuallocation to reversegeocoded city
-            print("full", address.fullAddress)
-            print("short", address.shortAddress)
-            self.location = ""
+            self.location = mapItem.addressRepresentations?.cityWithContext ?? ""
         } else {
             // show alert if location isn't available
             showLocationAlert = true

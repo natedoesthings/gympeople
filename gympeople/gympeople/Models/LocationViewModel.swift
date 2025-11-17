@@ -11,7 +11,7 @@ import Combine
 import MapKit
 
 class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
-    @Published var address: MKAddress?
+    @Published var mapItem: MKMapItem?
     private var location: CLLocation?
     private let manager = CLLocationManager()
 
@@ -42,7 +42,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                 do {
                     let mapItems = try await request.mapItems
                     let mapItem = mapItems.first
-                    self.address = mapItem?.address ?? nil
+                    self.mapItem = mapItem ?? nil
                     
                 } catch  {
                     print("Reverse Geocoding Error:", error)
