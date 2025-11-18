@@ -19,6 +19,9 @@ struct SummaryStepView: View {
     let phone: String
     let location: String
     let gyms: [String]
+    
+    var onDone: () -> Void
+    
 
     @State private var isSubmitting = false
     @State private var submissionError: String?
@@ -49,6 +52,7 @@ struct SummaryStepView: View {
 
                 Button(isSubmitting ? "Submitting..." : "Submit") {
                     Task { await handleSubmit() }
+                    
                 }
                 .disabled(isSubmitting)
                 .buttonStyle(.borderedProminent)
@@ -73,7 +77,8 @@ struct SummaryStepView: View {
                 gyms: gyms
             )
             LOG.info("Profile saved successfully for \(email)")
-            authVM.needsOnboarding = false
+            
+            onDone()
         } catch {
             LOG.error("Error saving profile: \(error)")
             submissionError = error.localizedDescription

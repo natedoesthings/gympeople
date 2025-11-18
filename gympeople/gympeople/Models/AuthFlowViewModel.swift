@@ -18,7 +18,7 @@ class AuthViewModel: ObservableObject {
     @Published var lastName: String = ""
     @Published var userEmail: String = ""
     @Published var loginError: LoginError? = nil
-    @Published var needsOnboarding: Bool = true
+    @Published var needsOnboarding: Bool = false
 
 
     private let client = SupabaseManager.shared.client
@@ -155,7 +155,7 @@ class AuthViewModel: ObservableObject {
         isSignedIn = false
         firstName = ""
         userEmail = ""
-        needsOnboarding = true
+        needsOnboarding = false
         isLoading = false
     }
 

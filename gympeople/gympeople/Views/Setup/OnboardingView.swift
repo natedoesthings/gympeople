@@ -21,45 +21,57 @@ struct OnboardingView: View {
     @State private var phone: String = ""
     @State private var location: String = ""
     @State private var gymMemberships: [String] = []
+    
+    // NEW
+    var onCancel: () -> Void
+    var onFinished: () -> Void
 
     var body: some View {
-        NavigationStack(path: $path) {
-            FirstNameStepView(firstName: $firstName, next: { path.append(.lastName) })
-                .navigationDestination(for: OnboardingStep.self) { step in
-                    switch step {
-                    case .lastName:
-                        LastNameStepView(lastName: $lastName, next: { path.append(.userName) })
-                    case .userName:
-                        UserNameStepView(userName: $userName, next: { path.append(.dob) })
-                    case .dob:
-                        DOBStepView(dob: $dob, next: { path.append(.phone) })
-                    case .phone:
-                        PhoneStepView(phone: $phone, next: { path.append(.location) })
-                    case .location:
-                        LocationStepView(location: $location, next: { path.append(.gyms) })
-                    case .gyms:
-                        GymStepView(selectedGyms: $gymMemberships, next: { path.append(.summary) })
-                    case .summary:
-                        SummaryStepView(
-                            firstName: firstName,
-                            lastName: lastName,
-                            userName: userName,
-                            email: email,
-                            dob: dob,
-                            phone: phone,
-                            location: location,
-                            gyms: gymMemberships,
-                        )
-                    default:
-                        EmptyView()
+        ZStack {
+            NavigationStack(path: $path) {
+                FirstNameStepView(firstName: $firstName, next: { path.append(.lastName) })
+                    .navigationDestination(for: OnboardingStep.self) { step in
+                        switch step {
+                        case .lastName:
+                            LastNameStepView(lastName: $lastName, next: { path.append(.userName) })
+                        case .userName:
+                            UserNameStepView(userName: $userName, next: { path.append(.dob) })
+                        case .dob:
+                            DOBStepView(dob: $dob, next: { path.append(.phone) })
+                        case .phone:
+                            PhoneStepView(phone: $phone, next: { path.append(.location) })
+                        case .location:
+                            LocationStepView(location: $location, next: { path.append(.gyms) })
+                        case .gyms:
+                            GymStepView(selectedGyms: $gymMemberships, next: { path.append(.summary) })
+                        case .summary:
+                            SummaryStepView(
+                                firstName: firstName,
+                                lastName: lastName,
+                                userName: userName,
+                                email: email,
+                                dob: dob,
+                                phone: phone,
+                                location: location,
+                                gyms: gymMemberships,
+                                onDone: {
+                                    onFinished()
+                                }
+                            )
+                        default:
+                            EmptyView()
+                        }
                     }
-                }
-                .navigationTitle("Onboarding")
+                    .navigationBarBackButtonHidden(true)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Back to Login") {
+                                onCancel()
+                            }
+                        }
+                    }
+            }
         }
-        Button("Sign Out") {
-            Task { await authVM.signOut() }
-        }
-        .foregroundColor(.red)
     }
     
     

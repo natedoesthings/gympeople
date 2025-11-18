@@ -17,6 +17,9 @@ struct ProfileView: View {
     @State private var avatarImage: UIImage?
     @State private var photosPickerItem: PhotosPickerItem?
     
+    @State private var pfpIsLoading: Bool = false
+    @State private var hasLoadedProfile: Bool = false
+    
     let manager = SupabaseManager.shared
     
     var body: some View {
@@ -24,13 +27,16 @@ struct ProfileView: View {
             if let _ = userProfile {
                 // Profile picture displayer and selector
                 PhotosPicker(selection: $photosPickerItem, matching: .images) {
-                    Image(uiImage: avatarImage ?? UIImage(systemName: "person.circle.fill")!)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 100, height: 100)
-                        .clipShape(.circle)
+                    if !pfpIsLoading {
+                        Image(uiImage: avatarImage ?? UIImage(systemName: "person.circle.fill")!)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 100, height: 100)
+                            .clipShape(.circle)
+                    } else {
+                        ProgressView()
+                    }
                 }
-                
                 
                 TextField("User Name", text: $userName)
                     .textFieldStyle(.roundedBorder)
@@ -55,8 +61,11 @@ struct ProfileView: View {
             }
         }
         .padding()
-        .task {
-            await loadProfile()
+        .onAppear {
+            if !hasLoadedProfile {
+                hasLoadedProfile = true
+                Task { await loadProfile() }
+            }
         }
         .onChange(of: photosPickerItem) { _,_ in
             Task {
@@ -86,12 +95,16 @@ struct ProfileView: View {
             userName = userProfile?.user_name ?? ""
             
             // Update image from url
+            pfpIsLoading = true
+            
             if let pfpURLString = userProfile?.pfp_url, let url = URL(string: pfpURLString) {
                 if let (data, _) = try? await URLSession.shared.data(from: url),
                    let image = UIImage(data: data) {
                     avatarImage = image
                 }
             }
+            
+            pfpIsLoading = false
             
         } catch {
             errorMessage = error.localizedDescription

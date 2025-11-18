@@ -13,7 +13,7 @@ struct FirstNameStepView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Confirm your name")
+            Text("Confirm your First Name")
                 .font(.title2)
             TextField("First name", text: $firstName)
                 .textFieldStyle(.roundedBorder)
@@ -35,7 +35,7 @@ struct LastNameStepView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Confirm your name")
+            Text("Confirm your Last Name")
                 .font(.title2)
             TextField("Last name", text: $lastName)
                 .textFieldStyle(.roundedBorder)
@@ -57,7 +57,7 @@ struct UserNameStepView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Confirm your name")
+            Text("Create a UserName")
                 .font(.title2)
             TextField("Unique User Name", text: $userName)
                 .textFieldStyle(.roundedBorder)

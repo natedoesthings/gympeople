@@ -9,11 +9,11 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject var authVM: AuthViewModel
+    @State private var showOnboarding = false
     
     var body: some View {
         VStack(spacing: 24) {
             if authVM.isLoading {
-                // Small loader while backend catches up
                 VStack {
                     ProgressView("Signing in...")
                         .progressViewStyle(CircularProgressViewStyle(tint: .blue))
@@ -25,11 +25,42 @@ struct LoginView: View {
                 .transition(.opacity)
             } else if !authVM.isSignedIn {
                 SignInView()
-            } else if authVM.needsOnboarding {
-                OnboardingView(firstName: $authVM.firstName, lastName: $authVM.lastName, email: $authVM.userEmail)
-            } else { // signed in and passed onboarding
-                HomeView()
+            } else {
+                
+                if !authVM.needsOnboarding {
+                    HomeView()
+                } else {
+                    // Possible that user still needs to onboard
+                    EmptyView()
+                }
             }
+        }
+        .onChange(of: authVM.needsOnboarding) { _, needsOnboarding in
+            // When user signs in and needs onboarding, present the flow
+            if needsOnboarding && authVM.isSignedIn {
+                showOnboarding = true
+            }
+        }
+        .fullScreenCover(isPresented: $showOnboarding, onDismiss: {
+            // If onboarding was dismissed but still marked as needed,
+            // user backed out. Sign them out.
+            if authVM.needsOnboarding {
+                Task { await authVM.signOut() }
+            }
+        }) {
+            OnboardingView(
+                firstName: $authVM.firstName,
+                lastName: $authVM.lastName,
+                email: $authVM.userEmail,
+                onCancel: {
+                    showOnboarding = false
+                    Task { await authVM.signOut() }
+                },
+                onFinished: {
+                    authVM.needsOnboarding = false
+                    showOnboarding = false
+                }
+            )
         }
         .alert(item: $authVM.loginError) { loginError in
             Alert(
@@ -43,6 +74,7 @@ struct LoginView: View {
         .animation(.easeInOut, value: authVM.isLoading)
     }
 }
+
 
 struct SignInView: View {
     @EnvironmentObject var authVM: AuthViewModel
