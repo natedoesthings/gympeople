@@ -31,6 +31,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FE7C6AC92ECC05A30073CF85 /* Exceptions for "gympeople" folder in "gympeopleTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Launch Screen.storyboard",
+			);
+			target = FE92F8662EC5BFDD006DCD66 /* gympeopleTests */;
+		};
 		FE92F83D2EC476F3006DCD66 /* Exceptions for "gympeople" folder in "gympeople" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -45,6 +52,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				FE92F83D2EC476F3006DCD66 /* Exceptions for "gympeople" folder in "gympeople" target */,
+				FE7C6AC92ECC05A30073CF85 /* Exceptions for "gympeople" folder in "gympeopleTests" target */,
 			);
 			path = gympeople;
 			sourceTree = "<group>";
@@ -411,7 +419,7 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app is requesting your location to help find users around your area.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -451,7 +459,7 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app is requesting your location to help find users around your area.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;

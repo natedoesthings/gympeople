@@ -108,12 +108,17 @@ class AuthViewModel: ObservableObject {
     }
 
     private func updateUserFromSession() async {
+        LOG.debug("Updating User Session")
         isLoading = true
         defer { isLoading = false }
         
         do {
+            LOG.debug("Searching for Session")
+            
             let session = try await client.auth.session
             let user = session.user
+            
+            LOG.debug("Session Found for User: \(user.id)")
 
             // Update basic user info
             if let nameField = user.userMetadata["name"],
@@ -130,6 +135,7 @@ class AuthViewModel: ObservableObject {
 
             // Check if the user has completed onboarding
             do {
+                LOG.debug("Searching for onboarding record for \(user.id)")
                 let _ = try await client
                     .from("user_profiles")
                     .select()
@@ -161,8 +167,10 @@ class AuthViewModel: ObservableObject {
 
     func signOut() async {
         do {
+            LOG.debug("Signing Out \(userEmail)")
             try await client.auth.signOut()
             resetState()
+            LOG.debug("Signed Out \(userEmail)")
         } catch {
             LOG.error("Sign-out error: \(error)")
         }
