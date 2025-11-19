@@ -65,13 +65,13 @@ struct LocationStepView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(!location.isEmpty ? "BrandOrange" : "SecondaryColor"))
+                    .background(!location.isEmpty ? Color.brandOrange : Color.standardSecondary)
                     .cornerRadius(20)
             }
             .frame(width: 300)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             .padding(.bottom, 50)
-            .disabled(location.isEmpty)
+//            .disabled(location.isEmpty)
             
         }
         .alert(isPresented: $showLocationAlert) {

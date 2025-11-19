@@ -14,3 +14,5 @@ let GYMS = [
     "Anytime Fitness"
     
 ]
+
+//let DUMMY_USER_PROFILE =

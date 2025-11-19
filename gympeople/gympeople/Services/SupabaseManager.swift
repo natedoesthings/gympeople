@@ -38,6 +38,7 @@ extension SupabaseManager {
             "first_name": AnyEncodable(firstName),
             "last_name": AnyEncodable(lastName),
             "user_name": AnyEncodable(userName),
+            "biography": AnyEncodable(""),
             "email": AnyEncodable(email),
             "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: dob)),
             "phone_number": AnyEncodable(phone),
@@ -61,6 +62,7 @@ extension SupabaseManager {
             .execute()
         
         let data = response.data
+        
         let decoder = JSONDecoder()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ" // handles full timestamps
@@ -97,11 +99,38 @@ extension SupabaseManager {
         return profile
     }
     
+    // Update individual fields
     func updateUserProfile(fields: [String: AnyEncodable]) async throws {
         guard let userID = client.auth.currentUser?.id else {
             LOG.notice("No authenticated user found")
             return
         }
+
+        try await client
+            .from("user_profiles")
+            .update(fields)
+            .eq("id", value: userID)
+            .execute()
+    }
+    
+    // Update whole profile
+    func updateUserProfile(userProfile: UserProfile) async throws {
+        guard let userID = client.auth.currentUser?.id else {
+            LOG.notice("No authenticated user found")
+            return
+        }
+        
+        let fields: [String: AnyEncodable] = [
+            "first_name": AnyEncodable(userProfile.first_name),
+            "last_name": AnyEncodable(userProfile.last_name),
+            "user_name": AnyEncodable(userProfile.user_name),
+            "biography": AnyEncodable(userProfile.biography),
+            "email": AnyEncodable(userProfile.email),
+            "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: userProfile.date_of_birth)),
+            "phone_number": AnyEncodable(userProfile.phone_number),
+            "location": AnyEncodable(userProfile.location ?? nil),
+            "gym_memberships": AnyEncodable(userProfile.gym_memberships)
+        ]
 
         try await client
             .from("user_profiles")

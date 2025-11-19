@@ -54,7 +54,7 @@ struct FirstNameStepView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(validFirstName ? "BrandOrange" : "SecondaryColor"))
+                    .background(validFirstName ? Color.brandOrange : Color.standardSecondary)
                     .cornerRadius(20)
             }
             .frame(width: 300)
@@ -113,7 +113,7 @@ struct LastNameStepView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(validLastName ? "BrandOrange" : "SecondaryColor"))
+                    .background(validLastName ? Color.brandOrange : Color.standardSecondary)
                     .cornerRadius(20)
             }
             .frame(width: 300)
@@ -172,7 +172,7 @@ struct UserNameStepView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(validUserName ? "BrandOrange" : "SecondaryColor"))
+                    .background(validUserName ? Color.brandOrange : Color.standardSecondary)
                     .cornerRadius(20)
             }
             .frame(width: 300)

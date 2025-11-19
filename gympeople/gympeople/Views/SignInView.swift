@@ -36,7 +36,7 @@ struct SignInView: View {
                 
                 Text("Find your crew today!")
                     .font(.caption)
-                    .foregroundStyle(Color("SecondaryColor"))
+                    .foregroundStyle(.standardSecondary)
             }
             
             // --- FORM ---
@@ -46,9 +46,10 @@ struct SignInView: View {
                     googleSignInButton()
                 }
                 
+                
                 Text("or continue with email")
                     .font(.caption)
-                    .foregroundStyle(Color("SecondaryColor"))
+                    .foregroundStyle(.standardSecondary)
                 
                 VStack(alignment: .leading) {
                     Text("Email")
@@ -91,7 +92,7 @@ struct SignInView: View {
                         } label: {
                             Text("Forgot Password?")
                                 .font(.caption)
-                                .foregroundStyle(Color("SecondaryColor"))
+                                .foregroundStyle(.standardSecondary)
                         }
                         
                     }
@@ -113,7 +114,7 @@ struct SignInView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(email.isEmpty || !validEmail ? Color("SecondaryColor") : Color("BrandOrange"))
+                            .background(email.isEmpty || !validEmail ? Color.standardSecondary : Color.brandOrange)
                             .cornerRadius(20)
                     }
                     .frame(width: 300)
@@ -133,7 +134,7 @@ struct SignInView: View {
                         
                     } label: {
                         Text(isCreatingAccount ? "Sign in" : "Sign up")
-                            .foregroundStyle(Color("InvertedPrimaryColor"))
+                            .foregroundStyle(.invertedPrimary)
                             .fontWeight(.semibold)
                         
                     }

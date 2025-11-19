@@ -22,7 +22,7 @@ struct PhoneStepView: View {
                     .font(.title2)
                 
                 HStack {
-                    Image(systemName: "person")
+                    Image(systemName: "phone")
                         .foregroundColor(.gray)
                         .padding(.leading, 10)
                     
@@ -38,7 +38,7 @@ struct PhoneStepView: View {
                 )
                 
                 if !validPhoneNumber {
-                    Text("First name is empty.")
+                    Text("Phone number is empty.")
                         .font(.caption)
                         .foregroundStyle(Color("Error"))
                 }
@@ -54,7 +54,7 @@ struct PhoneStepView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(validPhoneNumber ? "BrandOrange" : "SecondaryColor"))
+                    .background(validPhoneNumber ? Color.brandOrange : Color.standardSecondary)
                     .cornerRadius(20)
             }
             .frame(width: 300)

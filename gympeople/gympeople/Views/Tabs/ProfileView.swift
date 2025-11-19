@@ -10,9 +10,11 @@ import PhotosUI
 
 struct ProfileView: View {
     @State private var userProfile: UserProfile?
-    @State private var userName = ""
+//    @State private var firstName: String = "Nathanael"
+//    @State private var lastName: String = "Tesfaye"
+//    @State private var userName: String = "Nate"
+//    @State private var gyms: [String] = ["YMCA"]
     @State private var errorMessage: String?
-    @State private var successMessage: String?
     
     @State private var avatarImage: UIImage?
     @State private var photosPickerItem: PhotosPickerItem?
@@ -20,39 +22,96 @@ struct ProfileView: View {
     @State private var pfpIsLoading: Bool = false
     @State private var hasLoadedProfile: Bool = false
     
+    @State private var showProfileEditingPage: Bool = false
+    
     let manager = SupabaseManager.shared
     
     var body: some View {
         VStack(spacing: 20) {
-            if userProfile != nil {
+            if let userProfile = userProfile {
                 // Profile picture displayer and selector
-                PhotosPicker(selection: $photosPickerItem, matching: .images) {
-                    if !pfpIsLoading {
-                        Image(uiImage: avatarImage ?? UIImage(systemName: "person.circle.fill")!)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 100, height: 100)
-                            .clipShape(.circle)
-                    } else {
-                        ProgressView()
-                    }
-                }
-                
-                TextField("User Name", text: $userName)
-                    .textFieldStyle(.roundedBorder)
-                    .padding()
+                NavigationStack {
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        
+                        PhotosPicker(selection: $photosPickerItem, matching: .images) {
+                            if !pfpIsLoading {
+                                Image(uiImage: avatarImage ?? UIImage(systemName: "person.circle.fill")!)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 75, height: 75)
+                                    .clipShape(.circle)
+                            } else {
+                                Image(uiImage: UIImage(systemName: "person.circle.fill")!)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 75, height: 75)
+                                    .clipShape(.circle)
+                            }
+                        }
+                        
+                        HStack {
+                            Text(userProfile.first_name)
+                            Text(userProfile.last_name)
+                        }
+                        .padding(.top, 5)
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("@\(userProfile.user_name)")
+                            if !userProfile.biography.isEmpty {
+                                Text("\(userProfile.biography)")
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundStyle(Color.standardSecondary)
+                        
+                        VStack(alignment: .leading, spacing: 15) {
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    if let gyms = userProfile.gym_memberships {
+                                        ForEach(gyms, id: \.self) { gym in
+                                            gymTagButton(gymTagType: .gym(gym: gym))
+                                        }
+                                        gymTagButton(gymTagType: .plus)
+                                    }
+                                    else {
+                                        gymTagButton(gymTagType: .none)
+                                    }
+                                }
+                                .padding(1)
+                            }
+                        }
+                        .padding(.vertical, 15)
+                        
+                        
 
-                Button("Save Changes") {
-                    Task {
-                        await updateUserName()
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            HStack {
+                                Button {
+                                    showProfileEditingPage = true
+                                } label: {
+                                    Image(systemName: "pencil")
+                                }
+                                
+                                NavigationLink {
+                                    ProfileSettingsPageView()
+                                } label: {
+                                    Image(systemName: "slider.horizontal.3")
+                                }
+                            }
+                        }
                     }
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(userName.isEmpty)
-                
-                if let success = successMessage {
-                    Text(success).foregroundColor(.green)
+                .sheet(isPresented: $showProfileEditingPage) {
+                    ProfileEditingPageView(userProfile: $userProfile, hasLoadedProfile: $hasLoadedProfile)
                 }
+                
             } else if let error = errorMessage {
                 Text("Error: \(error)")
                     .foregroundColor(.red)
@@ -60,7 +119,6 @@ struct ProfileView: View {
                 ProgressView("Loading Profile...")
             }
         }
-        .padding()
         .onAppear {
             if !hasLoadedProfile {
                 hasLoadedProfile = true
@@ -91,9 +149,9 @@ struct ProfileView: View {
     
     private func loadProfile() async {
         do {
+            LOG.debug("Fetching user profile")
             userProfile = try await manager.fetchUserProfile()
-            userName = userProfile?.user_name ?? ""
-            
+            LOG.debug("Fetched user profile")
             // Update image from url
             pfpIsLoading = true
             
@@ -107,16 +165,44 @@ struct ProfileView: View {
             pfpIsLoading = false
             
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.localizedDescription.debugDescription
         }
     }
     
-    private func updateUserName() async {
-        do {
-            try await manager.updateUserProfile(fields: ["user_name": AnyEncodable(userName)])
-            successMessage = "Profile updated successfully!"
-        } catch {
-            errorMessage = error.localizedDescription
+    @ViewBuilder
+    private func gymTagButton(gymTagType: GymTagType) -> some View {
+        Button {
+            showProfileEditingPage = true
+        } label: {
+            HStack {
+                switch gymTagType {
+                case .none:
+                    Text("Add gyms")
+                    Image(systemName: "plus")
+                case .gym(let gym):
+                    Text("\(gym)")
+                case .plus:
+                    Image(systemName: "plus")
+                }
+                
+            }
+            .padding(5)
+            .font(.caption)
+            .foregroundColor(Color.brandOrange)
+            .cornerRadius(20)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.brandOrange, lineWidth: 2)
+            )
         }
     }
 }
+
+//#Preview {
+//    ProfileView()
+//}
+
+
+
+
+
