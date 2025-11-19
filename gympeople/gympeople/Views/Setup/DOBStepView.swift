@@ -12,21 +12,37 @@ struct DOBStepView: View {
     var next: () -> Void
 
     var body: some View {
-        VStack(spacing: 24) {
-            Text("When’s your birthday?")
-                .font(.title2)
-                .bold()
-
-            DatePicker("Select Date of Birth", selection: $dob, displayedComponents: .date)
-                .datePickerStyle(.wheel)
-                .labelsHidden()
-                .padding()
-
-            Button("Next") {
-                next()
+        ZStack {
+            VStack(spacing: 24) {
+                Text("When’s your birthday?")
+                    .font(.title2)
+                
+                DatePicker("Select Date of Birth", selection: $dob, displayedComponents: .date)
+                    .datePickerStyle(.wheel)
+                    .labelsHidden()
+                    .padding()
             }
-            .buttonStyle(.borderedProminent)
+            .padding()
+            
+            Button {
+                next()
+            } label: {
+                Text("Next")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color("BrandOrange"))
+                    .cornerRadius(20)
+            }
+            .frame(width: 300)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            .padding(.bottom, 50)
         }
-        .padding()
     }
+}
+
+
+#Preview {
+    DOBStepView(dob: .constant(Date()), next: {})
 }

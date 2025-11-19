@@ -16,5 +16,4 @@ enum OnboardingStep: Hashable {
     case phone
     case location
     case gyms
-    case summary
 }

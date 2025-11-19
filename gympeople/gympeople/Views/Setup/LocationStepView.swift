@@ -18,30 +18,63 @@ struct LocationStepView: View {
     @State private var showLocationAlert: Bool = false
 
     var body: some View {
-        VStack(spacing: 24) {
-            Text("Where do you work out?")
-                .font(.title2)
-                .bold()
-
-            TextField("Enter city or zip", text: $location)
-                .textFieldStyle(.roundedBorder)
-                .padding(.horizontal)
-
-            Button("Use My Location") {
-                Task  {
-                    await fetchCurrentLocation()
+        ZStack {
+            VStack(spacing: 24) {
+                Text("Where do you work out?")
+                    .font(.title2)
+                
+                
+                HStack {
+                    Image(systemName: "mappin")
+                        .foregroundColor(.gray)
+                        .padding(.leading, 10)
+                    
+                    TextField("Enter city or zip code", text: $location)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .padding(.vertical, 12)
                 }
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color(.systemGray4), lineWidth: 2)
+                )
+                
+                Button {
+                    Task  {
+                        await fetchCurrentLocation()
+                    }
+                } label: {
+                    HStack {
+                        Text("Use my location")
+                        Image(systemName: "location")
+                    }
+                    .foregroundStyle(Color("BrandOrange"))
+                }
+                .buttonStyle(.bordered)
+                .padding(.bottom)
+            
             }
-            .buttonStyle(.bordered)
-            .padding(.bottom)
-
-            Button("Next") {
+            .padding()
+            
+            Button {
                 next()
+            } label: {
+                Text("Next")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(!location.isEmpty ? "BrandOrange" : "SecondaryColor"))
+                    .cornerRadius(20)
             }
-            .buttonStyle(.borderedProminent)
+            .frame(width: 300)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            .padding(.bottom, 50)
             .disabled(location.isEmpty)
+            
+            
         }
-        .padding()
         .alert(isPresented: $showLocationAlert) {
             Alert(
                 title: Text("Location Not Enabled"),
@@ -65,3 +98,6 @@ struct LocationStepView: View {
     }
 }
 
+#Preview {
+    LocationStepView(location: .constant(""), next: {})
+}

@@ -62,15 +62,15 @@ struct LoginView: View {
                 }
             )
         }
-//        .alert(item: $authVM.loginError) { loginError in
-//            Alert(
-//                title: Text("Login Error"),
-//                message: Text(loginError.message),
-//                dismissButton: .default(Text("OK")) {
-//                    authVM.loginError = nil
-//                }
-//            )
-//        }
+        .alert(item: $authVM.loginError) { loginError in
+            Alert(
+                title: Text("Login Error"),
+                message: Text(loginError.message),
+                dismissButton: .default(Text("OK")) {
+                    authVM.loginError = nil
+                }
+            )
+        }
         .animation(.easeInOut, value: authVM.isLoading)
     }
 }

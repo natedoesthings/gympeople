@@ -8,47 +8,110 @@
 import SwiftUI
 
 struct GymStepView: View {
+    @EnvironmentObject var authVM: AuthViewModel
+    
     @Binding var selectedGyms: [String]
-    var next: () -> Void
-
-    private let gyms = [
-        "Planet Fitness",
-        "LA Fitness",
-        "YMCA",
-        "Gold’s Gym",
-        "Crunch Fitness",
-        "Anytime Fitness"
-    ]
+    let firstName: String
+    let lastName: String
+    let userName: String
+    let email: String
+    let dob: Date
+    let phone: String
+    let location: String
+    
+    var onDone: () -> Void
+    
+    @State private var searchField: String = ""
+    @State private var isSubmitting = false
+    @State private var submissionError: String?
+    
+    private var filteredGyms: [String] {
+        let query = searchField.trimmingCharacters(in: .whitespacesAndNewlines)
+        if query.isEmpty { return GYMS }
+        return GYMS.filter { $0.localizedCaseInsensitiveContains(query) }
+    }
 
     var body: some View {
-        VStack(spacing: 24) {
-            Text("Select your gym memberships")
-                .font(.title2)
-                .bold()
-
-            List(gyms, id: \.self) { gym in
-                Button {
-                    toggleSelection(for: gym)
-                } label: {
-                    HStack {
-                        Text(gym)
-                        Spacer()
-                        if selectedGyms.contains(gym) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.blue)
-                        } else {
-                            Image(systemName: "circle")
-                                .foregroundColor(.gray)
+        ZStack {
+            VStack(spacing: 24) {
+                Text("Find your gym memberships")
+                    .font(.title2)
+                
+                HStack {
+                    Image(systemName: "dumbbell")
+                        .foregroundColor(.gray)
+                        .padding(.leading, 10)
+                    
+                    TextField("Enter a gym...", text: $searchField)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .padding(.vertical, 12)
+                }
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color(.systemGray4), lineWidth: 2)
+                )
+                
+                if !filteredGyms.isEmpty {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ScrollView {
+                            ForEach(filteredGyms, id: \.self) { gym in
+                                Button {
+                                    toggleSelection(for: gym)
+                                    // Optional: clear search after selecting
+                                    searchField = ""
+                                } label: {
+                                    HStack {
+                                        Text(gym)
+                                            .foregroundStyle(.black)
+                                        Spacer()
+                                        if selectedGyms.contains(gym) {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundStyle(Color.brandOrange)
+                                        }
+                                    }
+                                }
+                                Divider()
+                            }
                         }
+                        .frame(height: selectedGyms.isEmpty ? 420 : 300)
+                        
                     }
                 }
             }
-            .listStyle(.insetGrouped)
+            .padding(.top, 80)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            
 
-            Button("Next") {
-                next()
+            Button {
+                Task { await handleSubmit() }
+            } label: {
+                Text("Done")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color("BrandOrange"))
+                    .cornerRadius(20)
             }
-            .buttonStyle(.borderedProminent)
+            .frame(width: 300)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            .padding(.bottom, 50)
+            
+            // TODO: Fix skip button 
+//            Button {
+//                Task {
+//                    selectedGyms = []
+//                    await handleSubmit()
+//                }
+//            } label: {
+//                Text("Skip")
+//                    .padding(.top, -55)
+//                    .foregroundStyle(Color.brandOrange)
+//                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+//            }
+            
         }
         .padding()
     }
@@ -60,8 +123,33 @@ struct GymStepView: View {
             selectedGyms.append(gym)
         }
     }
+    
+    private func handleSubmit() async {
+        isSubmitting = true
+        submissionError = nil
+        do {
+            try await SupabaseManager.shared.saveUserProfile(
+                firstName: firstName,
+                lastName: lastName,
+                userName: userName,
+                email: email,
+                dob: dob,
+                phone: phone,
+                location: location,
+                gyms: selectedGyms
+            )
+            LOG.info("Profile saved successfully for \(email)")
+            
+            onDone()
+        } catch {
+            LOG.error("Error saving profile: \(error)")
+            submissionError = error.localizedDescription
+        }
+        isSubmitting = false
+    }
+    
 }
 
-#Preview {
-    GymStepView(selectedGyms: .constant([]), next: { LOG.debug("Next") })
-}
+//#Preview {
+//    GymStepView(selectedGyms: .constant([]), next: { LOG.debug("Next") })
+//}

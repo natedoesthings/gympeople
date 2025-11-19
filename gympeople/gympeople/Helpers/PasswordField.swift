@@ -37,9 +37,7 @@ struct PasswordField: View {
                 }
                 
                 Button {
-                    withAnimation {
-                        isVisible.toggle()
-                    }
+                    isVisible.toggle()
                 } label: {
                     Image(systemName: isVisible ? "eye.slash" : "eye")
                         .foregroundColor(.gray)

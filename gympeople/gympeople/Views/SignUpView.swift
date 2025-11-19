@@ -56,7 +56,6 @@ struct SignUpView: View {
                                 .padding(.leading, 10)
                             
                             TextField("First Name", text: $firstName)
-                                .keyboardType(.emailAddress)
                                 .autocapitalization(.none)
                                 .disableAutocorrection(true)
                                 .padding(.vertical, 12)
@@ -81,7 +80,6 @@ struct SignUpView: View {
                                 .padding(.leading, 10)
                             
                             TextField("Last Name", text: $lastName)
-                                .keyboardType(.emailAddress)
                                 .autocapitalization(.none)
                                 .disableAutocorrection(true)
                                 .padding(.vertical, 12)

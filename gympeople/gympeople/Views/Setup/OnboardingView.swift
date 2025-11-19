@@ -43,9 +43,8 @@ struct OnboardingView: View {
                         case .location:
                             LocationStepView(location: $location, next: { path.append(.gyms) })
                         case .gyms:
-                            GymStepView(selectedGyms: $gymMemberships, next: { path.append(.summary) })
-                        case .summary:
-                            SummaryStepView(
+                            GymStepView(
+                                selectedGyms: $gymMemberships,
                                 firstName: firstName,
                                 lastName: lastName,
                                 userName: userName,
@@ -53,10 +52,7 @@ struct OnboardingView: View {
                                 dob: dob,
                                 phone: phone,
                                 location: location,
-                                gyms: gymMemberships,
-                                onDone: {
-                                    onFinished()
-                                }
+                                onDone: { onFinished() }
                             )
                         default:
                             EmptyView()
@@ -71,8 +67,28 @@ struct OnboardingView: View {
                         }
                     }
             }
+            // TODO: Logo needs to be placed in same location across ui
+            HStack {
+                Spacer()
+                Image("gympeople_light_no_bg")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+                    .padding(.top, 55)
+                    .padding(.trailing, 20)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+
+            
         }
+        
     }
     
-    
 }
+
+#Preview {
+    OnboardingView(firstName: .constant(""), lastName: .constant(""), email: .constant(""), onCancel: {}, onFinished: {})
+}
+
+
+

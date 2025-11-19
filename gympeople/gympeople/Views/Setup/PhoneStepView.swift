@@ -9,25 +9,59 @@ import SwiftUI
 
 struct PhoneStepView: View {
     @Binding var phone: String
+    var validPhoneNumber: Bool {
+        !phone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
     var next: () -> Void
 
     var body: some View {
-        VStack(spacing: 24) {
-            Text("Add your phone number")
-                .font(.title2)
-                .bold()
-
-            TextField("e.g. 615-555-1234", text: $phone)
-                .keyboardType(.phonePad)
-                .textFieldStyle(.roundedBorder)
-                .padding()
-
-            Button("Next") {
-                next()
+        ZStack {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Add your phone number.")
+                    .font(.title2)
+                
+                HStack {
+                    Image(systemName: "person")
+                        .foregroundColor(.gray)
+                        .padding(.leading, 10)
+                    
+                    TextField("e.g. 615-555-1234", text: $phone)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .padding(.vertical, 12)
+                }
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color(.systemGray4), lineWidth: 2)
+                )
+                
+                if !validPhoneNumber {
+                    Text("First name is empty.")
+                        .font(.caption)
+                        .foregroundStyle(Color("Error"))
+                }
+                
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(phone.isEmpty)
+            .padding()
+            
+            Button {
+                next()
+            } label: {
+                Text("Next")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(validPhoneNumber ? "BrandOrange" : "SecondaryColor"))
+                    .cornerRadius(20)
+            }
+            .frame(width: 300)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            .padding(.bottom, 50)
+            .disabled(!validPhoneNumber)
         }
-        .padding()
+        
     }
 }

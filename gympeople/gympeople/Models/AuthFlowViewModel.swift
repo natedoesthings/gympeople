@@ -17,9 +17,8 @@ class AuthViewModel: ObservableObject {
     @Published var firstName: String = ""
     @Published var lastName: String = ""
     @Published var userEmail: String = ""
-    @Published var loginError: LoginError? = nil
+    @Published var loginError: LoginError?
     @Published var needsOnboarding: Bool = false
-
 
     private let client = SupabaseManager.shared.client
     private var authStateTask: Task<Void, Never>?
