@@ -74,4 +74,3 @@ struct LoginView: View {
         .animation(.easeInOut, value: authVM.isLoading)
     }
 }
-

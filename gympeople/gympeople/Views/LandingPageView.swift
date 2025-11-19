@@ -19,7 +19,6 @@ struct LandingPageView: View {
                         .scaledToFit()
                         .frame(height: 300)
                     
-                    
                     Text("Welcome to GymPeople!")
                         .font(.title2.bold())
                         .padding(.vertical, 5)
@@ -30,7 +29,6 @@ struct LandingPageView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
-                
                 
                 NavigationLink {
                     // action
@@ -46,8 +44,6 @@ struct LandingPageView: View {
                 }
                 .frame(width: 300)
                 .padding(.vertical, 40)
-                
-                
                 
             }
             .padding()

@@ -24,7 +24,7 @@ struct ProfileView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            if let _ = userProfile {
+            if userProfile != nil {
                 // Profile picture displayer and selector
                 PhotosPicker(selection: $photosPickerItem, matching: .images) {
                     if !pfpIsLoading {
@@ -67,7 +67,7 @@ struct ProfileView: View {
                 Task { await loadProfile() }
             }
         }
-        .onChange(of: photosPickerItem) { _,_ in
+        .onChange(of: photosPickerItem) { _, _ in
             Task {
                 if let photosPickerItem {
                     if let data = try? await photosPickerItem.loadTransferable(type: Data.self) {

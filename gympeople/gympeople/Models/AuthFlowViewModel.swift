@@ -135,7 +135,7 @@ class AuthViewModel: ObservableObject {
             // Check if the user has completed onboarding
             do {
                 LOG.debug("Searching for onboarding record for \(user.id)")
-                let _ = try await client
+                _ = try await client
                     .from("user_profiles")
                     .select()
                     .eq("id", value: user.id)
@@ -174,6 +174,5 @@ class AuthViewModel: ObservableObject {
             LOG.error("Sign-out error: \(error)")
         }
     }
-    
     
 }

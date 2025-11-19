@@ -64,7 +64,6 @@ struct SignInView: View {
                             .disableAutocorrection(true)
                             .padding(.vertical, 12)
                         
-                        
                     }
                     .cornerRadius(12)
                     .overlay(
@@ -148,7 +147,7 @@ struct SignInView: View {
             Spacer()
             
         }
-        .onChange(of: email) { _,_ in
+        .onChange(of: email) { _, _ in
             let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
             let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
             validEmail = emailPredicate.evaluate(with: email)

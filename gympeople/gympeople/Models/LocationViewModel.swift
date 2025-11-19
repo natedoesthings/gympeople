@@ -44,7 +44,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                     let mapItem = mapItems.first
                     self.mapItem = mapItem ?? nil
                     
-                } catch  {
+                } catch {
                     LOG.error("Reverse Geocoding Error: \(error)")
                 }
             }

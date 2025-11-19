@@ -79,7 +79,6 @@ struct OnboardingView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
 
-            
         }
         
     }
@@ -89,6 +88,3 @@ struct OnboardingView: View {
 #Preview {
     OnboardingView(firstName: .constant(""), lastName: .constant(""), email: .constant(""), onCancel: {}, onFinished: {})
 }
-
-
-

@@ -83,7 +83,6 @@ struct GymStepView: View {
             .padding(.top, 80)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             
-
             Button {
                 Task { await handleSubmit() }
             } label: {
@@ -150,6 +149,6 @@ struct GymStepView: View {
     
 }
 
-//#Preview {
+// #Preview {
 //    GymStepView(selectedGyms: .constant([]), next: { LOG.debug("Next") })
-//}
+// }

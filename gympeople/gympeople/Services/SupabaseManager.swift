@@ -155,6 +155,4 @@ extension SupabaseManager {
         LOG.info("Profile Picture Updated!")
     }
     
-    
-
 }

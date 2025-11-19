@@ -23,7 +23,6 @@ struct LocationStepView: View {
                 Text("Where do you work out?")
                     .font(.title2)
                 
-                
                 HStack {
                     Image(systemName: "mappin")
                         .foregroundColor(.gray)
@@ -41,7 +40,7 @@ struct LocationStepView: View {
                 )
                 
                 Button {
-                    Task  {
+                    Task {
                         await fetchCurrentLocation()
                     }
                 } label: {
@@ -49,10 +48,11 @@ struct LocationStepView: View {
                         Text("Use my location")
                         Image(systemName: "location")
                     }
-                    .foregroundStyle(Color("BrandOrange"))
+                    .foregroundStyle(.invertedPrimary)
                 }
                 .buttonStyle(.bordered)
                 .padding(.bottom)
+                
             
             }
             .padding()
@@ -73,7 +73,6 @@ struct LocationStepView: View {
             .padding(.bottom, 50)
             .disabled(location.isEmpty)
             
-            
         }
         .alert(isPresented: $showLocationAlert) {
             Alert(
@@ -89,7 +88,6 @@ struct LocationStepView: View {
         await locationVM.reverseGeoCode()
         
         if let mapItem = locationVM.mapItem {
-            // TODO: set manuallocation to reversegeocoded city
             self.location = mapItem.addressRepresentations?.cityWithContext ?? ""
         } else {
             // show alert if location isn't available

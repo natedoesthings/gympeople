@@ -44,7 +44,6 @@ struct SignUpView: View {
                     .font(.title2)
                     .fontWeight(.semibold)
                 
-                
                 // --- FORM ---
                 VStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 16) {
@@ -102,7 +101,6 @@ struct SignUpView: View {
                             text: $password
                         )
 
-                        
                         if !validPassword {
                             Text("Password needs to contain at least 8 characters, one symbol, one uppercase, and one lowercase character.")
                                 .font(.caption)
@@ -127,7 +125,6 @@ struct SignUpView: View {
                         
                     }
                     
-                    
                     Button {
                         Task {
                             checkForm()
@@ -138,7 +135,6 @@ struct SignUpView: View {
                             } else {
                                 LOG.debug("Form is invalid")
                             }
-                            
                             
                         }
                     } label: {

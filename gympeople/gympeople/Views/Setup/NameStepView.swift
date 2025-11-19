@@ -66,7 +66,6 @@ struct FirstNameStepView: View {
     }
 }
 
-
 struct LastNameStepView: View {
     @Binding var lastName: String
     var validLastName: Bool {
@@ -184,7 +183,6 @@ struct UserNameStepView: View {
         
     }
 }
-
 
 #Preview {
     UserNameStepView(userName: .constant(""), next: {})

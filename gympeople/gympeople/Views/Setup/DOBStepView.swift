@@ -42,7 +42,6 @@ struct DOBStepView: View {
     }
 }
 
-
 #Preview {
     DOBStepView(dob: .constant(Date()), next: {})
 }

@@ -55,5 +55,3 @@ enum LoginError: Error, Identifiable {
         return .unknown(message: error.localizedDescription)
     }
 }
-
-
