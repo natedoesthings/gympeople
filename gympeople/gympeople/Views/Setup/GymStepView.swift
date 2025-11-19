@@ -64,7 +64,7 @@ struct GymStepView: View {
                                 } label: {
                                     HStack {
                                         Text(gym)
-                                            .foregroundStyle(.black)
+                                            .foregroundStyle(.invertedPrimary)
                                         Spacer()
                                         if selectedGyms.contains(gym) {
                                             Image(systemName: "checkmark.circle.fill")

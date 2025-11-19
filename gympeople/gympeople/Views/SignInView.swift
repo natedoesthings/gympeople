@@ -20,7 +20,7 @@ struct SignInView: View {
             // --- TOP RIGHT LOGO ---
             HStack {
                 Spacer()
-                Image("gympeople_light_no_bg")
+                Image("gympeople_no_bg")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 32, height: 32)
@@ -171,7 +171,7 @@ struct SignInView: View {
             .font(.system(size: 16))
             .frame(width: 300, height: 20)
             .padding()
-            .foregroundColor(.black)
+            .foregroundColor(.invertedPrimary)
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.gray.opacity(0.4), lineWidth: 1)
@@ -192,10 +192,10 @@ struct SignInView: View {
                     .scaledToFit()
                     .frame(width: 20, height: 20)
             }
+            .foregroundColor(.invertedPrimary)
             .font(.system(size: 16))
             .frame(width: 300, height: 20)
             .padding()
-            .foregroundColor(.black)
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.gray.opacity(0.4), lineWidth: 1)

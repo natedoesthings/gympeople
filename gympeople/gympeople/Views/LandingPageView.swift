@@ -14,7 +14,7 @@ struct LandingPageView: View {
         NavigationStack {
             VStack(spacing: 16) {
                 VStack {
-                    Image("gympeople_light_no_bg")
+                    Image("gympeople_no_bg")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 300)

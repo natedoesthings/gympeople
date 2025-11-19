@@ -31,7 +31,7 @@ struct SignUpView: View {
                 // --- TOP RIGHT LOGO ---
                 HStack {
                     Spacer()
-                    Image("gympeople_light_no_bg")
+                    Image("gympeople_no_bg")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 32, height: 32)
