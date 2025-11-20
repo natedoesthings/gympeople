@@ -127,9 +127,10 @@ struct LastNameStepView: View {
 
 struct UserNameStepView: View {
     @Binding var userName: String
-    var validUserName: Bool {
-        !userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
+    
+    @State private var validUserName: Bool = false
+    @State private var checkingUsername: Bool = false
+    @FocusState private var userNameFieldIsFocused: Bool
     
     var next: () -> Void
 
@@ -148,6 +149,19 @@ struct UserNameStepView: View {
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .padding(.vertical, 12)
+                        .focused($userNameFieldIsFocused)
+                    
+                    Spacer()
+                    
+                    if checkingUsername {
+                        ProgressView()
+                            .padding(.trailing, 10)
+                    } else {
+                        Image(systemName: validUserName ? "checkmark.circle.fill" : "x.circle.fill")
+                            .padding(.trailing, 10)
+                            .foregroundStyle(validUserName ? .success : .error)
+                    }
+                    
                 }
                 .cornerRadius(12)
                 .overlay(
@@ -156,7 +170,7 @@ struct UserNameStepView: View {
                 )
                 
                 if !validUserName {
-                    Text("Username is taken.")
+                    Text("Username unavailable.")
                         .font(.caption)
                         .foregroundStyle(Color("Error"))
                 }
@@ -180,7 +194,13 @@ struct UserNameStepView: View {
             .padding(.bottom, 50)
             .disabled(!validUserName)
         }
-        
+        .onChange(of: userNameFieldIsFocused) { _,_ in
+            Task {
+                checkingUsername = true
+                validUserName = await SupabaseManager.shared.checkUserName(userName: userName) && !userName.isEmpty
+                checkingUsername = false
+            }
+        }
     }
 }
 

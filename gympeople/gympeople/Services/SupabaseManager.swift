@@ -184,4 +184,43 @@ extension SupabaseManager {
         LOG.info("Profile Picture Updated!")
     }
     
+    
+    func createPost(content: String) async throws -> Post {
+        let userId = try await client.auth.session.user.id
+
+        let post = Post(
+            id: nil,
+            user_id: userId,
+            content: content,
+            created_at: nil
+        )
+
+        let result = try await client
+            .from("posts")
+            .insert(post)
+            .select()
+            .single()
+            .execute()
+            .value as Post
+
+        return result
+    }
+    
+    func checkUserName(userName: String) async -> Bool {
+        do {
+            let result = try await client
+                .from("user_profiles")
+                .select("id")
+                .eq("user_name", value: userName)
+                .single()
+                .execute()
+            
+            // Successfully finds a username
+            return false
+        } catch {
+            print("Error checking username:", error)
+            return true
+        }
+    }
+    
 }
