@@ -11,11 +11,16 @@ import MapKit
 
 struct LocationStepView: View {
     @StateObject private var locationVM = LocationViewModel()
+    @StateObject private var citySearch = CitySearchService()
+    
     @Binding var location: String
     
     var next: () -> Void
     
     @State private var showLocationAlert: Bool = false
+    @State private var isTyping = false
+    
+    @FocusState private var locationFieldIsFocused: Bool
 
     var body: some View {
         ZStack {
@@ -28,10 +33,17 @@ struct LocationStepView: View {
                         .foregroundColor(.gray)
                         .padding(.leading, 10)
                     
-                    TextField("Enter city or zip code", text: $location)
+                    TextField("Enter city or zip code", text: $location,onEditingChanged: { editing in
+                        isTyping = editing
+                        locationFieldIsFocused = editing
+                    })
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .padding(.vertical, 12)
+                        .focused($locationFieldIsFocused)
+                        .onChange(of: location) { _,newValue in
+                            citySearch.update(query: newValue)
+                        }
                 }
                 .cornerRadius(12)
                 .overlay(
@@ -39,39 +51,65 @@ struct LocationStepView: View {
                         .stroke(Color(.systemGray4), lineWidth: 2)
                 )
                 
-                Button {
-                    Task {
-                        await fetchCurrentLocation()
+                if isTyping && !citySearch.suggestions.isEmpty {
+                    List {
+                        ForEach(citySearch.suggestions, id: \.self) { suggestion in
+                            Button {
+                                selectSuggestion(suggestion)
+                            } label: {
+                                VStack(alignment: .leading) {
+                                    Text(suggestion.title)
+                                        .font(.body)
+                                    if !suggestion.subtitle.isEmpty {
+                                        Text(suggestion.subtitle)
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
+                        }
                     }
-                } label: {
-                    HStack {
-                        Text("Use my location")
-                        Image(systemName: "location")
-                    }
-                    .foregroundStyle(.invertedPrimary)
+                    .frame(height: 200) // dropdown height
+                    .listStyle(.plain)
                 }
-                .buttonStyle(.bordered)
-                .padding(.bottom)
+                
+                if !isTyping{
+                    Button {
+                        Task {
+                            await fetchCurrentLocation()
+                        }
+                    } label: {
+                        HStack {
+                            Text("Use my location")
+                            Image(systemName: "location")
+                        }
+                        .foregroundStyle(.invertedPrimary)
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.bottom)
+                }
                 
             
             }
             .padding()
             
-            Button {
-                next()
-            } label: {
-                Text("Next")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(!location.isEmpty ? Color.brandOrange : Color.standardSecondary)
-                    .cornerRadius(20)
+            if !isTyping {
+                Button {
+                    next()
+                } label: {
+                    Text("Next")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(!location.isEmpty ? Color.brandOrange : Color.standardSecondary)
+                        .cornerRadius(20)
+                }
+                .frame(width: 300)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                .padding(.bottom, 50)
+                .disabled(location.isEmpty)
             }
-            .frame(width: 300)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-            .padding(.bottom, 50)
-//            .disabled(location.isEmpty)
             
         }
         .alert(isPresented: $showLocationAlert) {
@@ -83,6 +121,21 @@ struct LocationStepView: View {
         }
 
     }
+    
+    private func selectSuggestion(_ suggestion: MKLocalSearchCompletion) {
+        let request = MKLocalSearch.Request(completion: suggestion)
+        let search = MKLocalSearch(request: request)
+
+        search.start { response, _ in
+            guard let item = response?.mapItems.first else { return }
+
+            // Best formatted city name
+            location = item.addressRepresentations?.cityWithContext ?? ""
+            isTyping = false
+            locationFieldIsFocused = false // hide dropdown
+        }
+    }
+    
 
     private func fetchCurrentLocation() async {
         await locationVM.reverseGeoCode()
