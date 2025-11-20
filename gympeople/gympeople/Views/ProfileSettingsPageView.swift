@@ -14,7 +14,6 @@ struct ProfileSettingsPageView: View {
     }
 }
 
-
 #Preview {
     ProfileSettingsPageView()
 }

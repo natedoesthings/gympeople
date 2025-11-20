@@ -46,7 +46,6 @@ struct SignInView: View {
                     googleSignInButton()
                 }
                 
-                
                 Text("or continue with email")
                     .font(.caption)
                     .foregroundStyle(.standardSecondary)

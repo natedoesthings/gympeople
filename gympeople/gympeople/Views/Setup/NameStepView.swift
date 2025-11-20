@@ -194,7 +194,7 @@ struct UserNameStepView: View {
             .padding(.bottom, 50)
             .disabled(!validUserName)
         }
-        .onChange(of: userNameFieldIsFocused) { _,_ in
+        .onChange(of: userNameFieldIsFocused) { _, _ in
             Task {
                 checkingUsername = true
                 validUserName = await SupabaseManager.shared.checkUserName(userName: userName) && !userName.isEmpty

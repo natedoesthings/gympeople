@@ -184,7 +184,6 @@ extension SupabaseManager {
         LOG.info("Profile Picture Updated!")
     }
     
-    
     func createPost(content: String) async throws -> Post {
         let userId = try await client.auth.session.user.id
 

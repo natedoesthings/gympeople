@@ -28,7 +28,6 @@ struct HomeView: View {
                 
             }
             
-            
             HStack(spacing: 25) {
                 Button {
                     tabSelected = .home
@@ -67,7 +66,6 @@ struct HomeView: View {
             }
             .frame(maxHeight: .infinity, alignment: .bottom)
         }
-        
         
     }
 }

@@ -33,7 +33,7 @@ struct LocationStepView: View {
                         .foregroundColor(.gray)
                         .padding(.leading, 10)
                     
-                    TextField("Enter city or zip code", text: $location,onEditingChanged: { editing in
+                    TextField("Enter city or zip code", text: $location, onEditingChanged: { editing in
                         isTyping = editing
                         locationFieldIsFocused = editing
                     })
@@ -41,7 +41,7 @@ struct LocationStepView: View {
                         .disableAutocorrection(true)
                         .padding(.vertical, 12)
                         .focused($locationFieldIsFocused)
-                        .onChange(of: location) { _,newValue in
+                        .onChange(of: location) { _, newValue in
                             citySearch.update(query: newValue)
                         }
                 }
@@ -73,7 +73,7 @@ struct LocationStepView: View {
                     .listStyle(.plain)
                 }
                 
-                if !isTyping{
+                if !isTyping {
                     Button {
                         Task {
                             await fetchCurrentLocation()
@@ -89,7 +89,6 @@ struct LocationStepView: View {
                     .padding(.bottom)
                 }
                 
-            
             }
             .padding()
             
@@ -136,7 +135,6 @@ struct LocationStepView: View {
         }
     }
     
-
     private func fetchCurrentLocation() async {
         await locationVM.reverseGeoCode()
         

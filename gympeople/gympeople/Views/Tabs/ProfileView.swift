@@ -75,8 +75,7 @@ struct ProfileView: View {
                                             gymTagButton(gymTagType: .gym(gym: gym))
                                         }
                                         gymTagButton(gymTagType: .plus)
-                                    }
-                                    else {
+                                    } else {
                                         gymTagButton(gymTagType: .none)
                                     }
                                 }
@@ -85,8 +84,6 @@ struct ProfileView: View {
                         }
                         .padding(.vertical, 15)
                         
-                        
-
                     }
                     .padding()
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -198,11 +195,6 @@ struct ProfileView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    ProfileView()
-//}
-
-
-
-
-
+// }

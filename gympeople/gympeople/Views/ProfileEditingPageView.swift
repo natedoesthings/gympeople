@@ -90,7 +90,6 @@ struct ProfileEditingPageView: View {
                                     .stroke(Color(.systemGray4), lineWidth: 2)
                             )
                             
-                            
                             Text("Last Name")
                                 .font(.caption)
                             HStack {
@@ -165,14 +164,11 @@ struct ProfileEditingPageView: View {
                                 set: { newValue in
                                     userProfile?.date_of_birth = newValue
                                 }
-                            ), in: ...Date(), displayedComponents: .date)
-                            {
+                            ), in: ...Date(), displayedComponents: .date) {
                                 Text("Date of Birth")
                             }
                             .padding(.vertical, 16)
 
-                            
-                            
                             Text("Email")
                                 .font(.caption)
                             HStack {
@@ -197,9 +193,6 @@ struct ProfileEditingPageView: View {
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color(.systemGray4), lineWidth: 2)
                             )
-                            
-                            
-                            
                             
                         }
                         .padding()
@@ -230,8 +223,7 @@ struct ProfileEditingPageView: View {
             if let userProfile = userProfile {
                 try await manager.updateUserProfile(userProfile: userProfile)
                 LOG.info("Profile updated successfully!")
-            }
-            else {
+            } else {
                 LOG.info("Profile not found. Try again.")
             }
         } catch {
