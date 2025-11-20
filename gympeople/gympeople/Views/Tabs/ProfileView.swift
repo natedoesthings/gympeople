@@ -10,6 +10,7 @@ import PhotosUI
 
 struct ProfileView: View {
     @State private var userProfile: UserProfile?
+    @State private var posts: [Post]?
 //    @State private var firstName: String = "Nathanael"
 //    @State private var lastName: String = "Tesfaye"
 //    @State private var userName: String = "Nate"
@@ -31,9 +32,8 @@ struct ProfileView: View {
             if let userProfile = userProfile {
                 // Profile picture displayer and selector
                 NavigationStack {
-                    
                     VStack(alignment: .leading, spacing: 4) {
-                        
+                        // Profile Picture
                         PhotosPicker(selection: $photosPickerItem, matching: .images) {
                             if !pfpIsLoading {
                                 Image(uiImage: avatarImage ?? UIImage(systemName: "person.circle.fill")!)
@@ -50,6 +50,7 @@ struct ProfileView: View {
                             }
                         }
                         
+                        // Name, user, bio
                         HStack {
                             Text(userProfile.first_name)
                             Text(userProfile.last_name)
@@ -67,6 +68,7 @@ struct ProfileView: View {
                         .font(.caption)
                         .foregroundStyle(Color.standardSecondary)
                         
+                        // Gym Tags
                         VStack(alignment: .leading, spacing: 15) {
                             ScrollView(.horizontal) {
                                 HStack {
@@ -83,6 +85,13 @@ struct ProfileView: View {
                             }
                         }
                         .padding(.vertical, 15)
+                        
+                        // Posts
+                        if let posts = posts {
+                            ForEach(posts, id: \.self) { post in
+                                Text(post.content)
+                            }
+                        }
                         
                     }
                     .padding()
@@ -118,8 +127,10 @@ struct ProfileView: View {
         }
         .onAppear {
             if !hasLoadedProfile {
+                Task {
+                    await loadProfile()
+                }
                 hasLoadedProfile = true
-                Task { await loadProfile() }
             }
         }
         .onChange(of: photosPickerItem) { _, _ in
@@ -146,9 +157,16 @@ struct ProfileView: View {
     
     private func loadProfile() async {
         do {
+            // Fetch posts
+            LOG.debug("Fetching users posts")
+            posts = try await manager.fetchMyPosts()
+            LOG.debug("Fetched users posts")
+            
+            // Fetch profile
             LOG.debug("Fetching user profile")
             userProfile = try await manager.fetchUserProfile()
             LOG.debug("Fetched user profile")
+            
             // Update image from url
             pfpIsLoading = true
             

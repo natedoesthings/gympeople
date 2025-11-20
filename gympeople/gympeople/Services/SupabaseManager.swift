@@ -184,25 +184,25 @@ extension SupabaseManager {
         LOG.info("Profile Picture Updated!")
     }
     
-    func createPost(content: String) async throws -> Post {
-        let userId = try await client.auth.session.user.id
+    func createPost(content: String) async throws {
+        guard let userID = client.auth.currentUser?.id else {
+            LOG.notice("No authenticated user found")
+            return
+        }
 
         let post = Post(
             id: nil,
-            user_id: userId,
+            user_id: userID,
             content: content,
             created_at: nil
         )
 
-        let result = try await client
+        try await client
             .from("posts")
             .insert(post)
             .select()
             .single()
             .execute()
-            .value as Post
-
-        return result
     }
     
     func checkUserName(userName: String) async -> Bool {
@@ -221,5 +221,28 @@ extension SupabaseManager {
             return true
         }
     }
+    
+    func fetchPosts(for userId: UUID) async throws -> [Post] {
+        let posts = try await client
+            .from("posts")
+            .select()
+            .eq("user_id", value: userId.uuidString)
+            .order("created_at", ascending: false)
+            .execute()
+            .value as [Post]
+
+        return posts
+    }
+
+    
+    func fetchMyPosts() async throws -> [Post] {
+        guard let userId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return []
+        }
+        
+        return try await fetchPosts(for: userId)
+    }
+
     
 }

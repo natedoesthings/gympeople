@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var tabSelected: Tab = .home
+    @State private var showPostView: Bool = false
     
     var body: some View {
         ZStack {
@@ -44,7 +45,7 @@ struct HomeView: View {
                 }
                 
                 Button {
-                    tabSelected = .post
+                    showPostView = true
                 } label: {
                     Image(systemName: tabSelected == .post ? "plus.circle.fill" : "plus.circle")
                         .font(.system(size: 35))
@@ -65,6 +66,9 @@ struct HomeView: View {
                 }
             }
             .frame(maxHeight: .infinity, alignment: .bottom)
+        }
+        .sheet(isPresented: $showPostView) {
+            PostView()
         }
         
     }
