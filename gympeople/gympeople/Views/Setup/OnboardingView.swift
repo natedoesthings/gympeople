@@ -67,7 +67,6 @@ struct OnboardingView: View {
                         }
                     }
             }
-            // TODO: Logo needs to be placed in same location across ui
             HStack {
                 Spacer()
                 Image("gympeople_no_bg")

@@ -194,7 +194,7 @@ extension SupabaseManager {
             id: nil,
             user_id: userID,
             content: content,
-            created_at: nil
+            created_at: Date()
         )
 
         try await client
