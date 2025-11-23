@@ -16,7 +16,7 @@ struct ProfileSettingsPageView: View {
     var body: some View {
         VStack(spacing: 16) {
             VStack(spacing: 8) {
-                AvatarView(url: URL(string: userProfile.pfp_url ?? ""))
+                AvatarView(url: userProfile.pfp_url)
                     .frame(width: 80, height: 80)
                 
                 Text("\(userProfile.first_name) \(userProfile.last_name)")

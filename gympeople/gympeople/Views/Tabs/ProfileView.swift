@@ -95,7 +95,7 @@ struct ProfileView: View {
                             LazyVStack {
                                 if let posts = posts {
                                     ForEach(posts, id: \.self) { post in
-                                        PostCard(post: post, displayName: userProfile.first_name, username: userProfile.user_name, avatarURL: URL(string: userProfile.pfp_url ?? ""))
+                                        PostCard(post: post, displayName: userProfile.first_name, username: userProfile.user_name, avatarURL: userProfile.pfp_url)
                                     }
                                 }
                             }

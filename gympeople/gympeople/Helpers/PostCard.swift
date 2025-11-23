@@ -12,7 +12,7 @@ struct PostCard: View {
     let post: Post
     let displayName: String
     let username: String
-    let avatarURL: URL?
+    let avatarURL: String?
 //    let createdAt: String
 //    let content: String
 
@@ -75,12 +75,12 @@ struct PostCard: View {
 }
 
 struct AvatarView: View {
-    let url: URL?
+    let url: String?
 
     var body: some View {
         Group {
             if let url {
-                AsyncImage(url: url) { phase in
+                AsyncImage(url: URL(string: url)) { phase in
                     switch phase {
                     case .empty:
                         placeholder
@@ -122,7 +122,7 @@ struct AvatarView: View {
                     post: post,
                     displayName: "Nathanael Tesfaye",
                     username: "nate",
-                    avatarURL: URL(string: "https://picsum.photos/seed/nate/200")
+                    avatarURL: "https://picsum.photos/seed/nate/200"
                 )
                 Divider()
             }
