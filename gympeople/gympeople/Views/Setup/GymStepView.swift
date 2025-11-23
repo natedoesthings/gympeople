@@ -24,6 +24,7 @@ struct GymStepView: View {
     @State private var searchField: String = ""
     @State private var isSubmitting = false
     @State private var submissionError: String?
+    @FocusState private var isFocused: Bool
     
     private var filteredGyms: [String] {
         let query = searchField.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -46,6 +47,7 @@ struct GymStepView: View {
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .padding(.vertical, 12)
+                        .focused($isFocused)
                 }
                 .cornerRadius(12)
                 .overlay(
@@ -53,63 +55,93 @@ struct GymStepView: View {
                         .stroke(Color(.systemGray4), lineWidth: 2)
                 )
                 
-                if !filteredGyms.isEmpty {
-                    VStack(alignment: .leading, spacing: 0) {
-                        ScrollView {
-                            ForEach(filteredGyms, id: \.self) { gym in
-                                Button {
-                                    toggleSelection(for: gym)
-                                    // Optional: clear search after selecting
-                                    searchField = ""
-                                } label: {
-                                    HStack {
-                                        Text(gym)
-                                            .foregroundStyle(.invertedPrimary)
-                                        Spacer()
-                                        if selectedGyms.contains(gym) {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .foregroundStyle(Color.brandOrange)
+                if isFocused {
+                    if !filteredGyms.isEmpty {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ScrollView {
+                                ForEach(filteredGyms, id: \.self) { gym in
+                                    Button {
+                                        toggleSelection(for: gym)
+                                        // Optional: clear search after selecting
+                                        searchField = ""
+                                    } label: {
+                                        HStack {
+                                            Text(gym)
+                                                .foregroundStyle(.invertedPrimary)
+                                            Spacer()
+                                            if selectedGyms.contains(gym) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundStyle(Color.brandOrange)
+                                            }
                                         }
                                     }
+                                    Divider()
                                 }
-                                Divider()
                             }
+                            .frame(height: 420)
+                            
                         }
-                        .frame(height: selectedGyms.isEmpty ? 420 : 300)
-                        
+                    }
+                } else {
+                    if !selectedGyms.isEmpty {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ScrollView {
+                                ForEach(selectedGyms, id: \.self) { gym in
+                                    Button {
+                                        toggleSelection(for: gym)
+                                    } label: {
+                                        HStack {
+                                            Text(gym)
+                                                .foregroundStyle(.invertedPrimary)
+                                            Spacer()
+                                            if selectedGyms.contains(gym) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundStyle(Color.brandOrange)
+                                            }
+                                        }
+                                    }
+                                    Divider()
+                                }
+                            }
+                            .frame(height: 300)
+                            
+                        }
                     }
                 }
+                
             }
             .padding(.top, 80)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             
-            Button {
-                Task { await handleSubmit() }
-            } label: {
-                Text("Done")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color("BrandOrange"))
-                    .cornerRadius(20)
+            
+            if !isFocused {
+                Button {
+                    Task { await handleSubmit() }
+                } label: {
+                    Text("Done")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color("BrandOrange"))
+                        .cornerRadius(20)
+                }
+                .frame(width: 300)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                .padding(.bottom, 50)
             }
-            .frame(width: 300)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-            .padding(.bottom, 50)
             
             // TODO: Fix skip button 
-//            Button {
-//                Task {
-//                    selectedGyms = []
-//                    await handleSubmit()
-//                }
-//            } label: {
-//                Text("Skip")
-//                    .padding(.top, -55)
-//                    .foregroundStyle(Color.brandOrange)
-//                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-//            }
+            Button {
+                Task {
+                    selectedGyms = []
+                    await handleSubmit()
+                }
+            } label: {
+                Text("Skip")
+                    .foregroundStyle(Color.brandOrange)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             
         }
         .padding()

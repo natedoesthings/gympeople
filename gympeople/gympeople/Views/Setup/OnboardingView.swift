@@ -67,16 +67,20 @@ struct OnboardingView: View {
                         }
                     }
             }
-            HStack {
-                Spacer()
-                Image("gympeople_no_bg")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32, height: 32)
-                    .padding(.top, 55)
-                    .padding(.trailing, 20)
+            
+            if path.last != .gyms {
+                HStack {
+                    Spacer()
+                    Image("gympeople_no_bg")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 32, height: 32)
+                        .padding(.top, 55)
+                        .padding(.trailing, 20)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            
 
         }
         
