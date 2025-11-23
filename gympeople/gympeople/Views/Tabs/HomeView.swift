@@ -29,7 +29,7 @@ struct HomeView: View {
                 
             }
             
-            HStack() {
+            HStack {
                 Group {
                     Button {
                         tabSelected = .home
@@ -80,9 +80,9 @@ struct HomeView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    HomeView()
-//}
+// }
 
 enum HomeTab {
     case explore
@@ -157,7 +157,6 @@ struct FeedView: View {
                                 
                             }
                             
-                            
                             // Content
                             Text("Say something!")
                                 .font(.body)
@@ -188,7 +187,6 @@ struct FeedView: View {
 }
 
 #Preview {
-    
     
     WelcomeView()
 }

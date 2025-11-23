@@ -20,5 +20,4 @@ let POSTS = [Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the t
              Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
              Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7))]
 
-
 // let DUMMY_USER_PROFILE =

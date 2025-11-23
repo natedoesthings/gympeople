@@ -234,7 +234,6 @@ extension SupabaseManager {
         return posts
     }
 
-    
     func fetchMyPosts() async throws -> [Post] {
         guard let userId = client.auth.currentUser?.id else {
             LOG.error("No authenticated user found")
@@ -244,5 +243,4 @@ extension SupabaseManager {
         return try await fetchPosts(for: userId)
     }
 
-    
 }

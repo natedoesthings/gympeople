@@ -36,7 +36,6 @@ struct PostView: View {
                 
                 Divider()
                 
-                
                 VStack(alignment: .leading) {
                     ZStack(alignment: .topLeading) {
                         if content.isEmpty {
@@ -55,7 +54,6 @@ struct PostView: View {
                 }
                 .padding(.horizontal)
                 
-                
                 HStack {
                     Button {
                         Task {
@@ -63,8 +61,7 @@ struct PostView: View {
                                 try await SupabaseManager.shared.createPost(content: content)
                                 
                                 dismiss()
-                            }
-                            catch {
+                            } catch {
                                 errorMessage = error.localizedDescription
                             }
                         }
@@ -102,4 +99,3 @@ struct PostView: View {
 #Preview {
     PostView()
 }
-

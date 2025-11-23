@@ -52,7 +52,6 @@ struct PostCard: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
-                    
                     Text(post.created_at, style: .relative) // e.g. “5m ago”
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -62,7 +61,6 @@ struct PostCard: View {
                         .foregroundStyle(.secondary)
                 }
                 
-
                 // Content
                 Text(post.content)
                     .font(.body)
@@ -114,7 +112,6 @@ struct AvatarView: View {
                  Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
                  Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7))]
     
-    
     ScrollView {
         LazyVStack(spacing: 0) {
             ForEach(posts, id: \.self) { post in
@@ -129,6 +126,5 @@ struct AvatarView: View {
             
         }
 
-            
     }
 }

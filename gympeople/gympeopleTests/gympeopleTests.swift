@@ -35,7 +35,7 @@ final class AuthViewModelTests: XCTestCase {
     private var userID: UUID?
     
     // MARK: Test Cases
-    func testValidEmailSignUp () async throws {
+    func testValidEmailSignUp() async throws {
         var testEmail: String {
             "test+\(UUID().uuidString.prefix(8))@example.com"
         }
@@ -64,7 +64,7 @@ final class AuthViewModelTests: XCTestCase {
         }
     }
 
-    func testInValidPasswordSignUp () async throws {
+    func testInValidPasswordSignUp() async throws {
         do {
             
             await authVM.signUpWithEmail(email: validTestEmail, password: inValidTestPassword, firstName: "Test", lastName: "User")
@@ -89,7 +89,7 @@ final class AuthViewModelTests: XCTestCase {
         }
     }
     
-    func testInValidEmailSignUp () async throws {
+    func testInValidEmailSignUp() async throws {
         do {
             
             await authVM.signUpWithEmail(email: inValidTestEmail, password: validTestPassword, firstName: "Test", lastName: "User")
@@ -114,7 +114,6 @@ final class AuthViewModelTests: XCTestCase {
         }
     }
 }
-
 
 final class SupabaseTests: XCTestCase {
     let manager = SupabaseManager.shared
@@ -216,7 +215,6 @@ final class SupabaseTests: XCTestCase {
             XCTAssertEqual(profile.location, "Nashville, TN")
             XCTAssertEqual(profile.gym_memberships ?? [], ["Planet Fitness", "YMCA"])
         
-            
         } catch {
             XCTFail("Test failed: \(error)")
         }

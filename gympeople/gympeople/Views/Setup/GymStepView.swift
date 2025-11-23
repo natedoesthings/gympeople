@@ -113,7 +113,6 @@ struct GymStepView: View {
             .padding(.top, 80)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             
-            
             if !isFocused {
                 Button {
                     Task { await handleSubmit() }

@@ -69,7 +69,6 @@ struct ProfileSettingsPageView: View {
                     
                 }
                 
-
                 Section(header: header("Preferences")) {
                     Button {
                         
