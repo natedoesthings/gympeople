@@ -114,7 +114,7 @@ struct ProfileView: View {
                                 }
                                 
                                 NavigationLink {
-                                    ProfileSettingsPageView()
+                                    ProfileSettingsPageView(userProfile: userProfile)
                                 } label: {
                                     Image(systemName: "slider.horizontal.3")
                                 }

@@ -20,6 +20,7 @@ struct PostCard: View {
         HStack(alignment: .top, spacing: 12) {
             // Avatar
             AvatarView(url: avatarURL)
+                .frame(width: 36, height: 36)
 
             // Main column
             VStack(alignment: .leading, spacing: 8) {
@@ -29,26 +30,38 @@ struct PostCard: View {
                         .fontWeight(.semibold)
                         .lineLimit(1)
 
+                    Spacer()
+
+                    // Placeholder actions menu icon
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                }
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
                     Text("@\(username)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
-
-                    Text("•")
+                    
+                    Text("-")
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
+                    
                     Text(post.created_at, style: .relative) // e.g. “5m ago”
                         .font(.caption)
                         .foregroundStyle(.secondary)
-
-                    Spacer()
-
-                    // Placeholder actions menu icon
-                    Image(systemName: "ellipsis")
+                    
+                    Text("ago")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                
 
                 // Content
                 Text(post.content)
@@ -57,12 +70,11 @@ struct PostCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(.horizontal)
         .padding(.vertical, 10)
     }
 }
 
-private struct AvatarView: View {
+struct AvatarView: View {
     let url: URL?
 
     var body: some View {
@@ -86,7 +98,6 @@ private struct AvatarView: View {
                 placeholder
             }
         }
-        .frame(width: 44, height: 44)
         .clipShape(Circle())
     }
 
@@ -98,36 +109,26 @@ private struct AvatarView: View {
     }
 }
 
-//#Preview {
-//    ScrollView {
-//        VStack(spacing: 0) {
-//            PostCard(
-//                displayName: "Nathanael Tesfaye",
-//                username: "nate",
-//                avatarURL: URL(string: "https://picsum.photos/seed/nate/200"),
-//                createdAt: "", // 7 minutes ago
-//                content: "Hit a new PR on deadlifts today! 405 lbs for a clean single. Feeling strong 💪 Any tips for improving form on the negative?"
-//            )
-//            Divider()
-//
-//            PostCard(
-//                displayName: "Jane Doe",
-//                username: "jane_d",
-//                avatarURL: nil, // shows placeholder
-//                createdAt: "", // 3 hours ago
-//                content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills."
-//            )
-//            
-//            Divider()
-//
-//            PostCard(
-//                displayName: "Marcus Lee",
-//                username: "marcus",
-//                avatarURL: URL(string: "https://picsum.photos/seed/marcus/200"),
-//                createdAt: "", // 2 days ago
-//                content: "Upper body push day: bench 3x5 @ 225, OHP 3x5 @ 135, dips 3x10. Feeling dialed in."
-//            )
-//        }
-//        .padding(.top)
-//    }
-//}
+#Preview {
+    let posts = [Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
+                 Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
+                 Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7))]
+    
+    
+    ScrollView {
+        LazyVStack(spacing: 0) {
+            ForEach(posts, id: \.self) { post in
+                PostCard(
+                    post: post,
+                    displayName: "Nathanael Tesfaye",
+                    username: "nate",
+                    avatarURL: URL(string: "https://picsum.photos/seed/nate/200")
+                )
+                Divider()
+            }
+            
+        }
+
+            
+    }
+}
