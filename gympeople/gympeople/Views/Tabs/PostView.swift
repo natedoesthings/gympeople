@@ -32,6 +32,7 @@ struct PostView: View {
                     Spacer()
                     Spacer()
                 }
+                .padding()
                 
                 Divider()
                 
@@ -41,16 +42,19 @@ struct PostView: View {
                         if content.isEmpty {
                             Text("Say Hello!")
                                 .foregroundColor(Color(.placeholderText))
-                                .padding(.horizontal, 5)
+                                .padding(.horizontal, 2)
                                 .padding(.vertical, 9)
                         }
                         
                         TextEditor(text: $content)
                             .scrollContentBackground(.hidden)
                             .focused($isEditorFocused)
+                            .padding(.horizontal, -3)
                     }
                     
                 }
+                .padding(.horizontal)
+                
                 
                 HStack {
                     Button {
@@ -77,7 +81,6 @@ struct PostView: View {
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
-            .padding()
             .frame(maxHeight: .infinity, alignment: .top)
             .alert(isPresented: $showErrorAlert) {
                 Alert(

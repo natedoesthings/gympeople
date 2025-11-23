@@ -11,10 +11,7 @@ import PhotosUI
 struct ProfileView: View {
     @State private var userProfile: UserProfile?
     @State private var posts: [Post]?
-//    @State private var firstName: String = "Nathanael"
-//    @State private var lastName: String = "Tesfaye"
-//    @State private var userName: String = "Nate"
-//    @State private var gyms: [String] = ["YMCA"]
+
     @State private var errorMessage: String?
     
     @State private var avatarImage: UIImage?
@@ -24,6 +21,7 @@ struct ProfileView: View {
     @State private var hasLoadedProfile: Bool = false
     
     @State private var showProfileEditingPage: Bool = false
+    @State private var profileTab: ProfileTabs = .posts
     
     let manager = SupabaseManager.shared
     
@@ -86,10 +84,20 @@ struct ProfileView: View {
                         }
                         .padding(.vertical, 15)
                         
-                        // Posts
-                        if let posts = posts {
-                            ForEach(posts, id: \.self) { post in
-                                Text(post.content)
+                        Picker("", selection: $profileTab) {
+                            ForEach(ProfileTabs.allCases) { tab in
+                                Text(tab.rawValue).tag(tab)
+                            }
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        
+                        ScrollView {
+                            LazyVStack {
+                                if let posts = posts {
+                                    ForEach(posts, id: \.self) { post in
+                                        PostCard(post: post, displayName: userProfile.first_name, username: userProfile.user_name, avatarURL: URL(string: userProfile.pfp_url ?? ""))
+                                    }
+                                }
                             }
                         }
                         
@@ -214,5 +222,8 @@ struct ProfileView: View {
 }
 
 // #Preview {
-//    ProfileView()
+//     
+//     let userProfile = UserProfile.init(id: UUID(), first_name: "Nate", last_name: "dasd", user_name: "", biography: "ds", email: "dsd", date_of_birth: Date(), phone_number: "", created_at: Date())
+//     
+//     ProfileView(userProfile: .constant(userProfile))
 // }
