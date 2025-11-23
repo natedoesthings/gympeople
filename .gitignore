@@ -1,2 +1,8 @@
 # XCConfig files
 *.xcconfig
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+DerivedData/
