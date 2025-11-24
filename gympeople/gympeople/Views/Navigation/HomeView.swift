@@ -13,21 +13,13 @@ struct HomeView: View {
     
     var body: some View {
         ZStack {
-            switch tabSelected {
-            case .home:
-                ExploreView()
-//                EmptyView()
-            case .chat:
-                EmptyView()
-            case .post:
-                EmptyView()
-            case .memberships:
-                EmptyView()
-            case .profile:
-                ProfileView()
-//                EmptyView()
-                
+            TabView(selection: $tabSelected) {
+                ExploreView().tag(Tab.home)
+                EmptyView().tag(Tab.chat)
+                EmptyView().tag(Tab.memberships)
+                ProfileView().tag(Tab.profile)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never)) // hide default bar
             
             HStack {
                 Group {
