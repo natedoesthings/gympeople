@@ -23,50 +23,7 @@ class SupabaseManager {
 }
 
 extension SupabaseManager {
-    func saveUserProfile(
-        firstName: String,
-        lastName: String,
-        userName: String,
-        email: String,
-        dob: Date,
-        phone: String,
-        latitude: Double,
-        longitude: Double,
-        location: String,
-        gyms: [String]
-    ) async throws {
-        let data: [String: AnyEncodable] = [
-            "id": AnyEncodable(client.auth.currentUser?.id),
-            "first_name": AnyEncodable(firstName),
-            "last_name": AnyEncodable(lastName),
-            "user_name": AnyEncodable(userName),
-            "biography": AnyEncodable(""),
-            "email": AnyEncodable(email),
-            "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: dob)),
-            "phone_number": AnyEncodable(phone),
-            "latitude": AnyEncodable(latitude),
-            "longitude": AnyEncodable(longitude),
-            "location": AnyEncodable(location.isEmpty ? nil : location),
-            "gym_memberships": AnyEncodable(gyms)
-        ]
-        try await client.from("user_profiles").insert(data).execute()
-    }
-
-    func fetchUserProfile() async throws -> UserProfile? {
-        guard let userID = client.auth.currentUser?.id else {
-            LOG.notice("No authenticated user found")
-            return nil
-        }
-        
-        let response = try await client
-            .from("user_profiles")
-            .select()
-            .eq("id", value: userID)
-            .single()
-            .execute()
-        
-        let data = response.data
-        
+    private func makeUserProfileDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
@@ -107,8 +64,76 @@ extension SupabaseManager {
             )
         }
 
+        return decoder
+    }
+
+    func saveUserProfile(
+        firstName: String,
+        lastName: String,
+        userName: String,
+        email: String,
+        dob: Date,
+        phone: String,
+        latitude: Double,
+        longitude: Double,
+        location: String,
+        gyms: [String]
+    ) async throws {
+        let data: [String: AnyEncodable] = [
+            "id": AnyEncodable(client.auth.currentUser?.id),
+            "first_name": AnyEncodable(firstName),
+            "last_name": AnyEncodable(lastName),
+            "user_name": AnyEncodable(userName),
+            "biography": AnyEncodable(""),
+            "email": AnyEncodable(email),
+            "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: dob)),
+            "phone_number": AnyEncodable(phone),
+            "latitude": AnyEncodable(latitude),
+            "longitude": AnyEncodable(longitude),
+            "location": AnyEncodable(location.isEmpty ? nil : location),
+            "gym_memberships": AnyEncodable(gyms)
+        ]
+        try await client.from("user_profiles").insert(data).execute()
+    }
+
+    func fetchUserProfile(for userID: UUID) async throws -> UserProfile? {
+        let response = try await client
+            .from("user_profiles")
+            .select()
+            .eq("id", value: userID)
+            .single()
+            .execute()
+        
+        let data = response.data
+        
+        let decoder = makeUserProfileDecoder()
         let profile = try decoder.decode(UserProfile.self, from: data)
         return profile
+    }
+    
+    func fetchMyUserProfile() async throws -> UserProfile? {
+        guard let userID = client.auth.currentUser?.id else {
+            LOG.notice("No authenticated user found")
+            return nil
+        }
+        
+        return try await fetchUserProfile(for: userID)
+    }
+
+    func searchUserProfiles(matching query: String, limit: Int = 20) async throws -> [UserProfile] {
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedQuery.isEmpty else { return [] }
+
+        let response = try await client
+            .from("user_profiles")
+            .select()
+            .ilike("user_name", pattern: "%\(trimmedQuery)%")
+            .order("user_name", ascending: true)
+            .limit(limit)
+            .execute()
+
+        let decoder = makeUserProfileDecoder()
+        return try decoder.decode([UserProfile].self, from: response.data)
     }
     
     // Update individual fields

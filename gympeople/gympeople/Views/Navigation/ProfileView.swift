@@ -15,11 +15,10 @@ struct ProfileView: View {
     @State private var errorMessage: String?
     
     @State private var photosPickerItem: PhotosPickerItem?
-    
     @State private var hasLoadedProfile: Bool = false
     
     @State private var showProfileEditingPage: Bool = false
-    @State private var profileTab: ProfileTabs = .posts
+    @State private var profileTab: ProfileTab = .posts
     
     let manager = SupabaseManager.shared
     
@@ -46,8 +45,8 @@ struct ProfileView: View {
                         
                         VStack(alignment: .leading, spacing: 5) {
                             Text("@\(userProfile.user_name)")
-                            if !userProfile.biography.isEmpty {
-                                Text("\(userProfile.biography)")
+                            if let bio = userProfile.biography {
+                                Text("\(bio)")
                             }
                         }
                         .font(.caption)
@@ -59,13 +58,28 @@ struct ProfileView: View {
                                 HStack {
                                     if let gyms = userProfile.gym_memberships {
                                         ForEach(gyms, id: \.self) { gym in
-                                            gymTagButton(gymTagType: .gym(gym: gym))
+                                            Button {
+                                                showProfileEditingPage = true
+                                            } label: {
+                                                GymTagButton(gymTagType: .gym(gym: gym))
+                                            }
+                                            
                                         }
                                     } else {
-                                        gymTagButton(gymTagType: .none)
+                                        Button {
+                                            showProfileEditingPage = true
+                                        } label: {
+                                            GymTagButton(gymTagType: .none)
+                                        }
+                                        
                                     }
                                     
-                                    gymTagButton(gymTagType: .plus)
+                                    Button {
+                                        showProfileEditingPage = true
+                                    } label: {
+                                        GymTagButton(gymTagType: .plus)
+                                    }
+                                    
                                 }
                                 .padding(1)
                             }
@@ -73,7 +87,7 @@ struct ProfileView: View {
                         .padding(.vertical, 15)
                         
                         Picker("", selection: $profileTab) {
-                            ForEach(ProfileTabs.allCases) { tab in
+                            ForEach(ProfileTab.allCases) { tab in
                                 Text(tab.rawValue).tag(tab)
                             }
                         }
@@ -166,39 +180,11 @@ struct ProfileView: View {
             
             // Fetch profile
             LOG.debug("Fetching user profile")
-            userProfile = try await manager.fetchUserProfile()
+            userProfile = try await manager.fetchMyUserProfile()
             LOG.debug("Fetched user profile")
             
         } catch {
             errorMessage = error.localizedDescription.debugDescription
-        }
-    }
-    
-    @ViewBuilder
-    private func gymTagButton(gymTagType: GymTagType) -> some View {
-        Button {
-            showProfileEditingPage = true
-        } label: {
-            HStack {
-                switch gymTagType {
-                case .none:
-                    Text("Add gyms")
-                    Image(systemName: "plus")
-                case .gym(let gym):
-                    Text("\(gym)")
-                case .plus:
-                    Image(systemName: "plus")
-                }
-                
-            }
-            .padding(5)
-            .font(.caption)
-            .foregroundColor(Color.brandOrange)
-            .cornerRadius(20)
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.brandOrange, lineWidth: 2)
-            )
         }
     }
 }

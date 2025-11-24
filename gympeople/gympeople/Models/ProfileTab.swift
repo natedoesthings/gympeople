@@ -5,7 +5,7 @@
 //  Created by Nathanael Tesfaye on 11/22/25.
 //
 
-enum ProfileTabs: String, CaseIterable, Identifiable {
+enum ProfileTab: String, CaseIterable, Identifiable {
     case posts = "Posts"
     case mentions = "Mentions"
     

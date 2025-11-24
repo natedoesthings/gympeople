@@ -88,119 +88,46 @@ struct ExploreView: View {
     @State private var homeTab: HomeTab = .explore
     
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Group {
-                    Button {
-                        homeTab = .explore
-                    } label: {
-                        Text("Explore")
-                            .foregroundStyle(homeTab == .explore ? .brandOrange : Color(.systemGray4))
-                    }
-                    
-                    Button {
-                        homeTab = .following
-                    } label: {
-                        Text("Following")
-                            .foregroundStyle(homeTab == .following ? .brandOrange : Color(.systemGray4))
-                    }
-                }
-                .font(Font.title.bold())
-                .padding(.trailing)
-            }
-            .padding()
-            
-            switch homeTab {
-            case .explore:
-                FeedView()
-            case .following:
-                EmptyView()
-//                FollowingView()
-            }
-        }
-        
-    }
-}
-
-struct FeedView: View {
-    let manager = SupabaseManager.shared
-    @State private var nearbyPosts: [NearbyPost]?
-    @State private var showPostView: Bool = false
-    
-    var body: some View {
-        ScrollView {
-            LazyVStack {
-                // Wanna say hi?
-                Button {
-                    showPostView = true
-                } label: {
-                    HStack(alignment: .top, spacing: 12) {
-                        // Avatar
-                        AvatarView(url: "")
-                            .frame(width: 36, height: 36)
-                        
-                        // Main column
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                                Text("Hi")
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                    .lineLimit(1)
-                                    .foregroundStyle(.invertedPrimary)
-                                
-                                Spacer()
-                                
-                            }
-                            
-                            // Content
-                            Text("Say something!")
-                                .font(.body)
-                                .foregroundStyle(.primary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .foregroundStyle(Color(.systemGray))
+        NavigationStack {
+            VStack(alignment: .leading) {
+                HStack {
+                    Group {
+                        Button {
+                            homeTab = .explore
+                        } label: {
+                            Text("Explore")
+                                .foregroundStyle(homeTab == .explore ? .brandOrange : Color(.systemGray4))
                         }
-                    }
-                    .padding()
-                }
-                
-                Divider()
-                
-                if let posts = nearbyPosts {
-                    ForEach(posts) { post in
-                        PostCard(
-                                post: Post(
-                                    id: post.post_id,
-                                    user_id: post.post_user_id,
-                                    content: post.content,
-                                    created_at: post.created_at
-                                ),
-                                displayName: post.displayName,
-                                username: post.author_user_name,
-                                avatarURL: post.author_pfp_url
-                            )
-                            .padding()
-                            .padding(.vertical, -10)
                         
-                        Divider()
+                        Button {
+                            homeTab = .following
+                        } label: {
+                            Text("Following")
+                                .foregroundStyle(homeTab == .following ? .brandOrange : Color(.systemGray4))
+                        }
+                        
                     }
-                } else {
-                    // TODO: account for no posts nearby
-                    Text("No posts nearby.")
+                    .font(Font.title.bold())
+                    .padding(.trailing)
+                    
+                    Spacer()
+                    
+                    NavigationLink {
+                        SearchView()
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                }
+                .padding()
+                
+                switch homeTab {
+                case .explore:
+                    FeedView()
+                case .following:
+                    EmptyView()
+                    //                FollowingView()
                 }
             }
-        }
-        .refreshable {
-            Task {
-                nearbyPosts = try await manager.fetchNearbyPosts()
-            }
-        }
-        .onAppear {
-            Task {
-                nearbyPosts = try await manager.fetchNearbyPosts()
-            }
-        }
-        .sheet(isPresented: $showPostView) {
-            PostView()
         }
         
     }
