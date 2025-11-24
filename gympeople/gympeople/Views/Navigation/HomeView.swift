@@ -15,7 +15,7 @@ struct HomeView: View {
         ZStack {
             switch tabSelected {
             case .home:
-                WelcomeView()
+                ExploreView()
 //                EmptyView()
             case .chat:
                 EmptyView()
@@ -84,14 +84,8 @@ struct HomeView: View {
 //    HomeView()
 // }
 
-enum HomeTab {
-    case explore
-    case following
-}
-
-struct WelcomeView: View {
+struct ExploreView: View {
     @State private var homeTab: HomeTab = .explore
-    @State private var showPostView: Bool = false
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -131,14 +125,14 @@ struct WelcomeView: View {
 struct FeedView: View {
     let manager = SupabaseManager.shared
     @State private var nearbyPosts: [NearbyPost]?
+    @State private var showPostView: Bool = false
     
     var body: some View {
         ScrollView {
             LazyVStack {
-                
                 // Wanna say hi?
                 Button {
-                    
+                    showPostView = true
                 } label: {
                     HStack(alignment: .top, spacing: 12) {
                         // Avatar
@@ -189,7 +183,15 @@ struct FeedView: View {
                         
                         Divider()
                     }
+                } else {
+                    // TODO: account for no posts nearby
+                    Text("No posts nearby.")
                 }
+            }
+        }
+        .refreshable {
+            Task {
+                nearbyPosts = try await manager.fetchNearbyPosts()
             }
         }
         .onAppear {
@@ -197,11 +199,13 @@ struct FeedView: View {
                 nearbyPosts = try await manager.fetchNearbyPosts()
             }
         }
+        .sheet(isPresented: $showPostView) {
+            PostView()
+        }
         
     }
 }
 
 #Preview {
-    
-    WelcomeView()
+    ExploreView()
 }

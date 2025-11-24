@@ -20,5 +20,5 @@ struct UserProfile: Codable, Identifiable {
     var location: String?
     var gym_memberships: [String]?
     var pfp_url: String?
-    let created_at: Date?
+    let created_at: Date
 }

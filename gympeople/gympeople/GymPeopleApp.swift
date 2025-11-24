@@ -17,7 +17,6 @@ struct GymPeopleApp: App {
                 .onOpenURL { url in
                     Task { await authVM.handleAuthCallback(url: url) }
                 }
-                .preferredColorScheme(.light)
         }
     }
 }

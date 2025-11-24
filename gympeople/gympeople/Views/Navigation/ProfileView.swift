@@ -14,10 +14,8 @@ struct ProfileView: View {
 
     @State private var errorMessage: String?
     
-    @State private var avatarImage: UIImage?
     @State private var photosPickerItem: PhotosPickerItem?
     
-    @State private var pfpIsLoading: Bool = false
     @State private var hasLoadedProfile: Bool = false
     
     @State private var showProfileEditingPage: Bool = false
@@ -33,19 +31,8 @@ struct ProfileView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         // Profile Picture
                         PhotosPicker(selection: $photosPickerItem, matching: .images) {
-                            if !pfpIsLoading {
-                                Image(uiImage: avatarImage ?? UIImage(systemName: "person.circle.fill")!)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 75, height: 75)
-                                    .clipShape(.circle)
-                            } else {
-                                Image(uiImage: UIImage(systemName: "person.circle.fill")!)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 75, height: 75)
-                                    .clipShape(.circle)
-                            }
+                            AvatarView(url: userProfile.pfp_url)
+                                .frame(width: 75, height: 75)
                         }
                         
                         // Name, user, bio
@@ -74,10 +61,11 @@ struct ProfileView: View {
                                         ForEach(gyms, id: \.self) { gym in
                                             gymTagButton(gymTagType: .gym(gym: gym))
                                         }
-                                        gymTagButton(gymTagType: .plus)
                                     } else {
                                         gymTagButton(gymTagType: .none)
                                     }
+                                    
+                                    gymTagButton(gymTagType: .plus)
                                 }
                                 .padding(1)
                             }
@@ -91,14 +79,21 @@ struct ProfileView: View {
                         }
                         .pickerStyle(SegmentedPickerStyle())
                         
-                        ScrollView {
-                            LazyVStack {
-                                if let posts = posts {
-                                    ForEach(posts, id: \.self) { post in
-                                        PostCard(post: post, displayName: userProfile.first_name, username: userProfile.user_name, avatarURL: userProfile.pfp_url)
+                        switch profileTab {
+                        case .posts:
+                            ScrollView {
+                                LazyVStack {
+                                    if let posts = posts {
+                                        ForEach(posts, id: \.self) { post in
+                                            PostCard(post: post, displayName: userProfile.first_name, username: userProfile.user_name, avatarURL: userProfile.pfp_url)
+                                            
+                                            Divider()
+                                        }
                                     }
                                 }
                             }
+                        case .mentions:
+                            Text("Your mentions")
                         }
                         
                     }
@@ -146,7 +141,6 @@ struct ProfileView: View {
                 if let photosPickerItem {
                     if let data = try? await photosPickerItem.loadTransferable(type: Data.self) {
                         if let image = UIImage(data: data) {
-                            avatarImage = image
                             do {
                                 try await manager.uploadProfilePicture(image)
                             } catch {
@@ -174,18 +168,6 @@ struct ProfileView: View {
             LOG.debug("Fetching user profile")
             userProfile = try await manager.fetchUserProfile()
             LOG.debug("Fetched user profile")
-            
-            // Update image from url
-            pfpIsLoading = true
-            
-            if let pfpURLString = userProfile?.pfp_url, let url = URL(string: pfpURLString) {
-                if let (data, _) = try? await URLSession.shared.data(from: url),
-                   let image = UIImage(data: data) {
-                    avatarImage = image
-                }
-            }
-            
-            pfpIsLoading = false
             
         } catch {
             errorMessage = error.localizedDescription.debugDescription
