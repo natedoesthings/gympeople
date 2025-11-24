@@ -17,6 +17,8 @@ struct GymStepView: View {
     let email: String
     let dob: Date
     let phone: String
+    let latitude: Double
+    let longitude: Double
     let location: String
     
     var onDone: () -> Void
@@ -165,6 +167,8 @@ struct GymStepView: View {
                 email: email,
                 dob: dob,
                 phone: phone,
+                latitude: latitude,
+                longitude: longitude,
                 location: location,
                 gyms: selectedGyms
             )

@@ -91,9 +91,9 @@ enum HomeTab {
 
 struct WelcomeView: View {
     @State private var homeTab: HomeTab = .explore
+    @State private var showPostView: Bool = false
     
     var body: some View {
-        
         VStack(alignment: .leading) {
             HStack {
                 Group {
@@ -129,7 +129,8 @@ struct WelcomeView: View {
 }
 
 struct FeedView: View {
-    let posts: [Post] = POSTS
+    let manager = SupabaseManager.shared
+    @State private var nearbyPosts: [NearbyPost]?
     
     var body: some View {
         ScrollView {
@@ -165,21 +166,35 @@ struct FeedView: View {
                                 .foregroundStyle(Color(.systemGray))
                         }
                     }
-    //                .padding(.vertical, 10)
                     .padding()
                 }
                 
                 Divider()
                 
-                //                    if let posts = posts {
-                ForEach(posts, id: \.self) { post in
-                    PostCard(post: post, displayName: "nate", username: "datnigga", avatarURL: "")
-                        .padding()
-                        .padding(.vertical, -10)
-                    
-                    Divider()
+                if let posts = nearbyPosts {
+                    ForEach(posts) { post in
+                        PostCard(
+                                post: Post(
+                                    id: post.post_id,
+                                    user_id: post.post_user_id,
+                                    content: post.content,
+                                    created_at: post.created_at
+                                ),
+                                displayName: post.displayName,
+                                username: post.author_user_name,
+                                avatarURL: post.author_pfp_url
+                            )
+                            .padding()
+                            .padding(.vertical, -10)
+                        
+                        Divider()
+                    }
                 }
-                //                    }
+            }
+        }
+        .onAppear {
+            Task {
+                nearbyPosts = try await manager.fetchNearbyPosts()
             }
         }
         

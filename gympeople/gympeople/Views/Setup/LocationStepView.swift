@@ -13,6 +13,8 @@ struct LocationStepView: View {
     @StateObject private var locationVM = LocationViewModel()
     @StateObject private var citySearch = CitySearchService()
     
+    @Binding var latitude: Double
+    @Binding var longitude: Double
     @Binding var location: String
     
     var next: () -> Void
@@ -107,7 +109,7 @@ struct LocationStepView: View {
                 .frame(width: 300)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                 .padding(.bottom, 50)
-                .disabled(location.isEmpty)
+                .disabled(location.isEmpty || latitude == 0)
             }
             
         }
@@ -129,6 +131,8 @@ struct LocationStepView: View {
             guard let item = response?.mapItems.first else { return }
 
             // Best formatted city name
+            latitude = item.location.coordinate.latitude
+            longitude = item.location.coordinate.longitude
             location = item.addressRepresentations?.cityWithContext ?? ""
             isTyping = false
             locationFieldIsFocused = false // hide dropdown
@@ -139,6 +143,8 @@ struct LocationStepView: View {
         await locationVM.reverseGeoCode()
         
         if let mapItem = locationVM.mapItem {
+            latitude = mapItem.location.coordinate.latitude
+            longitude = mapItem.location.coordinate.longitude
             self.location = mapItem.addressRepresentations?.cityWithContext ?? ""
         } else {
             // show alert if location isn't available
@@ -147,6 +153,6 @@ struct LocationStepView: View {
     }
 }
 
-#Preview {
-    LocationStepView(location: .constant(""), next: {})
-}
+//#Preview {
+//    LocationStepView(location: .constant(""), next: {})
+//}

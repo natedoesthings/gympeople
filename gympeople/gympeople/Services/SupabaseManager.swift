@@ -30,6 +30,8 @@ extension SupabaseManager {
         email: String,
         dob: Date,
         phone: String,
+        latitude: Double,
+        longitude: Double,
         location: String,
         gyms: [String]
     ) async throws {
@@ -42,6 +44,8 @@ extension SupabaseManager {
             "email": AnyEncodable(email),
             "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: dob)),
             "phone_number": AnyEncodable(phone),
+            "latitude": AnyEncodable(latitude),
+            "longitude": AnyEncodable(longitude),
             "location": AnyEncodable(location.isEmpty ? nil : location),
             "gym_memberships": AnyEncodable(gyms)
         ]
@@ -242,5 +246,38 @@ extension SupabaseManager {
         
         return try await fetchPosts(for: userId)
     }
+    
+    
+    func fetchNearbyPosts() async throws -> [NearbyPost] {
+        guard let userId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return []
+        }
+
+        // 10 miles to meters
+        let radiusMeters = 10.0 * 1609.34
+
+        do {
+            let posts = try await client
+                .rpc(
+                    "fetch_nearby_posts_with_authors",
+                    params: [
+                        "p_user_id": userId.uuidString,
+                        "p_radius_meters": String(radiusMeters)
+                    ]
+                )
+                .execute()
+                .value as [NearbyPost]
+
+            return posts
+        } catch {
+            LOG.error("Error fetching nearby posts: \(error)")
+            throw error
+        }
+    }
+
+
+    
+    
 
 }

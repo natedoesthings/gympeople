@@ -20,6 +20,8 @@ struct OnboardingView: View {
     @State private var dob: Date = Date()
     @State private var phone: String = ""
     @State private var location: String = ""
+    @State private var latitude: Double = 0
+    @State private var longitude: Double = 0
     @State private var gymMemberships: [String] = []
     
     // NEW
@@ -41,7 +43,11 @@ struct OnboardingView: View {
                         case .phone:
                             PhoneStepView(phone: $phone, next: { path.append(.location) })
                         case .location:
-                            LocationStepView(location: $location, next: { path.append(.gyms) })
+                            LocationStepView(
+                                latitude: $latitude,
+                                longitude: $longitude,
+                                location: $location,
+                                next: { path.append(.gyms) })
                         case .gyms:
                             GymStepView(
                                 selectedGyms: $gymMemberships,
@@ -51,6 +57,8 @@ struct OnboardingView: View {
                                 email: email,
                                 dob: dob,
                                 phone: phone,
+                                latitude: latitude,
+                                longitude: longitude,
                                 location: location,
                                 onDone: { onFinished() }
                             )
