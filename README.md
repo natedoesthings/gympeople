@@ -35,8 +35,8 @@ https://github.com/user-attachments/assets/3b765d55-54f6-4c91-876b-2fbf39423a21
 
 # App Icon
 
-<img width="512" height="512" alt="gympeople_light" src="https://github.com/user-attachments/assets/4bd2cdc1-40cd-4e65-8ab1-77ffc52bd08b" />
-<img width="512" height="512" alt="gympeople_dark" src="https://github.com/user-attachments/assets/e3f9212d-5aad-4338-9759-0d1edfd38432" />
+<img width="256" height="256" alt="gympeople_light" src="https://github.com/user-attachments/assets/4bd2cdc1-40cd-4e65-8ab1-77ffc52bd08b" />
+<img width="256" height="256" alt="gympeople_dark" src="https://github.com/user-attachments/assets/e3f9212d-5aad-4338-9759-0d1edfd38432" />
 
 ## How does this stand out from others?
 - This app will ensure user safety enforcing strict identification procedures causing people to feel safe with linking up in person
