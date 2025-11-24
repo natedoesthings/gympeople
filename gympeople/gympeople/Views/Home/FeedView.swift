@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FeedView: View {
     let manager = SupabaseManager.shared
+    @State private var userProfile: UserProfile?
     @State private var nearbyPosts: [NearbyPost]?
     @State private var showPostView: Bool = false
     
@@ -21,29 +22,32 @@ struct FeedView: View {
                 } label: {
                     HStack(alignment: .top, spacing: 12) {
                         // Avatar
-                        AvatarView(url: "")
-                            .frame(width: 36, height: 36)
-                        
-                        // Main column
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                                Text("Hi")
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                    .lineLimit(1)
-                                    .foregroundStyle(.invertedPrimary)
-                                
-                                Spacer()
-                                
-                            }
+                        if let userProfile = userProfile {
+                            AvatarView(url: userProfile.pfp_url)
+                                .frame(width: 36, height: 36)
                             
-                            // Content
-                            Text("Say something!")
-                                .font(.body)
-                                .foregroundStyle(.primary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .foregroundStyle(Color(.systemGray))
+                            // Main column
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                                    Text("\(userProfile.first_name) \(userProfile.last_name)")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .lineLimit(1)
+                                        .foregroundStyle(.invertedPrimary)
+                                    
+                                    Spacer()
+                                    
+                                }
+                                
+                                // Content
+                                Text("Say something!")
+                                    .font(.body)
+                                    .foregroundStyle(.primary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .foregroundStyle(Color(.systemGray))
+                            }
                         }
+                        
                     }
                     .padding()
                 }
@@ -82,6 +86,7 @@ struct FeedView: View {
         }
         .onAppear {
             Task {
+                userProfile = try await manager.fetchMyUserProfile()
                 nearbyPosts = try await manager.fetchNearbyPosts()
             }
         }

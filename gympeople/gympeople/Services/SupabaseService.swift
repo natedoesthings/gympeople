@@ -13,12 +13,34 @@ import PhotosUI
 class SupabaseManager {
     static let shared = SupabaseManager()
     let client: SupabaseClient
+    private let profileCache = UserProfileCache()
+
 
     private init() {
         client = SupabaseClient(
             supabaseURL: URL(string: Env.supabaseURL)!,
             supabaseKey: Env.supabaseAnonKey
         )
+    }
+}
+
+actor UserProfileCache {
+    private var cachedProfile: UserProfile?
+    private var cachedUserID: UUID?
+
+    func get(for userID: UUID) -> UserProfile? {
+        guard userID == cachedUserID else { return nil }
+        return cachedProfile
+    }
+
+    func store(_ profile: UserProfile, for userID: UUID) {
+        cachedUserID = userID
+        cachedProfile = profile
+    }
+
+    func clear() {
+        cachedProfile = nil
+        cachedUserID = nil
     }
 }
 
@@ -97,6 +119,8 @@ extension SupabaseManager {
     }
 
     func fetchUserProfile(for userID: UUID) async throws -> UserProfile? {
+        LOG.debug("Calling Fetch Request for user profile")
+        
         let response = try await client
             .from("user_profiles")
             .select()
@@ -116,8 +140,18 @@ extension SupabaseManager {
             LOG.notice("No authenticated user found")
             return nil
         }
-        
-        return try await fetchUserProfile(for: userID)
+
+        if let cached = await profileCache.get(for: userID) {
+            LOG.debug("Returning cached profile for current user")
+            return cached
+        }
+
+        let profile = try await fetchUserProfile(for: userID)
+        if let profile {
+            await profileCache.store(profile, for: userID)
+        }
+
+        return profile
     }
 
     func searchUserProfiles(matching query: String, limit: Int = 20) async throws -> [UserProfile] {
@@ -148,6 +182,10 @@ extension SupabaseManager {
             .update(fields)
             .eq("id", value: userID)
             .execute()
+
+        if let updatedProfile = try await fetchUserProfile(for: userID) {
+            await profileCache.store(updatedProfile, for: userID)
+        }
     }
     
     // Update whole profile
@@ -174,6 +212,8 @@ extension SupabaseManager {
             .update(fields)
             .eq("id", value: userID)
             .execute()
+
+        await profileCache.store(userProfile, for: userID)
     }
     
     func uploadProfilePicture(_ image: UIImage) async throws {
@@ -209,6 +249,10 @@ extension SupabaseManager {
                 } catch {
                     LOG.error("Error updating profile with url \(error)")
                 }
+
+                if let updatedProfile = try await fetchUserProfile(for: userID) {
+                    await profileCache.store(updatedProfile, for: userID)
+                }
                 
             } catch {
                 LOG.error("Error grabbing public url \(error)")
@@ -219,6 +263,10 @@ extension SupabaseManager {
         }
         
         LOG.info("Profile Picture Updated!")
+    }
+
+    func clearUserProfileCache() async {
+        await profileCache.clear()
     }
     
     func createPost(content: String) async throws {

@@ -21,6 +21,7 @@ class AuthViewModel: ObservableObject {
     @Published var needsOnboarding: Bool = false
 
     private let client = SupabaseManager.shared.client
+    private let supabaseManager = SupabaseManager.shared
     private var authStateTask: Task<Void, Never>?
 
     init() {
@@ -144,6 +145,12 @@ class AuthViewModel: ObservableObject {
 
                 self.needsOnboarding = false
                 LOG.info("User already onboarded")
+                
+                do {
+                    _ = try await supabaseManager.fetchMyUserProfile()
+                } catch {
+                    LOG.error("Error priming user profile cache: \(error)")
+                }
 
             } catch {
                 LOG.error("Error checking onboarding status: \(error)")
@@ -168,6 +175,7 @@ class AuthViewModel: ObservableObject {
         do {
             LOG.debug("Signing Out \(userEmail)")
             try await client.auth.signOut()
+            await supabaseManager.clearUserProfileCache()
             resetState()
             LOG.debug("Signed Out \(userEmail)")
         } catch {
