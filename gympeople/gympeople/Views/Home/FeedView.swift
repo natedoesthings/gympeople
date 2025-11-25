@@ -12,6 +12,7 @@ struct FeedView: View {
     @State private var userProfile: UserProfile?
     @State private var nearbyPosts: [NearbyPost]?
     @State private var showPostView: Bool = false
+    @State private var fetched: Bool = false
     
     var body: some View {
         ScrollView {
@@ -81,13 +82,18 @@ struct FeedView: View {
         }
         .refreshable {
             Task {
+                userProfile = try await manager.fetchMyUserProfile()
                 nearbyPosts = try await manager.fetchNearbyPosts()
             }
         }
-        .onAppear {
+        .task {
             Task {
-                userProfile = try await manager.fetchMyUserProfile()
-                nearbyPosts = try await manager.fetchNearbyPosts()
+                if !fetched {
+                    userProfile = try await manager.fetchMyUserProfile()
+                    nearbyPosts = try await manager.fetchNearbyPosts()
+                }
+                
+                fetched = true
             }
         }
         .sheet(isPresented: $showPostView) {

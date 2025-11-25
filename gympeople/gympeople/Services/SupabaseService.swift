@@ -161,9 +161,8 @@ extension SupabaseManager {
         let response = try await client
             .from("user_profiles")
             .select()
-            .ilike("user_name", pattern: "%\(trimmedQuery)%")
+            .or("user_name.ilike.%\(trimmedQuery)%,full_name.ilike.%\(trimmedQuery)%")
             .order("user_name", ascending: true)
-            .limit(limit)
             .execute()
 
         let decoder = makeUserProfileDecoder()
@@ -182,6 +181,8 @@ extension SupabaseManager {
             .update(fields)
             .eq("id", value: userID)
             .execute()
+        
+        try await Task.sleep(nanoseconds: 250_000_000)
 
         if let updatedProfile = try await fetchUserProfile(for: userID) {
             await profileCache.store(updatedProfile, for: userID)
@@ -223,13 +224,29 @@ extension SupabaseManager {
             LOG.notice("No authenticated user found")
             return
         }
+
+        let bucket = "profile_pictures"
+
+        // Try to clean up any existing profile picture before uploading a new one.
+        if let currentProfile = try? await fetchMyUserProfile(),
+           let currentURLString = currentProfile.pfp_url,
+           let path = storagePath(fromPublicURL: currentURLString, bucket: bucket) {
+            do {
+                try await client.storage
+                    .from(bucket)
+                    .remove(paths: [path])
+                LOG.debug("Removed old profile picture at path: \(path)")
+            } catch {
+                LOG.error("Failed to remove old profile picture: \(error)")
+            }
+        }
         
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             throw NSError(domain: "ImageError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to JPEG."])
         }
 
-        let fileName = "\(userID.uuidString).jpg"
-        let bucket = "profile_pictures"
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let fileName = "\(userID.uuidString)_\(timestamp).jpg"
 
         // 1. Upload to storage
         do {
@@ -248,10 +265,6 @@ extension SupabaseManager {
                     try await updateUserProfile(fields: ["pfp_url": AnyEncodable(publicURL.absoluteString)])
                 } catch {
                     LOG.error("Error updating profile with url \(error)")
-                }
-
-                if let updatedProfile = try await fetchUserProfile(for: userID) {
-                    await profileCache.store(updatedProfile, for: userID)
                 }
                 
             } catch {
@@ -357,8 +370,13 @@ extension SupabaseManager {
         }
     }
 
-
-    
-    
-
+    private func storagePath(fromPublicURL urlString: String, bucket: String) -> String? {
+        guard let url = URL(string: urlString) else { return nil }
+        let components = url.pathComponents
+        guard let bucketIndex = components.firstIndex(of: bucket),
+              bucketIndex + 1 < components.count else { return nil }
+        let pathComponents = components[(bucketIndex + 1)...]
+        let path = pathComponents.joined(separator: "/")
+        return path.isEmpty ? nil : path
+    }
 }

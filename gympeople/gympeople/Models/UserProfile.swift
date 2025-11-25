@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import CoreLocation
 
 struct UserProfile: Codable, Identifiable {
     let id: UUID
@@ -21,4 +20,25 @@ struct UserProfile: Codable, Identifiable {
     var gym_memberships: [String]?
     var pfp_url: String?
     let created_at: Date
+    var updated_at: Date?
+}
+
+extension UserProfile {
+    static func placeholder() -> UserProfile {
+        return UserProfile(
+            id: UUID(),
+            first_name: "",
+            last_name: "",
+            user_name: "",
+            biography: nil,
+            email: "",
+            date_of_birth: Date(),
+            phone_number: "",
+            location: nil,
+            gym_memberships: [],
+            pfp_url: nil,
+            created_at: Date(),
+            updated_at: Date()
+        )
+    }
 }

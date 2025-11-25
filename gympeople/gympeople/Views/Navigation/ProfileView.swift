@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @State private var userProfile: UserProfile?
+    @State private var userProfile: UserProfile = .placeholder()
     @State private var posts: [Post]?
 
     @State private var errorMessage: String?
@@ -24,110 +24,117 @@ struct ProfileView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            if let userProfile = userProfile {
+            if hasLoadedProfile {
                 // Profile picture displayer and selector
                 NavigationStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        // Profile Picture
-                        PhotosPicker(selection: $photosPickerItem, matching: .images) {
-                            AvatarView(url: userProfile.pfp_url)
-                                .frame(width: 75, height: 75)
-                        }
-                        
-                        // Name, user, bio
-                        HStack {
-                            Text(userProfile.first_name)
-                            Text(userProfile.last_name)
-                        }
-                        .padding(.top, 5)
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("@\(userProfile.user_name)")
-                            if let bio = userProfile.biography {
-                                Text("\(bio)")
+                    ScrollView{
+                        VStack(alignment: .leading, spacing: 4) {
+                            // Profile Picture
+                            PhotosPicker(selection: $photosPickerItem, matching: .images) {
+                                AvatarView(url: userProfile.pfp_url)
+                                    .frame(width: 75, height: 75)
                             }
-                        }
-                        .font(.caption)
-                        .foregroundStyle(Color.standardSecondary)
-                        
-                        // Gym Tags
-                        VStack(alignment: .leading, spacing: 15) {
-                            ScrollView(.horizontal) {
-                                HStack {
-                                    if let gyms = userProfile.gym_memberships {
-                                        ForEach(gyms, id: \.self) { gym in
+                            
+                            // Name, user, bio
+                            HStack {
+                                Text(userProfile.first_name)
+                                Text(userProfile.last_name)
+                            }
+                            .padding(.top, 5)
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text("@\(userProfile.user_name)")
+                                if let bio = userProfile.biography {
+                                    Text("\(bio)")
+                                }
+                            }
+                            .font(.caption)
+                            .foregroundStyle(Color.standardSecondary)
+                            
+                            // Gym Tags
+                            VStack(alignment: .leading, spacing: 15) {
+                                ScrollView(.horizontal) {
+                                    HStack {
+                                        if let gyms = userProfile.gym_memberships {
+                                            ForEach(gyms, id: \.self) { gym in
+                                                Button {
+                                                    showProfileEditingPage = true
+                                                } label: {
+                                                    GymTagButton(gymTagType: .gym(gym: gym))
+                                                }
+                                                
+                                            }
+                                        } else {
                                             Button {
                                                 showProfileEditingPage = true
                                             } label: {
-                                                GymTagButton(gymTagType: .gym(gym: gym))
+                                                GymTagButton(gymTagType: .none)
                                             }
                                             
                                         }
-                                    } else {
+                                        
                                         Button {
                                             showProfileEditingPage = true
                                         } label: {
-                                            GymTagButton(gymTagType: .none)
+                                            GymTagButton(gymTagType: .plus)
                                         }
                                         
                                     }
-                                    
-                                    Button {
-                                        showProfileEditingPage = true
-                                    } label: {
-                                        GymTagButton(gymTagType: .plus)
-                                    }
-                                    
+                                    .padding(1)
                                 }
-                                .padding(1)
                             }
-                        }
-                        .padding(.vertical, 15)
-                        
-                        Picker("", selection: $profileTab) {
-                            ForEach(ProfileTab.allCases) { tab in
-                                Text(tab.rawValue).tag(tab)
+                            .padding(.vertical, 15)
+                            
+                            Picker("", selection: $profileTab) {
+                                ForEach(ProfileTab.allCases) { tab in
+                                    Text(tab.rawValue).tag(tab)
+                                }
                             }
-                        }
-                        .pickerStyle(SegmentedPickerStyle())
-                        
-                        switch profileTab {
-                        case .posts:
-                            ScrollView {
-                                LazyVStack {
-                                    if let posts = posts {
-                                        ForEach(posts, id: \.self) { post in
-                                            PostCard(post: post, displayName: userProfile.first_name, username: userProfile.user_name, avatarURL: userProfile.pfp_url)
-                                            
-                                            Divider()
+                            .pickerStyle(SegmentedPickerStyle())
+                            
+                            switch profileTab {
+                            case .posts:
+                                ScrollView {
+                                    LazyVStack {
+                                        if let posts = posts {
+                                            ForEach(posts, id: \.self) { post in
+                                                PostCard(post: post, displayName: userProfile.first_name, username: userProfile.user_name, avatarURL: userProfile.pfp_url)
+                                                
+                                                Divider()
+                                            }
                                         }
                                     }
                                 }
+                            case .mentions:
+                                Text("Your mentions")
                             }
-                        case .mentions:
-                            Text("Your mentions")
+                            
                         }
-                        
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            HStack {
-                                Button {
-                                    showProfileEditingPage = true
-                                } label: {
-                                    Image(systemName: "pencil")
-                                }
-                                
-                                NavigationLink {
-                                    ProfileSettingsPageView(userProfile: userProfile)
-                                } label: {
-                                    Image(systemName: "slider.horizontal.3")
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                HStack {
+                                    Button {
+                                        showProfileEditingPage = true
+                                    } label: {
+                                        Image(systemName: "pencil")
+                                    }
+                                    
+                                    NavigationLink {
+                                        ProfileSettingsPageView(userProfile: userProfile)
+                                    } label: {
+                                        Image(systemName: "slider.horizontal.3")
+                                    }
                                 }
                             }
+                        }
+                    }
+                    .refreshable {
+                        Task {
+                            await loadProfile()
                         }
                     }
                 }
@@ -157,6 +164,7 @@ struct ProfileView: View {
                         if let image = UIImage(data: data) {
                             do {
                                 try await manager.uploadProfilePicture(image)
+                                await loadProfile()
                             } catch {
                                 LOG.error("Could not upload profile picture: \(error)")
                             }
@@ -180,7 +188,7 @@ struct ProfileView: View {
             
             // Fetch profile
             LOG.debug("Fetching user profile")
-            userProfile = try await manager.fetchMyUserProfile()
+            userProfile = try await manager.fetchMyUserProfile() ?? .placeholder()
             LOG.debug("Fetched user profile")
             
         } catch {

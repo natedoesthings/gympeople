@@ -10,13 +10,15 @@ import SwiftUI
 struct SearchView: View {
     @StateObject private var viewModel = SearchViewModel()
     @State private var searchText: String = ""
+    @Binding var hideTabBar: Bool
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         VStack(spacing: 16) {
             searchField
 
             Group {
-                if viewModel.isSearching {
+                if !viewModel.isSearching {
                     ProgressView("Searching...")
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else if let error = viewModel.errorMessage {
@@ -39,8 +41,14 @@ struct SearchView: View {
         }
         .padding()
         .navigationTitle("Search")
-        .onChange(of: searchText) { newValue in
+        .onChange(of: searchText) { _, newValue in
             viewModel.search(query: newValue)
+        }
+        .onChange(of: isFocused) { _, isFocused in
+            hideTabBar = isFocused
+        }
+        .onDisappear {
+            hideTabBar = false
         }
         .frame(maxHeight: .infinity, alignment: .top)
     }
@@ -53,6 +61,7 @@ struct SearchView: View {
             TextField("Search by username", text: $searchText)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled(true)
+                .focused($isFocused)
         }
         .padding(12)
         .background(

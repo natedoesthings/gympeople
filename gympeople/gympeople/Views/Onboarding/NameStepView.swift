@@ -157,6 +157,7 @@ struct UserNameStepView: View {
                         ProgressView()
                             .padding(.trailing, 10)
                     } else {
+                        // TODO: https://github.com/natedoesthings/gympeople/issues/23
                         Image(systemName: validUserName ? "checkmark.circle.fill" : "x.circle.fill")
                             .padding(.trailing, 10)
                             .foregroundStyle(validUserName ? .success : .error)

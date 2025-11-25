@@ -132,7 +132,6 @@ struct GymStepView: View {
                 .padding(.bottom, 50)
             }
             
-            // TODO: Fix skip button 
             Button {
                 Task {
                     selectedGyms = []

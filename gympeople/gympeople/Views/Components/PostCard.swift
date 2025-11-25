@@ -117,24 +117,24 @@ struct AvatarView: View {
     }
 }
 
-#Preview {
-    let posts = [Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
-                 Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
-                 Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7))]
-    
-    ScrollView {
-        LazyVStack(spacing: 0) {
-            ForEach(posts, id: \.self) { post in
-                PostCard(
-                    post: post,
-                    displayName: "Nathanael Tesfaye",
-                    username: "nate",
-                    avatarURL: "https://picsum.photos/seed/nate/200"
-                )
-                Divider()
-            }
-            
-        }
-
-    }
-}
+//#Preview {
+//    let posts = [Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
+//                 Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
+//                 Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7))]
+//    
+//    ScrollView {
+//        LazyVStack(spacing: 0) {
+//            ForEach(posts, id: \.self) { post in
+//                PostCard(
+//                    post: post,
+//                    displayName: "Nathanael Tesfaye",
+//                    username: "nate",
+//                    avatarURL: "https://picsum.photos/seed/nate/200"
+//                )
+//                Divider()
+//            }
+//            
+//        }
+//
+//    }
+//}

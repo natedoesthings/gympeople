@@ -10,59 +10,62 @@ import SwiftUI
 struct HomeView: View {
     @State private var tabSelected: Tab = .home
     @State private var showPostView: Bool = false
+    @State private var hideTabBar: Bool = false
     
     var body: some View {
         ZStack {
             TabView(selection: $tabSelected) {
-                ExploreView().tag(Tab.home)
+                ExploreView(hideTabBar: $hideTabBar).tag(Tab.home)
                 EmptyView().tag(Tab.chat)
                 EmptyView().tag(Tab.memberships)
                 ProfileView().tag(Tab.profile)
             }
             .tabViewStyle(.page(indexDisplayMode: .never)) // hide default bar
             
-            HStack {
-                Group {
-                    Button {
-                        tabSelected = .home
-                    } label: {
-                        Image(systemName: tabSelected == .home ? "house.fill" : "house")
-                            .font(.system(size: 24))
+            if !hideTabBar {
+                HStack {
+                    Group {
+                        Button {
+                            tabSelected = .home
+                        } label: {
+                            Image(systemName: tabSelected == .home ? "house.fill" : "house")
+                                .font(.system(size: 24))
+                        }
+                        
+                        Button {
+                            tabSelected = .chat
+                        } label: {
+                            Image(systemName: tabSelected == .chat ? "message.fill" : "message")
+                                .font(.system(size: 24))
+                        }
+                        
+                        Button {
+                            showPostView = true
+                        } label: {
+                            Image(systemName: tabSelected == .post ? "plus.circle.fill" : "plus.circle")
+                                .font(.system(size: 24))
+                        }
+                        
+                        Button {
+                            tabSelected = .memberships
+                        } label: {
+                            Image(systemName: tabSelected == .memberships ? "wallet.pass.fill" : "wallet.pass")
+                                .font(.system(size: 24))
+                        }
+                        
+                        Button {
+                            tabSelected = .profile
+                        } label: {
+                            Image(systemName: tabSelected == .profile ? "person.fill" : "person")
+                                .font(.system(size: 24))
+                        }
                     }
-                    
-                    Button {
-                        tabSelected = .chat
-                    } label: {
-                        Image(systemName: tabSelected == .chat ? "message.fill" : "message")
-                            .font(.system(size: 24))
-                    }
-                    
-                    Button {
-                        showPostView = true
-                    } label: {
-                        Image(systemName: tabSelected == .post ? "plus.circle.fill" : "plus.circle")
-                            .font(.system(size: 24))
-                    }
-                    
-                    Button {
-                        tabSelected = .memberships
-                    } label: {
-                        Image(systemName: tabSelected == .memberships ? "wallet.pass.fill" : "wallet.pass")
-                            .font(.system(size: 24))
-                    }
-                    
-                    Button {
-                        tabSelected = .profile
-                    } label: {
-                        Image(systemName: tabSelected == .profile ? "person.fill" : "person")
-                            .font(.system(size: 24))
-                    }
+                    .padding(.top, 20)
+                    .padding(.horizontal, 23)
                 }
-                .padding(.top, 20)
-                .padding(.horizontal, 23)
+                .background(Color.standardPrimary)
+                .frame(maxHeight: .infinity, alignment: .bottom)
             }
-            .background(Color.standardPrimary)
-            .frame(maxHeight: .infinity, alignment: .bottom)
             
         }
         .sheet(isPresented: $showPostView) {
@@ -72,11 +75,8 @@ struct HomeView: View {
     }
 }
 
-// #Preview {
-//    HomeView()
-// }
-
 struct ExploreView: View {
+    @Binding var hideTabBar: Bool
     @State private var homeTab: HomeTab = .explore
     
     var body: some View {
@@ -105,7 +105,7 @@ struct ExploreView: View {
                     Spacer()
                     
                     NavigationLink {
-                        SearchView()
+                        SearchView(hideTabBar: $hideTabBar)
                     } label: {
                         Image(systemName: "magnifyingglass")
                     }
@@ -123,8 +123,4 @@ struct ExploreView: View {
         }
         
     }
-}
-
-#Preview {
-    ExploreView()
 }
