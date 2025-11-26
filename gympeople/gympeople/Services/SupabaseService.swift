@@ -307,6 +307,14 @@ extension SupabaseManager {
     
     func checkUserName(userName: String) async -> Bool {
         do {
+            if let userID = client.auth.currentUser?.id {
+                if let cached = await profileCache.get(for: userID) {
+                    if userName == cached.user_name {
+                        return true
+                    }
+                }
+            }
+            
             let result = try await client
                 .from("user_profiles")
                 .select("id")

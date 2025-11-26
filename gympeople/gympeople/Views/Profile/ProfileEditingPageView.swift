@@ -9,9 +9,14 @@ import SwiftUI
 import MapKit
 
 struct ProfileEditingPageView: View {
-    @Binding var userProfile: UserProfile
+    @State var userProfile: UserProfile
     @Environment(\.dismiss) var dismiss
-    @FocusState private var locationFieldIsFocused: Bool
+    
+    @State private var checkingUsername: Bool = false
+    @State private var validUserName: Bool = true
+    @State private var showInvalidUsernameAlert: Bool = false
+    
+    @FocusState private var userNameFieldIsFocused: Bool
     
     let manager = SupabaseManager.shared
     
@@ -32,6 +37,19 @@ struct ProfileEditingPageView: View {
                             .autocapitalization(.none)
                             .disableAutocorrection(true)
                             .padding(.vertical, 12)
+                            .focused($userNameFieldIsFocused)
+                            
+                            Spacer()
+                            
+                            if checkingUsername {
+                                ProgressView()
+                                    .padding(.trailing, 10)
+                            } else {
+                                // TODO: https://github.com/natedoesthings/gympeople/issues/23
+                                Image(systemName: validUserName ? "checkmark.circle.fill" : "x.circle.fill")
+                                    .padding(.trailing, 10)
+                                    .foregroundStyle(validUserName ? .success : .error)
+                            }
                         }
                         .cornerRadius(12)
                         .overlay(
@@ -116,12 +134,33 @@ struct ProfileEditingPageView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") {
-                        Task {
-                            await updateUserProfile()
-                            dismiss()
+                        if !validUserName {
+                            showInvalidUsernameAlert = true
+                        } else {
+                            Task {
+                                await updateUserProfile()
+                                dismiss()
+                            }
                         }
                     }
                 }
+            }
+            .onChange(of: userNameFieldIsFocused) { _,newValue in
+                Task {
+                    if newValue { return }
+                    
+                    checkingUsername = true
+                    validUserName = await SupabaseManager.shared.checkUserName(userName: userProfile.user_name) && !userProfile.user_name.isEmpty
+                    checkingUsername = false
+                }
+            }
+            .alert(isPresented: $showInvalidUsernameAlert) {
+                Alert(
+                    title: Text("Username Invalid"),
+                    message: Text("The username you have entered was invalid, please try again or dismiss any changes you have made"),
+                    primaryButton: .cancel(Text("Go Back")),
+                    secondaryButton: .destructive(Text("Continue"), action: { dismiss() })
+                )
             }
         }
     }

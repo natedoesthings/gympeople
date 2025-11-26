@@ -145,7 +145,7 @@ struct ProfileView: View {
                     }
                 }
                 .sheet(isPresented: $showProfileEditingPage) {
-                    ProfileEditingPageView(userProfile: $userProfile)
+                    ProfileEditingPageView(userProfile: userProfile)
                 }
                 
             } else if let error = errorMessage {
