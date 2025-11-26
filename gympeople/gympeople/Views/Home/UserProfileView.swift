@@ -112,7 +112,7 @@ private struct ProfileContentView: View {
                 
                 switch profileTab {
                 case .posts:
-                    ScrollView {
+                    HiddenScrollView {
                         LazyVStack {
                             if let posts = posts {
                                 ForEach(posts, id: \.self) { post in
@@ -161,11 +161,10 @@ private struct ProfileContentView: View {
         .foregroundStyle(Color.standardSecondary)
 
         VStack(alignment: .leading, spacing: 15) {
-            ScrollView(.horizontal) {
-                if let gyms = userProfile.gym_memberships {
+            HiddenScrollView(.horizontal) {
+                if !userProfile.gym_memberships.isEmpty {
                     HStack {
-                        
-                        ForEach(gyms, id: \.self) { gym in
+                        ForEach(userProfile.gym_memberships, id: \.self) { gym in
                             GymTagButton(gymTagType: .gym(gym: gym))
                         }
                         

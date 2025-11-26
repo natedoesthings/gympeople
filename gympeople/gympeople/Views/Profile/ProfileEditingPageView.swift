@@ -23,7 +23,7 @@ struct ProfileEditingPageView: View {
     var body: some View {
         NavigationView {
             VStack {
-                ScrollView {
+                HiddenScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Username")
                             .font(.caption)
@@ -104,9 +104,43 @@ struct ProfileEditingPageView: View {
                             )
                         }
                         
+                        Text("Gym Memberships")
+                            .font(.caption)
+                        
+                        VStack(alignment: .leading, spacing: 15) {
+                            HiddenScrollView(.horizontal) {
+                                HStack {
+                                    if !userProfile.gym_memberships.isEmpty {
+                                        ForEach(userProfile.gym_memberships, id: \.self) { gym in
+                                            Button {
+                                                
+                                            } label: {
+                                                GymTagButton(gymTagType: .gym(gym: gym))
+                                            }
+                                            
+                                        }
+                                        
+                                        NavigationLink {
+                                            GymEditingView(gym_memberships: $userProfile.gym_memberships)
+                                        } label: {
+                                            GymTagButton(gymTagType: .plus)
+                                        }
+                                        
+                                    } else {
+                                        NavigationLink {
+                                            GymEditingView(gym_memberships: $userProfile.gym_memberships)
+                                        } label: {
+                                            GymTagButton(gymTagType: .none)
+                                        }
+                                    }
+                                }
+                                .padding(1)
+                            }
+                        }
+                        
                         Text("Phone")
                             .font(.caption)
-                        CustomTextField(placeholder: "e.g. 615-555-1234", field: $userProfile.last_name, systemName: "phone")
+                        CustomTextField(placeholder: "e.g. 615-555-1234", field: $userProfile.phone_number, systemName: "phone")
 
                         DatePicker(selection: Binding(
                             get: { userProfile.date_of_birth },
@@ -121,7 +155,7 @@ struct ProfileEditingPageView: View {
                         Text("Email")
                             .font(.caption)
                         
-                        CustomTextField(placeholder: "Email", field: $userProfile.last_name, systemName: "envelope")
+                        CustomTextField(placeholder: "Email", field: $userProfile.email, systemName: "envelope")
 
                         
                         

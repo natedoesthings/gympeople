@@ -28,7 +28,7 @@ struct ProfileView: View {
             if hasLoadedProfile {
                 // Profile picture displayer and selector
                 NavigationStack {
-                    ScrollView{
+                    HiddenScrollView {
                         VStack(alignment: .leading, spacing: 4) {
                             // Profile Picture
                             PhotosPicker(selection: $photosPickerItem, matching: .images) {
@@ -56,32 +56,30 @@ struct ProfileView: View {
                             
                             // Gym Tags
                             VStack(alignment: .leading, spacing: 15) {
-                                ScrollView(.horizontal) {
+                                HiddenScrollView(.horizontal) {
                                     HStack {
-                                        if let gyms = userProfile.gym_memberships {
-                                            ForEach(gyms, id: \.self) { gym in
+                                        if !userProfile.gym_memberships.isEmpty {
+                                            ForEach(userProfile.gym_memberships, id: \.self) { gym in
                                                 Button {
                                                     showProfileEditingPage = true
                                                 } label: {
                                                     GymTagButton(gymTagType: .gym(gym: gym))
                                                 }
-                                                
+                                            }
+                                            
+                                            NavigationLink {
+                                                GymEditingView(gym_memberships: $userProfile.gym_memberships)
+                                            } label: {
+                                                GymTagButton(gymTagType: .plus)
                                             }
                                         } else {
-                                            Button {
-                                                showProfileEditingPage = true
+                                            NavigationLink {
+                                                GymEditingView(gym_memberships: $userProfile.gym_memberships)
                                             } label: {
                                                 GymTagButton(gymTagType: .none)
                                             }
                                             
                                         }
-                                        
-                                        Button {
-                                            showProfileEditingPage = true
-                                        } label: {
-                                            GymTagButton(gymTagType: .plus)
-                                        }
-                                        
                                     }
                                     .padding(1)
                                 }

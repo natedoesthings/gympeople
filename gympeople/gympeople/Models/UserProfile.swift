@@ -19,7 +19,7 @@ struct UserProfile: Codable, Identifiable {
     var location: String
     var latitude: Double
     var longitude: Double
-    var gym_memberships: [String]?
+    var gym_memberships: [String]
     var pfp_url: String?
     let created_at: Date
     var updated_at: Date?

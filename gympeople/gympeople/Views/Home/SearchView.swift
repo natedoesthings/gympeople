@@ -28,7 +28,7 @@ struct SearchView: View {
                 } else if viewModel.results.isEmpty {
                     emptyState
                 } else {
-                    ScrollView {
+                    HiddenScrollView {
                         LazyVStack(alignment: .leading, spacing: 12) {
                             ForEach(viewModel.results) { profile in
                                 userRow(profile)

@@ -15,7 +15,7 @@ struct FeedView: View {
     @State private var fetched: Bool = false
     
     var body: some View {
-        ScrollView {
+        HiddenScrollView {
             LazyVStack {
                 // Wanna say hi?
                 Button {

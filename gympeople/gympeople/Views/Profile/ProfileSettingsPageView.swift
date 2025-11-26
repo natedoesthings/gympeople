@@ -39,7 +39,7 @@ struct ProfileSettingsPageView: View {
                 .frame(width: 100)
                 
             }
-            ScrollView {
+            HiddenScrollView {
                 Section(header: header("Content")) {
                     Button {
                         

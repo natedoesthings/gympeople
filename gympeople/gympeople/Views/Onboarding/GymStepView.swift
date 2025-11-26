@@ -60,7 +60,7 @@ struct GymStepView: View {
                 if isFocused {
                     if !filteredGyms.isEmpty {
                         VStack(alignment: .leading, spacing: 0) {
-                            ScrollView {
+                            HiddenScrollView {
                                 ForEach(filteredGyms, id: \.self) { gym in
                                     Button {
                                         toggleSelection(for: gym)
