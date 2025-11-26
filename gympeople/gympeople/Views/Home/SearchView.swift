@@ -18,7 +18,7 @@ struct SearchView: View {
             searchField
 
             Group {
-                if !viewModel.isSearching {
+                if viewModel.isSearching {
                     ProgressView("Searching...")
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else if let error = viewModel.errorMessage {

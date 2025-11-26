@@ -100,79 +100,80 @@ private struct ProfileContentView: View {
 
     var body: some View {
         VStack {
-            header
-
-            Picker("", selection: $profileTab) {
-                ForEach(ProfileTab.allCases) { tab in
-                    Text(tab.rawValue).tag(tab)
+            VStack(alignment: .leading, spacing: 4) {
+                header()
+                
+                Picker("", selection: $profileTab) {
+                    ForEach(ProfileTab.allCases) { tab in
+                        Text(tab.rawValue).tag(tab)
+                    }
                 }
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
-
-            switch profileTab {
-            case .posts:
-                ScrollView {
-                    LazyVStack {
-                        if let posts = posts {
-                            ForEach(posts, id: \.self) { post in
-                                PostCard(
-                                    post: post,
-                                    displayName: userProfile.first_name,
-                                    username: userProfile.user_name,
-                                    avatarURL: userProfile.pfp_url
-                                )
-                                .padding()
-
-                                Divider()
+                .pickerStyle(SegmentedPickerStyle())
+                
+                switch profileTab {
+                case .posts:
+                    ScrollView {
+                        LazyVStack {
+                            if let posts = posts {
+                                ForEach(posts, id: \.self) { post in
+                                    PostCard(
+                                        post: post,
+                                        displayName: userProfile.first_name,
+                                        username: userProfile.user_name,
+                                        avatarURL: userProfile.pfp_url
+                                    )
+                                    
+                                    Divider()
+                                }
                             }
                         }
                     }
+                case .mentions:
+                    Text("Mentions")
                 }
-            case .mentions:
-                Text("Mentions")
             }
         }
+        .padding()
     }
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            AvatarView(url: userProfile.pfp_url)
-                .frame(width: 75, height: 75)
+    @ViewBuilder
+    private func header() -> some View {
+        AvatarView(url: userProfile.pfp_url)
+            .frame(width: 75, height: 75)
 
-            HStack {
-                Text(userProfile.first_name)
-                Text(userProfile.last_name)
-            }
-            .padding(.top, 5)
-            .font(.title3)
-            .fontWeight(.semibold)
+        HStack {
+            Text(userProfile.first_name)
+            Text(userProfile.last_name)
+        }
+        .padding(.top, 5)
+        .font(.title3)
+        .fontWeight(.semibold)
 
-            VStack(alignment: .leading, spacing: 5) {
-                Text("@\(userProfile.user_name)")
-                if let bio = userProfile.biography {
+        VStack(alignment: .leading, spacing: 5) {
+            Text("@\(userProfile.user_name)")
+            if let bio = userProfile.biography {
+                if !bio.isEmpty {
                     Text("\(bio)")
                 }
             }
-            .font(.caption)
-            .foregroundStyle(Color.standardSecondary)
+        }
+        .font(.caption)
+        .foregroundStyle(Color.standardSecondary)
 
-            VStack(alignment: .leading, spacing: 15) {
-                ScrollView(.horizontal) {
-                    if let gyms = userProfile.gym_memberships {
-                        HStack {
-                            
-                            ForEach(gyms, id: \.self) { gym in
-                                GymTagButton(gymTagType: .gym(gym: gym))
-                            }
-                            
+        VStack(alignment: .leading, spacing: 15) {
+            ScrollView(.horizontal) {
+                if let gyms = userProfile.gym_memberships {
+                    HStack {
+                        
+                        ForEach(gyms, id: \.self) { gym in
+                            GymTagButton(gymTagType: .gym(gym: gym))
                         }
-                        .padding(1)
+                        
                     }
+                    .padding(1)
                 }
             }
-            .padding(.vertical, 15)
         }
-        .padding()
+        .padding(.vertical, 15)
     }
 }
