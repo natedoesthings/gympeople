@@ -95,7 +95,7 @@ struct ProfileView: View {
                             
                             switch profileTab {
                             case .posts:
-                                ScrollView {
+                                HiddenScrollView {
                                     LazyVStack {
                                         if let posts = posts {
                                             ForEach(posts, id: \.self) { post in
@@ -111,6 +111,7 @@ struct ProfileView: View {
                                         .onChanged { _ in outerDisabled = true }
                                         .onEnded { _ in outerDisabled = false }
                                 )
+                                .frame(height: 500)
                             case .mentions:
                                 Text("Your mentions")
                             }
