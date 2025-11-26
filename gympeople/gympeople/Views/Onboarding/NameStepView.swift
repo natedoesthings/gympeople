@@ -21,21 +21,7 @@ struct FirstNameStepView: View {
                 Text("Confirm your First Name.")
                     .font(.title2)
                 
-                HStack {
-                    Image(systemName: "person")
-                        .foregroundColor(.gray)
-                        .padding(.leading, 10)
-                    
-                    TextField("First Name", text: $firstName)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                        .padding(.vertical, 12)
-                }
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.systemGray4), lineWidth: 2)
-                )
+                CustomTextField(placeholder: "First Name", field: $firstName, systemName: "person")
                 
                 if !validFirstName {
                     Text("First name is empty.")
@@ -80,21 +66,7 @@ struct LastNameStepView: View {
                 Text("Confirm your Last Name.")
                     .font(.title2)
                 
-                HStack {
-                    Image(systemName: "person.text.rectangle")
-                        .foregroundColor(.gray)
-                        .padding(.leading, 10)
-                    
-                    TextField("Last Name", text: $lastName)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                        .padding(.vertical, 12)
-                }
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.systemGray4), lineWidth: 2)
-                )
+                CustomTextField(placeholder: "Last Name", field: $lastName, systemName: "person.text.rectangle")
                 
                 if !validLastName {
                     Text("Last name is empty.")

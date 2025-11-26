@@ -19,6 +19,7 @@ struct ProfileView: View {
     
     @State private var showProfileEditingPage: Bool = false
     @State private var profileTab: ProfileTab = .posts
+    @State private var outerDisabled = false
     
     let manager = SupabaseManager.shared
     
@@ -107,6 +108,11 @@ struct ProfileView: View {
                                         }
                                     }
                                 }
+                                .gesture(
+                                    DragGesture()
+                                        .onChanged { _ in outerDisabled = true }
+                                        .onEnded { _ in outerDisabled = false }
+                                )
                             case .mentions:
                                 Text("Your mentions")
                             }
@@ -139,7 +145,7 @@ struct ProfileView: View {
                     }
                 }
                 .sheet(isPresented: $showProfileEditingPage) {
-                    ProfileEditingPageView(userProfile: $userProfile, hasLoadedProfile: $hasLoadedProfile)
+                    ProfileEditingPageView(userProfile: $userProfile)
                 }
                 
             } else if let error = errorMessage {

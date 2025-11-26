@@ -21,21 +21,7 @@ struct PhoneStepView: View {
                 Text("Add your phone number.")
                     .font(.title2)
                 
-                HStack {
-                    Image(systemName: "phone")
-                        .foregroundColor(.gray)
-                        .padding(.leading, 10)
-                    
-                    TextField("e.g. 615-555-1234", text: $phone)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                        .padding(.vertical, 12)
-                }
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.systemGray4), lineWidth: 2)
-                )
+                CustomTextField(placeholder: "e.g. 615-555-1234", field: $phone, systemName: "phone")
                 
                 if !validPhoneNumber {
                     Text("Phone number is empty.")

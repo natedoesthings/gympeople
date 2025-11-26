@@ -204,7 +204,9 @@ extension SupabaseManager {
             "email": AnyEncodable(userProfile.email),
             "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: userProfile.date_of_birth)),
             "phone_number": AnyEncodable(userProfile.phone_number),
-            "location": AnyEncodable(userProfile.location ?? nil),
+            "location": AnyEncodable(userProfile.location),
+            "latitude": AnyEncodable(userProfile.latitude),
+            "longitude": AnyEncodable(userProfile.longitude),
             "gym_memberships": AnyEncodable(userProfile.gym_memberships)
         ]
 

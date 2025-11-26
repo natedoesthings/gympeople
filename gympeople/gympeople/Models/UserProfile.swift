@@ -16,7 +16,9 @@ struct UserProfile: Codable, Identifiable {
     var email: String
     var date_of_birth: Date
     var phone_number: String
-    var location: String?
+    var location: String
+    var latitude: Double
+    var longitude: Double
     var gym_memberships: [String]?
     var pfp_url: String?
     let created_at: Date
@@ -34,7 +36,9 @@ extension UserProfile {
             email: "",
             date_of_birth: Date(),
             phone_number: "",
-            location: nil,
+            location: "",
+            latitude: 0,
+            longitude: 0,
             gym_memberships: [],
             pfp_url: nil,
             created_at: Date(),
