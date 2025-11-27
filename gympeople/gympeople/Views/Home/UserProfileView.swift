@@ -138,8 +138,25 @@ private struct ProfileContentView: View {
 
     @ViewBuilder
     private func header() -> some View {
-        AvatarView(url: userProfile.pfp_url)
-            .frame(width: 75, height: 75)
+        HStack(spacing: 30) {
+            AvatarView(url: userProfile.pfp_url)
+                .frame(width: 75, height: 75)
+            
+            VStack(alignment: .leading) {
+                Text("\(userProfile.post_count)")
+                Text("posts")
+            }
+            
+            VStack(alignment: .leading) {
+                Text("\(userProfile.follower_count)")
+                Text("followers")
+            }
+            
+            VStack(alignment: .leading) {
+                Text("\(userProfile.following_count)")
+                Text("following")
+            }
+        }
 
         HStack {
             Text(userProfile.first_name)
@@ -175,4 +192,9 @@ private struct ProfileContentView: View {
         }
         .padding(.vertical, 15)
     }
+}
+
+
+#Preview {
+    UserProfileView(userProfile: .placeholder())
 }

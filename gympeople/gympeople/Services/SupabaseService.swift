@@ -113,7 +113,8 @@ extension SupabaseManager {
             "latitude": AnyEncodable(latitude),
             "longitude": AnyEncodable(longitude),
             "location": AnyEncodable(location.isEmpty ? nil : location),
-            "gym_memberships": AnyEncodable(gyms)
+            "gym_memberships": AnyEncodable(gyms),
+            "is_private": AnyEncodable(false) // public by default
         ]
         try await client.from("user_profiles").insert(data).execute()
     }
@@ -135,15 +136,17 @@ extension SupabaseManager {
         return profile
     }
     
-    func fetchMyUserProfile() async throws -> UserProfile? {
+    func fetchMyUserProfile(refresh: Bool = false) async throws -> UserProfile? {
         guard let userID = client.auth.currentUser?.id else {
             LOG.notice("No authenticated user found")
             return nil
         }
 
-        if let cached = await profileCache.get(for: userID) {
-            LOG.debug("Returning cached profile for current user")
-            return cached
+        if !refresh {
+            if let cached = await profileCache.get(for: userID) {
+                LOG.debug("Returning cached profile for current user")
+                return cached
+            }
         }
 
         let profile = try await fetchUserProfile(for: userID)

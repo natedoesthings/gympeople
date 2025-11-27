@@ -31,10 +31,47 @@ struct ProfileView: View {
                     HiddenScrollView {
                         VStack(alignment: .leading, spacing: 4) {
                             // Profile Picture
-                            PhotosPicker(selection: $photosPickerItem, matching: .images) {
-                                AvatarView(url: userProfile.pfp_url)
+                            HStack(spacing: 30) {
+                                PhotosPicker(selection: $photosPickerItem, matching: .images) {
+                                    ZStack(alignment: .bottomTrailing) {
+                                        AvatarView(url: userProfile.pfp_url)
+                                            .frame(width: 75, height: 75)
+                                            .clipShape(Circle())
+                                            .overlay(
+                                                Circle()
+                                                    .stroke(Color.gray.opacity(0.3), lineWidth: 2)
+                                            )
+                                        
+                                        // Edit badge
+                                        Circle()
+                                            .fill(Color.invertedPrimary)
+                                            .frame(width: 26, height: 26)
+                                            .overlay(
+                                                Image(systemName: "pencil")
+                                                    .font(.system(size: 12, weight: .medium))
+                                                    .foregroundColor(.standardPrimary)
+                                            )
+                                            .offset(x: 4, y: 4)  // small outward offset
+                                    }
                                     .frame(width: 75, height: 75)
+                                }
+                                
+                                VStack(alignment: .leading) {
+                                    Text("\(userProfile.post_count)")
+                                    Text("posts")
+                                }
+                                
+                                VStack(alignment: .leading) {
+                                    Text("\(userProfile.follower_count)")
+                                    Text("followers")
+                                }
+                                
+                                VStack(alignment: .leading) {
+                                    Text("\(userProfile.following_count)")
+                                    Text("following")
+                                }
                             }
+                            
                             
                             // Name, user, bio
                             HStack {
@@ -193,7 +230,7 @@ struct ProfileView: View {
             
             // Fetch profile
             LOG.debug("Fetching user profile")
-            userProfile = try await manager.fetchMyUserProfile() ?? .placeholder()
+            userProfile = try await manager.fetchMyUserProfile(refresh: true) ?? .placeholder()
             LOG.debug("Fetched user profile")
             
         } catch {
@@ -202,9 +239,6 @@ struct ProfileView: View {
     }
 }
 
-// #Preview {
-//     
-//     let userProfile = UserProfile.init(id: UUID(), first_name: "Nate", last_name: "dasd", user_name: "", biography: "ds", email: "dsd", date_of_birth: Date(), phone_number: "", created_at: Date())
-//     
-//     ProfileView(userProfile: .constant(userProfile))
-// }
+ #Preview {
+     ProfileView()
+ }

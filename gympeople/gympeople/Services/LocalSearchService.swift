@@ -1,5 +1,5 @@
 //
-//  CitySearchService.swift
+//  LocalSearchService.swift
 //  gympeople
 //
 //  Created by Nathanael Tesfaye on 11/19/25.
@@ -8,17 +8,17 @@
 import MapKit
 import Combine
 
-class CitySearchService: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
+class LocalSearchService: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     @Published var suggestions: [MKLocalSearchCompletion] = []
     
     private let completer: MKLocalSearchCompleter
     
-    override init() {
+    init(resultTypes: MKLocalSearchCompleter.ResultType) {
         self.completer = MKLocalSearchCompleter()
         super.init()
         
         completer.delegate = self
-        completer.resultTypes = .address   // includes cities
+        completer.resultTypes = resultTypes
     }
     
     func update(query: String) {

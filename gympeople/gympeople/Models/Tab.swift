@@ -9,6 +9,6 @@ enum Tab {
     case home
     case chat
     case post
-    case memberships
+    case gyms
     case profile
 }

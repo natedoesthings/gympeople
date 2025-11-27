@@ -11,7 +11,7 @@ import MapKit
 struct LocationEditingView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var locationVM = LocationViewModel()
-    @StateObject private var citySearch = CitySearchService()
+    @StateObject private var citySearch = LocalSearchService(resultTypes: .address)
     
     @Binding var location: String
     @Binding var latitude: Double
@@ -100,7 +100,7 @@ struct LocationEditingView: View {
 
         search.start { response, _ in
             guard let item = response?.mapItems.first else { return }
-
+            
             // Best formatted city name
             LOG.debug("lat: \(item.location.coordinate.latitude)")
             LOG.debug("lat: \(item.location.coordinate.longitude)")

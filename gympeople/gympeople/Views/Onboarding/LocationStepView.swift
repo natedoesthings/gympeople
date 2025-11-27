@@ -11,7 +11,7 @@ import MapKit
 
 struct LocationStepView: View {
     @StateObject private var locationVM = LocationViewModel()
-    @StateObject private var citySearch = CitySearchService()
+    @StateObject private var citySearch = LocalSearchService(resultTypes: .address)
     
     @Binding var latitude: Double
     @Binding var longitude: Double

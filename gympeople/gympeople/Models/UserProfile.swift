@@ -23,6 +23,11 @@ struct UserProfile: Codable, Identifiable {
     var pfp_url: String?
     let created_at: Date
     var updated_at: Date?
+    var push_token: String?
+    var is_private: Bool
+    let follower_count: Int
+    let following_count: Int
+    let post_count: Int
 }
 
 extension UserProfile {
@@ -42,7 +47,12 @@ extension UserProfile {
             gym_memberships: [],
             pfp_url: nil,
             created_at: Date(),
-            updated_at: Date()
+            updated_at: Date(),
+            is_private: false,
+            follower_count: 0,
+            following_count: 0,
+            post_count: 0
+            
         )
     }
 }

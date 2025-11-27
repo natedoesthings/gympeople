@@ -17,7 +17,7 @@ struct HomeView: View {
             TabView(selection: $tabSelected) {
                 ExploreView(hideTabBar: $hideTabBar).tag(Tab.home)
                 EmptyView().tag(Tab.chat)
-                EmptyView().tag(Tab.memberships)
+                GymsView().tag(Tab.gyms)
                 ProfileView().tag(Tab.profile)
             }
             .tabViewStyle(.page(indexDisplayMode: .never)) // hide default bar
@@ -42,14 +42,14 @@ struct HomeView: View {
                         Button {
                             showPostView = true
                         } label: {
-                            Image(systemName: tabSelected == .post ? "plus.circle.fill" : "plus.circle")
+                            Image(systemName: "plus.circle")
                                 .font(.system(size: 24))
                         }
                         
                         Button {
-                            tabSelected = .memberships
+                            tabSelected = .gyms
                         } label: {
-                            Image(systemName: tabSelected == .memberships ? "wallet.pass.fill" : "wallet.pass")
+                            Image(systemName: tabSelected == .gyms ? "wallet.pass.fill" : "wallet.pass")
                                 .font(.system(size: 24))
                         }
                         
@@ -117,7 +117,6 @@ struct ExploreView: View {
                     FeedView()
                 case .following:
                     EmptyView()
-                    //                FollowingView()
                 }
             }
         }
