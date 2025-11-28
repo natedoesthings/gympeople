@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct PostCard: View {
+    @State private var showEditingPost: Bool = false
+    @State private var showDeletingAlert: Bool = false
+    
     let post: Post
     let displayName: String
     let username: String
@@ -42,12 +45,37 @@ struct PostCard: View {
                         Spacer()
                         
                         // Placeholder actions menu icon
-                        Button {
-                            
+                        Menu {
+                            if feed {
+                                Button {
+                                    
+                                } label: {
+                                    Text("Report")
+                                    Image(systemName: "exclamationmark.bubble")
+                                }
+                                
+                            } else {
+                                Button {
+                                    showEditingPost = true
+                                } label: {
+                                    HStack {
+                                        Text("Edit")
+                                        Image(systemName: "pencil")
+                                    }
+                                }
+                                
+                                Button {
+                                    showDeletingAlert = true
+                                } label: {
+                                    HStack {
+                                        Text("Delete")
+                                        Image(systemName: "trash")
+                                    }
+                                }
+                            }
                         } label: {
                             Image(systemName: "ellipsis")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
                         }
                         
                     }
@@ -78,6 +106,21 @@ struct PostCard: View {
                 }
             }
             .padding(.vertical, 10)
+            .sheet(isPresented: $showEditingPost) {
+                EditingPostView(post_id: post.id, content: post.content)
+            }
+            .alert(isPresented: $showDeletingAlert) {
+                Alert(
+                    title: Text("Delete Post"),
+                    message: Text("Are you sure you want to delete this post? This action cannot be undone."),
+                    primaryButton: .cancel(Text("Cancel")),
+                    secondaryButton: .destructive(Text("Delete"), action: {
+                        Task {
+                            await SupabaseManager.shared.deletePost(post_id: post.id)
+                        }
+                    })
+                )
+            }
         }
     }
 }

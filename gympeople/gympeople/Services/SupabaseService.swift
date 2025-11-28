@@ -295,7 +295,7 @@ extension SupabaseManager {
         }
 
         let post = Post(
-            id: nil,
+            id: UUID(),
             user_id: userID,
             content: content,
             created_at: Date()
@@ -319,7 +319,7 @@ extension SupabaseManager {
                 }
             }
             
-            let result = try await client
+            let _ = try await client
                 .from("user_profiles")
                 .select("id")
                 .eq("user_name", value: userName)
@@ -477,6 +477,32 @@ extension SupabaseManager {
             return []
         }
         
+    }
+    
+    func updatePost(post_id: UUID, content: String) async throws {
+        LOG.debug("updating post \(post_id)")
+        
+        try await client
+            .from("posts")
+            .update(["content": AnyEncodable(content)])
+            .eq("id", value: post_id.uuidString)
+            .execute()
+    
+    }
+    
+    func deletePost(post_id: UUID) async {
+        LOG.debug("deleting post \(post_id)")
+        
+        do {
+            try await client
+                .from("posts")
+                .delete()
+                .eq("id", value: post_id.uuidString)
+                .execute()
+
+        } catch let error {
+            LOG.error("Failed to delete: \(error)")
+        }
     }
 
 

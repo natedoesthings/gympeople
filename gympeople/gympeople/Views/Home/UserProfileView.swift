@@ -104,37 +104,33 @@ private struct ProfileContentView: View {
             VStack(alignment: .leading, spacing: 4) {
                 header()
                 
-                if !userProfile.is_private {
-                    Picker("", selection: $profileTab) {
-                        ForEach(ProfileTab.allCases) { tab in
-                            Text(tab.rawValue).tag(tab)
-                        }
+                Picker("", selection: $profileTab) {
+                    ForEach(ProfileTab.allCases) { tab in
+                        Text(tab.rawValue).tag(tab)
                     }
-                    .pickerStyle(SegmentedPickerStyle())
-                    
-                    switch profileTab {
-                    case .posts:
-                        HiddenScrollView {
-                            LazyVStack {
-                                if let posts = posts {
-                                    ForEach(posts, id: \.self) { post in
-                                        PostCard(
-                                            post: post,
-                                            displayName: userProfile.first_name,
-                                            username: userProfile.user_name,
-                                            avatarURL: userProfile.pfp_url
-                                        )
-                                        
-                                        Divider()
-                                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                
+                switch profileTab {
+                case .posts:
+                    HiddenScrollView {
+                        LazyVStack {
+                            if let posts = posts {
+                                ForEach(posts, id: \.self) { post in
+                                    PostCard(
+                                        post: post,
+                                        displayName: userProfile.first_name,
+                                        username: userProfile.user_name,
+                                        avatarURL: userProfile.pfp_url
+                                    )
+                                    
+                                    Divider()
                                 }
                             }
                         }
-                    case .mentions:
-                        Text("Mentions")
                     }
-                } else {
-                    Text("Private account")
+                case .mentions:
+                    Text("Mentions")
                 }
             }
         }
@@ -177,30 +173,28 @@ private struct ProfileContentView: View {
             .font(.title3)
             .fontWeight(.semibold)
             
-            if !userProfile.is_private {
-                Spacer()
-                
-                Button {
-                    Task {
-                        if followed {
-                            await SupabaseManager.shared.removeFollowee(userId: userProfile.id)
-                            followed = false
-                            
-                        } else {
-                            await SupabaseManager.shared.addFollowee(userId: userProfile.id)
-                            followed = true
-                        }
+            Spacer()
+            
+            Button {
+                Task {
+                    if followed {
+                        await SupabaseManager.shared.removeFollowee(userId: userProfile.id)
+                        followed = false
+                        
+                    } else {
+                        await SupabaseManager.shared.addFollowee(userId: userProfile.id)
+                        followed = true
                     }
-                } label: {
-                    Text(followed ? "Unfollow" : "Follow" )
-                        .foregroundStyle(.invertedPrimary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(.brandOrange)
-                        .cornerRadius(12)
                 }
-                .frame(width: 150)
+            } label: {
+                Text(followed ? "Unfollow" : "Follow" )
+                    .foregroundStyle(.invertedPrimary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(.brandOrange)
+                    .cornerRadius(12)
             }
+            .frame(width: 150)
         }
         
 

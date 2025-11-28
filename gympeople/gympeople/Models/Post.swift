@@ -8,7 +8,7 @@
 import Foundation
 
 struct Post: Codable, Identifiable, Hashable {
-    let id: UUID?
+    let id: UUID
     let user_id: UUID
     let content: String
     let created_at: Date
