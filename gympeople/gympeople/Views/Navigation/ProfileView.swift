@@ -91,6 +91,7 @@ struct ProfileView: View {
                             .font(.caption)
                             .foregroundStyle(Color.standardSecondary)
                             
+                            
                             // Gym Tags
                             VStack(alignment: .leading, spacing: 15) {
                                 HiddenScrollView(.horizontal) {
@@ -129,6 +130,7 @@ struct ProfileView: View {
                                 }
                             }
                             .pickerStyle(SegmentedPickerStyle())
+                            
                             
                             switch profileTab {
                             case .posts:
@@ -176,7 +178,7 @@ struct ProfileView: View {
                     }
                     .refreshable {
                         Task {
-                            await loadProfile()
+                            await loadProfile(refresh: true)
                         }
                     }
                 }
@@ -221,7 +223,7 @@ struct ProfileView: View {
         }
     }
     
-    private func loadProfile() async {
+    private func loadProfile(refresh: Bool = false) async {
         do {
             // Fetch posts
             LOG.debug("Fetching users posts")
@@ -230,7 +232,7 @@ struct ProfileView: View {
             
             // Fetch profile
             LOG.debug("Fetching user profile")
-            userProfile = try await manager.fetchMyUserProfile(refresh: true) ?? .placeholder()
+            userProfile = try await manager.fetchMyUserProfile(refresh: refresh) ?? .placeholder()
             LOG.debug("Fetched user profile")
             
         } catch {

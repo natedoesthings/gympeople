@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct GymEditingView: View {
+    let manager = SupabaseManager.shared
+    
     @State private var searchField: String = ""
     @Binding var gym_memberships: [String]
     @FocusState private var isFocused: Bool
@@ -97,6 +99,15 @@ struct GymEditingView: View {
         }
         .padding()
         .frame(maxHeight: .infinity, alignment: .top)
+        .onDisappear {
+            Task {
+                do {
+                    try await manager.updateUserProfile(fields: ["gym_memberships" : AnyEncodable(gym_memberships)])
+                } catch {
+                    LOG.error(error.localizedDescription)
+                }
+            }
+        }
     }
     
     private func toggleSelection(for gym: String) {

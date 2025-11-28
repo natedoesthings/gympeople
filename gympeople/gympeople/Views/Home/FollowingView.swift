@@ -7,8 +7,52 @@
 
 import SwiftUI
 
-public struct FollowingView: View {
-    public var body: some View {
-        Text("Following View")
+struct FollowingView: View {
+    @State private var followingPosts: [FollowingPost]?
+    @State private var showPostView: Bool = false
+    @State private var fetched: Bool = false
+    
+    var body: some View {
+        HiddenScrollView {
+            LazyVStack {
+                if let posts = followingPosts {
+                    ForEach(posts) { post in
+                        PostCard(
+                            post: Post(
+                                id: post.post_id,
+                                user_id: post.post_user_id,
+                                content: post.post_content,
+                                created_at: post.post_created_at
+                            ),
+                            displayName: post.first_name + " " + post.last_name,
+                            username: post.user_name,
+                            avatarURL: post.pfp_url,
+                            feed: true
+                        )
+                        .padding()
+                        .padding(.vertical, -10)
+                        
+                        Divider()
+                    }
+                } else {
+                    // TODO: account for no followers
+                    Text("Follow People to see posts here!")
+                }
+            }
+        }
+        .refreshable {
+            Task {
+                followingPosts = await SupabaseManager.shared.fetchFollowingPosts()
+            }
+        }
+        .task {
+            Task {
+                if !fetched {
+                    followingPosts = await SupabaseManager.shared.fetchFollowingPosts()
+                }
+                fetched = true
+            }
+        }
+        .frame(maxHeight: .infinity, alignment: .top)
     }
 }

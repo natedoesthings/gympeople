@@ -34,8 +34,8 @@ extension UserProfile {
     static func placeholder() -> UserProfile {
         return UserProfile(
             id: UUID(),
-            first_name: "",
-            last_name: "",
+            first_name: "Nate",
+            last_name: "Tes",
             user_name: "",
             biography: nil,
             email: "",

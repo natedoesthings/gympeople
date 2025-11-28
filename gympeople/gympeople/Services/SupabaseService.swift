@@ -178,7 +178,8 @@ extension SupabaseManager {
             LOG.notice("No authenticated user found")
             return
         }
-
+        
+        LOG.debug("updating: \(fields.keys)")
         try await client
             .from("user_profiles")
             .update(fields)
@@ -382,6 +383,102 @@ extension SupabaseManager {
             throw error
         }
     }
+    
+    func checkIfFollowing(userId: UUID) async throws -> Bool {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return false
+        }
+        
+        LOG.debug("Checking if following \(userId)")
+        
+        let response = try await client
+            .rpc("is_following",
+                 params: [
+                    "follower": currentUserId.uuidString,
+                    "followee": userId.uuidString
+            ])
+            .execute()
+            .value as Bool
+        
+        LOG.debug("Is following: \(response)")
+        
+        return response
+    }
+    
+    func removeFollowee(userId: UUID) async {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return
+        }
+
+        LOG.debug("unfollowing \(userId)")
+        
+        do {
+            try await client
+                .from("user_relations")
+                .delete()
+                .eq("follower_id", value: currentUserId.uuidString)
+                .eq("followee_id", value: userId.uuidString)
+                .execute()
+
+        } catch let error {
+            LOG.error("Failed to unfollow user: \(error)")
+        }
+    }
+
+    
+    func addFollowee(userId: UUID) async {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return
+        }
+        
+        LOG.debug("following \(userId)")
+        
+        let relation: [String: AnyEncodable] = [
+            "follower_id": AnyEncodable(currentUserId.uuidString),
+            "followee_id": AnyEncodable(userId.uuidString)
+        ]
+
+        do {
+            try await client
+                .from("user_relations")
+                .insert(relation)
+                .execute()
+            
+        } catch let error {
+            LOG.error("Failed to follow user: \(error)")
+        }
+    }
+    
+    func fetchFollowingPosts() async -> [FollowingPost] {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return []
+        }
+
+        LOG.debug("Fetching following posts")
+        
+        do {
+            let posts = try await client
+                .rpc("fetch_following_posts_with_authors", params: [
+                    "user_id_param": currentUserId.uuidString
+                ])
+                .execute()
+                .value as [FollowingPost]
+            
+            LOG.debug("Fetched \(posts.count) posts")
+
+            return posts
+            
+        } catch {
+            LOG.error("Error fetching following posts \(error.localizedDescription)")
+            return []
+        }
+        
+    }
+
 
     private func storagePath(fromPublicURL urlString: String, bucket: String) -> String? {
         guard let url = URL(string: urlString) else { return nil }

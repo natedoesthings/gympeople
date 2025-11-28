@@ -112,12 +112,11 @@ struct ExploreView: View {
                 }
                 .padding()
                 
-                switch homeTab {
-                case .explore:
-                    FeedView()
-                case .following:
-                    EmptyView()
+                TabView(selection: $homeTab) {
+                    FeedView().tag(HomeTab.explore)
+                    FollowingView().tag(HomeTab.following)
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
             }
         }
         
