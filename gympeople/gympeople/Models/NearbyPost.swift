@@ -12,7 +12,9 @@ struct NearbyPost: Decodable, Identifiable {
     let post_user_id: UUID
     let content: String
     let created_at: Date
-    let updated_at: Date?
+    let updated_at: Date
+    let like_count: Int
+    let comment_count: Int
 
     let author_first_name: String
     let author_last_name: String?

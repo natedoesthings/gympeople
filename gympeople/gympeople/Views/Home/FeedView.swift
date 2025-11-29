@@ -62,7 +62,10 @@ struct FeedView: View {
                                     id: post.post_id,
                                     user_id: post.post_user_id,
                                     content: post.content,
-                                    created_at: post.created_at
+                                    created_at: post.created_at,
+                                    updated_at: post.updated_at,
+                                    like_count: post.like_count,
+                                    comment_count: post.comment_count
                                 ),
                                 displayName: post.displayName,
                                 username: post.author_user_name,

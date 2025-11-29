@@ -21,8 +21,11 @@ struct FollowingView: View {
                             post: Post(
                                 id: post.post_id,
                                 user_id: post.post_user_id,
-                                content: post.post_content,
-                                created_at: post.post_created_at
+                                content: post.content,
+                                created_at: post.created_at,
+                                updated_at: post.updated_at,
+                                like_count: post.like_count,
+                                comment_count: post.comment_count
                             ),
                             displayName: post.first_name + " " + post.last_name,
                             username: post.user_name,

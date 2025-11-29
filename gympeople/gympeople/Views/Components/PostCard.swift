@@ -10,6 +10,7 @@ import SwiftUI
 struct PostCard: View {
     @State private var showEditingPost: Bool = false
     @State private var showDeletingAlert: Bool = false
+    @State private var likeState: Bool = false
     
     let post: Post
     let displayName: String
@@ -58,19 +59,15 @@ struct PostCard: View {
                                 Button {
                                     showEditingPost = true
                                 } label: {
-                                    HStack {
-                                        Text("Edit")
-                                        Image(systemName: "pencil")
-                                    }
+                                    Text("Edit")
+                                    Image(systemName: "pencil")
                                 }
                                 
                                 Button {
                                     showDeletingAlert = true
                                 } label: {
-                                    HStack {
-                                        Text("Delete")
-                                        Image(systemName: "trash")
-                                    }
+                                    Text("Delete")
+                                    Image(systemName: "trash")
                                 }
                             }
                         } label: {
@@ -103,6 +100,39 @@ struct PostCard: View {
                         .font(.body)
                         .foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
+                    
+                    HStack(spacing: 40) {
+                        Button {
+                            Task {
+                                if !likeState {
+                                    await SupabaseManager.shared.likePost(for: post.id)
+                                } else {
+                                    await SupabaseManager.shared.unlikePost(for: post.id)
+                                }
+                                
+                                likeState.toggle()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: likeState ? "heart.fill" : "heart")
+                                Text("\(post.like_count + (likeState ? 1 : 0))")
+                            }
+                            .font(.caption)
+                        }
+                       
+                        
+                        Button {
+                            
+                        } label: {
+                            HStack {
+                                Image(systemName: "message")
+                                Text("\(post.comment_count)")
+                            }
+                            .font(.caption)
+                        }
+                        
+                    }
+                    .padding(.top, 10)
                 }
             }
             .padding(.vertical, 10)
@@ -160,24 +190,20 @@ struct AvatarView: View {
     }
 }
 
-//#Preview {
-//    let posts = [Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
-//                 Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7)),
-//                 Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7))]
-//    
+#Preview {
 //    ScrollView {
 //        LazyVStack(spacing: 0) {
-//            ForEach(posts, id: \.self) { post in
-//                PostCard(
-//                    post: post,
-//                    displayName: "Nathanael Tesfaye",
-//                    username: "nate",
-//                    avatarURL: "https://picsum.photos/seed/nate/200"
-//                )
+//            ForEach(POSTS, id: \.self) { post in
+                PostCard(
+                    post: POSTS[0],
+                    displayName: "Nathanael Tesfaye",
+                    username: "nate",
+                    avatarURL: "https://picsum.photos/seed/nate/200"
+                )
 //                Divider()
 //            }
 //            
 //        }
 //
 //    }
-//}
+}

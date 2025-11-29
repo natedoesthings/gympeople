@@ -308,7 +308,10 @@ extension SupabaseManager {
             id: UUID(),
             user_id: userID,
             content: content,
-            created_at: Date()
+            created_at: Date(),
+            updated_at: Date(),
+            like_count: 0,
+            comment_count: 0
         )
 
         try await client
@@ -641,6 +644,47 @@ extension SupabaseManager {
             return []
         }
     }
+    
+    func likePost(for postId: UUID) async {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return
+        }
+        
+        do {
+            try await client
+                .from("likes")
+                .insert(["user_id": AnyEncodable(currentUserId), "post_id": AnyEncodable(postId)])
+                .execute()
+            
+            LOG.info("Liked post with id: \(postId)")
+            
+        } catch {
+            LOG.error("Failed to like.")
+        }
+    }
+    
+    func unlikePost(for postId: UUID) async {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return
+        }
+        
+        do {
+            try await client
+                .from("likes")
+                .delete()
+                .eq("user_id", value: currentUserId.uuidString)
+                .eq("post_id", value: postId.uuidString)
+                .execute()
+            
+            LOG.info("Unliked post with id: \(postId)")
+            
+        } catch {
+            LOG.error("Failed to unlike.")
+        }
+    }
+    
 
 
 
