@@ -70,6 +70,7 @@ struct FeedView: View {
                                 displayName: post.displayName,
                                 username: post.author_user_name,
                                 avatarURL: post.author_pfp_url,
+                                likeState: post.is_liked,
                                 feed: true
                             )
                             .padding()

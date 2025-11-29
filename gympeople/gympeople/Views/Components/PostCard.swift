@@ -10,12 +10,12 @@ import SwiftUI
 struct PostCard: View {
     @State private var showEditingPost: Bool = false
     @State private var showDeletingAlert: Bool = false
-    @State private var likeState: Bool = false
     
     let post: Post
     let displayName: String
     let username: String
     let avatarURL: String?
+    @State var likeState: Bool
     var feed: Bool = false
 
     var body: some View {
@@ -198,7 +198,8 @@ struct AvatarView: View {
                     post: POSTS[0],
                     displayName: "Nathanael Tesfaye",
                     username: "nate",
-                    avatarURL: "https://picsum.photos/seed/nate/200"
+                    avatarURL: "https://picsum.photos/seed/nate/200",
+                    likeState: true
                 )
 //                Divider()
 //            }

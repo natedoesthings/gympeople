@@ -15,6 +15,7 @@ struct NearbyPost: Decodable, Identifiable {
     let updated_at: Date
     let like_count: Int
     let comment_count: Int
+    let is_liked: Bool
 
     let author_first_name: String
     let author_last_name: String?

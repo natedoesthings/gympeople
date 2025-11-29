@@ -130,7 +130,8 @@ private struct ProfileContentView: View {
                                         post: post,
                                         displayName: userProfile.first_name,
                                         username: userProfile.user_name,
-                                        avatarURL: userProfile.pfp_url
+                                        avatarURL: userProfile.pfp_url,
+                                        likeState: false
                                     )
                                     
                                     Divider()

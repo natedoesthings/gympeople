@@ -10,16 +10,17 @@ import Foundation
 struct FollowingPost: Decodable, Identifiable {
     let post_id: UUID
     let post_user_id: UUID
-    let content: String
-    let created_at: Date
-    let updated_at: Date
-    let like_count: Int
-    let comment_count: Int
+    let post_content: String
+    let post_created_at: Date
+    let post_updated_at: Date
+    let post_like_count: Int
+    let post_comment_count: Int
     
     let user_name: String
     let first_name: String
     let last_name: String
     let pfp_url: String?
+    let is_liked: Bool
     
     var id: UUID { post_id }
 }
