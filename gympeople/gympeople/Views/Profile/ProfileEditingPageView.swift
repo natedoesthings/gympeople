@@ -179,7 +179,7 @@ struct ProfileEditingPageView: View {
                     }
                 }
             }
-            .onChange(of: userNameFieldIsFocused) { _,newValue in
+            .onChange(of: userNameFieldIsFocused) { _, newValue in
                 Task {
                     if newValue { return }
                     

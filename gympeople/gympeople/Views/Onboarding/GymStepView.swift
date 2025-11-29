@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct GymStepView: View {
     @EnvironmentObject var authVM: AuthViewModel
+    @StateObject private var gymSearch = LocalSearchService(resultTypes: .pointOfInterest)
     
-    @Binding var selectedGyms: [String]
+    @State private var selectedGyms: [MKLocalSearchCompletion] = []
     let firstName: String
     let lastName: String
     let userName: String
@@ -28,11 +30,6 @@ struct GymStepView: View {
     @State private var submissionError: String?
     @FocusState private var isFocused: Bool
     
-    private var filteredGyms: [String] {
-        let query = searchField.trimmingCharacters(in: .whitespacesAndNewlines)
-        if query.isEmpty { return GYMS }
-        return GYMS.filter { $0.localizedCaseInsensitiveContains(query) }
-    }
 
     var body: some View {
         ZStack {
@@ -50,6 +47,9 @@ struct GymStepView: View {
                         .disableAutocorrection(true)
                         .padding(.vertical, 12)
                         .focused($isFocused)
+                        .onChange(of: searchField) { _, newValue in
+                            gymSearch.update(query: newValue)
+                        }
                 }
                 .cornerRadius(12)
                 .overlay(
@@ -58,24 +58,35 @@ struct GymStepView: View {
                 )
                 
                 if isFocused {
-                    if !filteredGyms.isEmpty {
-                        VStack(alignment: .leading, spacing: 0) {
+                    if !gymSearch.suggestions.isEmpty {
+                        VStack(spacing: 0) {
                             HiddenScrollView {
-                                ForEach(filteredGyms, id: \.self) { gym in
+                                ForEach(gymSearch.suggestions, id: \.self) { gym in
                                     Button {
                                         toggleSelection(for: gym)
-                                        // Optional: clear search after selecting
                                         searchField = ""
                                     } label: {
                                         HStack {
-                                            Text(gym)
-                                                .foregroundStyle(.invertedPrimary)
+                                            VStack(alignment: .leading) {
+                                                Text(gym.title)
+                                                    .font(.body)
+                                                    .foregroundStyle(.invertedPrimary)
+                                                if !gym.subtitle.isEmpty {
+                                                    Text(gym.subtitle)
+                                                        .font(.caption)
+                                                        .foregroundColor(.gray)
+                                                        .multilineTextAlignment(.leading)
+                                                }
+                                            }
+                                            
                                             Spacer()
+                                            
                                             if selectedGyms.contains(gym) {
                                                 Image(systemName: "checkmark.circle.fill")
                                                     .foregroundStyle(Color.brandOrange)
                                             }
                                         }
+                                    
                                     }
                                     Divider()
                                 }
@@ -86,15 +97,25 @@ struct GymStepView: View {
                     }
                 } else {
                     if !selectedGyms.isEmpty {
-                        VStack(alignment: .leading, spacing: 0) {
+                        VStack(spacing: 0) {
                             ScrollView {
                                 ForEach(selectedGyms, id: \.self) { gym in
                                     Button {
                                         toggleSelection(for: gym)
                                     } label: {
                                         HStack {
-                                            Text(gym)
-                                                .foregroundStyle(.invertedPrimary)
+                                            VStack(alignment: .leading) {
+                                                Text(gym.title)
+                                                    .font(.body)
+                                                    .foregroundStyle(.invertedPrimary)
+                                                if !gym.subtitle.isEmpty {
+                                                    Text(gym.subtitle)
+                                                        .font(.caption)
+                                                        .foregroundColor(.gray)
+                                                        .multilineTextAlignment(.leading)
+                                                }
+                                            }
+                                            
                                             Spacer()
                                             if selectedGyms.contains(gym) {
                                                 Image(systemName: "checkmark.circle.fill")
@@ -147,7 +168,7 @@ struct GymStepView: View {
         .padding()
     }
 
-    private func toggleSelection(for gym: String) {
+    private func toggleSelection(for gym: MKLocalSearchCompletion) {
         if selectedGyms.contains(gym) {
             selectedGyms.removeAll(where: { $0 == gym })
         } else {
@@ -158,6 +179,7 @@ struct GymStepView: View {
     private func handleSubmit() async {
         isSubmitting = true
         submissionError = nil
+        
         do {
             try await SupabaseManager.shared.saveUserProfile(
                 firstName: firstName,
@@ -169,18 +191,61 @@ struct GymStepView: View {
                 latitude: latitude,
                 longitude: longitude,
                 location: location,
-                gyms: selectedGyms
+                gyms: []
             )
             LOG.info("Profile saved successfully for \(email)")
             
+            if !selectedGyms.isEmpty {
+                LOG.info("saving gym memberships")
+                await saveGymSelections()
+                
+            }
+            
             onDone()
+            
         } catch {
             LOG.error("Error saving profile: \(error)")
             submissionError = error.localizedDescription
         }
+        
         isSubmitting = false
     }
     
+    private func saveGymSelections() async {
+        var gymPayloads: [[String: AnyEncodable]] = []
+
+        for suggestion in selectedGyms {
+            if let item = await mapItem(from: suggestion) {
+                gymPayloads.append([
+                    "name": AnyEncodable(item.name ?? nil),
+                    "address": AnyEncodable(item.addressRepresentations?.fullAddress(includingRegion: true, singleLine: false)),
+                    "latitude": AnyEncodable(item.location.coordinate.latitude),
+                    "longitude": AnyEncodable(item.location.coordinate.longitude),
+                    "url": AnyEncodable(item.url?.absoluteString),
+                    "phone_number": AnyEncodable(item.phoneNumber ?? nil)
+                ])
+            }
+        }
+
+        guard let insertedGyms = await SupabaseManager.shared.insertGyms(gymPayloads) else {
+            LOG.error("Failed to insert gyms.")
+            return
+        }
+        
+        await SupabaseManager.shared.insertGymMemberships(insertedGyms)
+
+        LOG.info("Saved gym memberships successfully")
+    }
+    
+    private func mapItem(from suggestion: MKLocalSearchCompletion) async -> MKMapItem? {
+        let request = MKLocalSearch.Request(completion: suggestion)
+        do {
+            let response = try await MKLocalSearch(request: request).start()
+            return response.mapItems.first
+        } catch {
+            return nil
+        }
+    }
 }
 
 // #Preview {

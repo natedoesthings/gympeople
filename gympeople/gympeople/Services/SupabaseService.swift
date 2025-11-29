@@ -504,6 +504,53 @@ extension SupabaseManager {
             LOG.error("Failed to delete: \(error)")
         }
     }
+    
+    func insertGyms(_ gyms: [[String: AnyEncodable]]) async -> [Gym]? {
+        do {
+            let gyms = try await client
+                .from("gyms")
+                .insert(gyms)
+                .select()
+                .execute()
+                .value as [Gym]
+            
+            LOG.notice("Inserted \(gyms.count) gyms")
+            return gyms
+            
+        } catch {
+            LOG.error("Failed to insert gyms: \(error)")
+            return nil
+        }
+    }
+    
+    func insertGymMemberships(_ insertedGyms: [Gym]) async {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return
+        }
+        
+        var membershipPayloads: [[String: AnyEncodable]] = []
+
+        for gym in insertedGyms {
+            membershipPayloads.append([
+                "user_id": AnyEncodable(currentUserId),
+                "gym_id": AnyEncodable(gym.id.uuidString)
+            ])
+        }
+        
+        do {
+            try await client
+                .from("gym_memberships")
+                .insert(membershipPayloads)
+                .execute()
+            
+            LOG.notice("Inserted \(insertedGyms.count) memberships")
+        } catch {
+            LOG.error("Failed to insert memberships.")
+        }
+        
+    }
+
 
 
     private func storagePath(fromPublicURL urlString: String, bucket: String) -> String? {

@@ -46,5 +46,7 @@ struct GymView: View {
     
     var body: some View {
         Text(gym.name ?? "Unknown Gym")
+        
+        
     }
 }

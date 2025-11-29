@@ -22,7 +22,6 @@ struct OnboardingView: View {
     @State private var location: String = ""
     @State private var latitude: Double = 0
     @State private var longitude: Double = 0
-    @State private var gymMemberships: [String] = []
     
     // NEW
     var onCancel: () -> Void
@@ -50,7 +49,6 @@ struct OnboardingView: View {
                                 next: { path.append(.gyms) })
                         case .gyms:
                             GymStepView(
-                                selectedGyms: $gymMemberships,
                                 firstName: firstName,
                                 lastName: lastName,
                                 userName: userName,

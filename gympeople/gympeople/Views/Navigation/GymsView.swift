@@ -97,6 +97,7 @@ struct GymsView: View {
     
     private func findNearbyGyms() async throws -> [MKMapItem]? {
         if let currentProfile = try await SupabaseManager.shared.fetchMyUserProfile() {
+            //TODO: search gyms from gyms table first, then mapkit
             let coordinate = CLLocationCoordinate2D(latitude: currentProfile.latitude, longitude: currentProfile.longitude)
             
             let request = MKLocalSearch.Request()
