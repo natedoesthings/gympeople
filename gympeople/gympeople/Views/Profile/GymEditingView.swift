@@ -6,19 +6,18 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct GymEditingView: View {
     let manager = SupabaseManager.shared
     
-    @State private var searchField: String = ""
-    @Binding var gym_memberships: [String]
-    @FocusState private var isFocused: Bool
+    @StateObject private var gymSearch = LocalSearchService()
+    @Binding var gym_memberships: [Gym]
+    @State private var selectedGyms: [MKLocalSearchCompletion] = []
     
-    private var filteredGyms: [String] {
-        let query = searchField.trimmingCharacters(in: .whitespacesAndNewlines)
-        if query.isEmpty { return GYMS }
-        return GYMS.filter { $0.localizedCaseInsensitiveContains(query) }
-    }
+    @State private var searchField: String = ""
+    
+    @FocusState private var isFocused: Bool
     
     var body: some View {
         VStack(spacing: 24) {
@@ -35,6 +34,9 @@ struct GymEditingView: View {
                     .disableAutocorrection(true)
                     .padding(.vertical, 12)
                     .focused($isFocused)
+                    .onChange(of: searchField) { _, newValue in
+                        gymSearch.update(query: newValue)
+                    }
             }
             .cornerRadius(12)
             .overlay(
@@ -43,24 +45,35 @@ struct GymEditingView: View {
             )
             
             if isFocused {
-                if !filteredGyms.isEmpty {
-                    VStack(alignment: .leading, spacing: 0) {
+                if !gymSearch.suggestions.isEmpty {
+                    VStack(spacing: 0) {
                         HiddenScrollView {
-                            ForEach(filteredGyms, id: \.self) { gym in
+                            ForEach(gymSearch.suggestions, id: \.self) { gym in
                                 Button {
                                     toggleSelection(for: gym)
-                                    // Optional: clear search after selecting
                                     searchField = ""
                                 } label: {
                                     HStack {
-                                        Text(gym)
-                                            .foregroundStyle(.invertedPrimary)
+                                        VStack(alignment: .leading) {
+                                            Text(gym.title)
+                                                .font(.body)
+                                                .foregroundStyle(.invertedPrimary)
+                                            if !gym.subtitle.isEmpty {
+                                                Text(gym.subtitle)
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                                    .multilineTextAlignment(.leading)
+                                            }
+                                        }
+                                        
                                         Spacer()
-                                        if gym_memberships.contains(gym) {
+                                        
+                                        if selectedGyms.contains(gym) {
                                             Image(systemName: "checkmark.circle.fill")
                                                 .foregroundStyle(Color.brandOrange)
                                         }
                                     }
+                                
                                 }
                                 Divider()
                             }
@@ -70,30 +83,75 @@ struct GymEditingView: View {
                     }
                 }
             } else {
-                if !gym_memberships.isEmpty {
-                    VStack(alignment: .leading, spacing: 0) {
-                        HiddenScrollView {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        // current memberships
+                        if !gym_memberships.isEmpty {
                             ForEach(gym_memberships, id: \.self) { gym in
+                                Button {
+                                    if gym_memberships.contains(gym) {
+                                        gym_memberships.removeAll(where: { $0 == gym })
+                                    }
+                                } label: {
+                                    HStack {
+                                        VStack(alignment: .leading) {
+                                            Text(gym.name ??  "Gym")
+                                                .font(.body)
+                                                .foregroundStyle(.invertedPrimary)
+                                        
+                                            Text(gym.address ?? "Address")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                                .multilineTextAlignment(.leading)
+                                            
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(Color.brandOrange)
+                                        
+                                    }
+                                }
+                                Divider()
+                                
+                                
+                            }
+                        }
+                        // any newley selected memberships
+                        if !selectedGyms.isEmpty {
+                            ForEach(selectedGyms, id: \.self) { gym in
                                 Button {
                                     toggleSelection(for: gym)
                                 } label: {
                                     HStack {
-                                        Text(gym)
-                                            .foregroundStyle(.invertedPrimary)
+                                        VStack(alignment: .leading) {
+                                            Text(gym.title)
+                                                .font(.body)
+                                                .foregroundStyle(.invertedPrimary)
+                                            if !gym.subtitle.isEmpty {
+                                                Text(gym.subtitle)
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                                    .multilineTextAlignment(.leading)
+                                            }
+                                        }
+                                        
                                         Spacer()
-                                        if gym_memberships.contains(gym) {
+                                        if selectedGyms.contains(gym) {
                                             Image(systemName: "checkmark.circle.fill")
                                                 .foregroundStyle(Color.brandOrange)
                                         }
                                     }
                                 }
                                 Divider()
+                                
+                                
                             }
                         }
-                        .frame(height: 300)
-                        
                     }
                 }
+                .frame(height: 300)
             }
             
         }
@@ -101,20 +159,44 @@ struct GymEditingView: View {
         .frame(maxHeight: .infinity, alignment: .top)
         .onDisappear {
             Task {
-                do {
-                    try await manager.updateUserProfile(fields: ["gym_memberships" : AnyEncodable(gym_memberships)])
-                } catch {
-                    LOG.error(error.localizedDescription)
+                await updateMemberships()
+                
+                // inserting gyms
+                guard let insertedGyms = await SupabaseManager.shared.insertGyms(gym_memberships) else {
+                    LOG.error("Failed to insert gyms.")
+                    return
                 }
+                
+                // syncing gym memberships for user
+                await manager.syncGymMemberships(gyms: insertedGyms)
+                
             }
         }
     }
     
-    private func toggleSelection(for gym: String) {
-        if gym_memberships.contains(gym) {
-            gym_memberships.removeAll(where: { $0 == gym })
+    private func updateMemberships() async {
+        for suggestion in selectedGyms {
+            if let item = await mapItem(from: suggestion) {
+                gym_memberships.append(Gym(id: UUID(), name: item.name ?? nil,phone_number: item.phoneNumber ?? nil, url: item.url?.absoluteString, latitude: item.location.coordinate.latitude, longitude: item.location.coordinate.longitude, address: item.addressRepresentations?.fullAddress(includingRegion: true, singleLine: false), member_count: 0, post_count: 0))
+            }
+        }
+    }
+    
+    private func toggleSelection(for gym: MKLocalSearchCompletion) {
+        if selectedGyms.contains(gym) {
+            selectedGyms.removeAll(where: { $0 == gym })
         } else {
-            gym_memberships.append(gym)
+            selectedGyms.append(gym)
+        }
+    }
+    
+    private func mapItem(from suggestion: MKLocalSearchCompletion) async -> MKMapItem? {
+        let request = MKLocalSearch.Request(completion: suggestion)
+        do {
+            let response = try await MKLocalSearch(request: request).start()
+            return response.mapItems.first
+        } catch {
+            return nil
         }
     }
 }

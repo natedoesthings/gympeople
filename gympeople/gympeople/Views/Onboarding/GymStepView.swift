@@ -10,7 +10,7 @@ import MapKit
 
 struct GymStepView: View {
     @EnvironmentObject var authVM: AuthViewModel
-    @StateObject private var gymSearch = LocalSearchService(resultTypes: .pointOfInterest)
+    @StateObject private var gymSearch = LocalSearchService()
     
     @State private var selectedGyms: [MKLocalSearchCompletion] = []
     let firstName: String

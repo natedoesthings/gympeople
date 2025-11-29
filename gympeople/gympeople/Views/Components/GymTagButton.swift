@@ -17,7 +17,9 @@ struct GymTagButton: View {
                 Text("Add gyms")
                 Image(systemName: "plus")
             case .gym(let gym):
-                Text("\(gym)")
+                if let gymName = gym.name {
+                    Text(gymName)
+                }
             case .plus:
                 Image(systemName: "plus")
             }

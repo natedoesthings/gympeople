@@ -11,6 +11,7 @@ import PhotosUI
 struct ProfileView: View {
     @State private var userProfile: UserProfile = .placeholder()
     @State private var posts: [Post]?
+    @State private var memberships: [Gym] = []
 
     @State private var errorMessage: String?
     
@@ -96,8 +97,8 @@ struct ProfileView: View {
                             VStack(alignment: .leading, spacing: 15) {
                                 HiddenScrollView(.horizontal) {
                                     HStack {
-                                        if !userProfile.gym_memberships.isEmpty {
-                                            ForEach(userProfile.gym_memberships, id: \.self) { gym in
+                                        if !memberships.isEmpty {
+                                            ForEach(memberships, id: \.self) { gym in
                                                 Button {
                                                     showProfileEditingPage = true
                                                 } label: {
@@ -106,13 +107,13 @@ struct ProfileView: View {
                                             }
                                             
                                             NavigationLink {
-                                                GymEditingView(gym_memberships: $userProfile.gym_memberships)
+                                                GymEditingView(gym_memberships: $memberships)
                                             } label: {
                                                 GymTagButton(gymTagType: .plus)
                                             }
                                         } else {
                                             NavigationLink {
-                                                GymEditingView(gym_memberships: $userProfile.gym_memberships)
+                                                GymEditingView(gym_memberships: $memberships)
                                             } label: {
                                                 GymTagButton(gymTagType: .none)
                                             }
@@ -183,7 +184,7 @@ struct ProfileView: View {
                     }
                 }
                 .sheet(isPresented: $showProfileEditingPage) {
-                    ProfileEditingPageView(userProfile: userProfile)
+                    ProfileEditingPageView(userProfile: userProfile, memberships: memberships)
                 }
                 
             } else if let error = errorMessage {
@@ -225,15 +226,17 @@ struct ProfileView: View {
     
     private func loadProfile(refresh: Bool = false) async {
         do {
+            // Fetch memberships
+            LOG.debug("Fetching users memberships")
+            memberships = try await manager.fetchMyGymMemberships()
+            
             // Fetch posts
             LOG.debug("Fetching users posts")
             posts = try await manager.fetchMyPosts()
-            LOG.debug("Fetched users posts")
             
             // Fetch profile
             LOG.debug("Fetching user profile")
             userProfile = try await manager.fetchMyUserProfile(refresh: refresh) ?? .placeholder()
-            LOG.debug("Fetched user profile")
             
         } catch {
             errorMessage = error.localizedDescription.debugDescription

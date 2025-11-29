@@ -9,7 +9,7 @@ import SwiftUI
 import MapKit
 
 struct GymsView: View {
-    @StateObject private var gymSearch = LocalSearchService(resultTypes: .pointOfInterest)
+    @StateObject private var gymSearch = LocalSearchService()
     @State private var searchText: String = ""
     @State private var gyms: [MKMapItem]?
     @FocusState private var isFocused: Bool

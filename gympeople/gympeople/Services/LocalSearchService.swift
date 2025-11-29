@@ -13,7 +13,7 @@ class LocalSearchService: NSObject, ObservableObject, MKLocalSearchCompleterDele
     
     private let completer: MKLocalSearchCompleter
     
-    init(resultTypes: MKLocalSearchCompleter.ResultType) {
+    init(resultTypes: MKLocalSearchCompleter.ResultType = .pointOfInterest) {
         self.completer = MKLocalSearchCompleter()
         super.init()
         

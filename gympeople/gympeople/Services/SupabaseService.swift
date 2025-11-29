@@ -27,6 +27,8 @@ class SupabaseManager {
 actor UserProfileCache {
     private var cachedProfile: UserProfile?
     private var cachedUserID: UUID?
+    private var cachedUserPosts: [Post]?
+    private var cachedMemberships: [Gym]?
 
     func get(for userID: UUID) -> UserProfile? {
         guard userID == cachedUserID else { return nil }
@@ -37,10 +39,20 @@ actor UserProfileCache {
         cachedUserID = userID
         cachedProfile = profile
     }
+    
+    func storePosts(_ posts: [Post]) {
+        cachedUserPosts = posts
+    }
+    
+    func storeMemberships(_ memberships: [Gym]) {
+        cachedMemberships = memberships
+    }
 
     func clear() {
         cachedProfile = nil
         cachedUserID = nil
+        cachedUserPosts = nil
+        cachedMemberships = nil
     }
 }
 
@@ -113,7 +125,6 @@ extension SupabaseManager {
             "latitude": AnyEncodable(latitude),
             "longitude": AnyEncodable(longitude),
             "location": AnyEncodable(location.isEmpty ? nil : location),
-            "gym_memberships": AnyEncodable(gyms),
             "is_private": AnyEncodable(false) // public by default
         ]
         try await client.from("user_profiles").insert(data).execute()
@@ -211,7 +222,6 @@ extension SupabaseManager {
             "location": AnyEncodable(userProfile.location),
             "latitude": AnyEncodable(userProfile.latitude),
             "longitude": AnyEncodable(userProfile.longitude),
-            "gym_memberships": AnyEncodable(userProfile.gym_memberships)
         ]
 
         try await client
@@ -506,10 +516,32 @@ extension SupabaseManager {
     }
     
     func insertGyms(_ gyms: [[String: AnyEncodable]]) async -> [Gym]? {
+        if gyms.isEmpty { return nil }
+        
         do {
             let gyms = try await client
                 .from("gyms")
-                .insert(gyms)
+                .upsert(gyms, onConflict: "address")
+                .select()
+                .execute()
+                .value as [Gym]
+            
+            LOG.notice("Inserted \(gyms.count) gyms")
+            return gyms
+            
+        } catch {
+            LOG.error("Failed to insert gyms: \(error)")
+            return nil
+        }
+    }
+    
+    func insertGyms(_ gyms: [Gym]) async -> [Gym]? {
+        if gyms.isEmpty { return nil }
+        
+        do {
+            let gyms = try await client
+                .from("gyms")
+                .upsert(gyms, onConflict: "address")
                 .select()
                 .execute()
                 .value as [Gym]
@@ -550,6 +582,65 @@ extension SupabaseManager {
         }
         
     }
+    
+    func syncGymMemberships(gyms: [Gym]) async {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return
+        }
+        
+        do {
+            _ = try await client
+                .rpc(
+                    "sync_gym_memberships",
+                    params: SyncGymMembershipsParams(p_gym_ids: gyms.map { $0.id }, p_user_id: currentUserId)
+                )
+                .execute()
+        } catch {
+            LOG.error("Failed syncing memberships. \(error.localizedDescription)")
+        }
+    }
+    
+    func fetchGymMemberships(for userId: UUID) async -> [Gym] {
+        do {
+            let gyms = try await client
+                .rpc(
+                    "fetch_gyms_for_user",
+                    params: ["p_user_id": userId]
+                )
+                .execute()
+                .value as [Gym]
+            
+            return gyms
+            
+        } catch {
+            LOG.error("Failed to find memberships.")
+            return []
+        }
+    }
+    
+    func fetchMyGymMemberships() async -> [Gym] {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return []
+        }
+        
+        do {
+            let gyms = try await client
+                .rpc(
+                    "fetch_gyms_for_user",
+                    params: ["p_user_id": currentUserId]
+                )
+                .execute()
+                .value as [Gym]
+            
+            return gyms
+            
+        } catch {
+            LOG.error("Failed to find memberships.")
+            return []
+        }
+    }
 
 
 
@@ -562,4 +653,10 @@ extension SupabaseManager {
         let path = pathComponents.joined(separator: "/")
         return path.isEmpty ? nil : path
     }
+}
+
+nonisolated
+struct SyncGymMembershipsParams: Encodable, Sendable {
+    let p_gym_ids: [UUID]
+    let p_user_id: UUID
 }

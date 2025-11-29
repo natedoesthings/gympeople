@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Gym: Codable, Identifiable {
+struct Gym: Codable, Identifiable, Hashable {
     let id: UUID
     let name: String?
     let phone_number: String?

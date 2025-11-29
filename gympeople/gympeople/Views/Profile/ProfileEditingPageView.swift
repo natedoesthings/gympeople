@@ -10,6 +10,7 @@ import MapKit
 
 struct ProfileEditingPageView: View {
     @State var userProfile: UserProfile
+    @State var memberships: [Gym]
     @Environment(\.dismiss) var dismiss
     
     @State private var checkingUsername: Bool = false
@@ -110,8 +111,8 @@ struct ProfileEditingPageView: View {
                         VStack(alignment: .leading, spacing: 15) {
                             HiddenScrollView(.horizontal) {
                                 HStack {
-                                    if !userProfile.gym_memberships.isEmpty {
-                                        ForEach(userProfile.gym_memberships, id: \.self) { gym in
+                                    if !memberships.isEmpty {
+                                        ForEach(memberships, id: \.self) { gym in
                                             Button {
                                                 
                                             } label: {
@@ -121,14 +122,14 @@ struct ProfileEditingPageView: View {
                                         }
                                         
                                         NavigationLink {
-                                            GymEditingView(gym_memberships: $userProfile.gym_memberships)
+                                            GymEditingView(gym_memberships: $memberships)
                                         } label: {
                                             GymTagButton(gymTagType: .plus)
                                         }
                                         
                                     } else {
                                         NavigationLink {
-                                            GymEditingView(gym_memberships: $userProfile.gym_memberships)
+                                            GymEditingView(gym_memberships: $memberships)
                                         } label: {
                                             GymTagButton(gymTagType: .none)
                                         }
@@ -201,7 +202,6 @@ struct ProfileEditingPageView: View {
     
     private func updateUserProfile() async {
         do {
-            LOG.debug("\(userProfile.latitude)")
             try await manager.updateUserProfile(userProfile: userProfile)
             LOG.info("Profile updated successfully!")
         } catch {

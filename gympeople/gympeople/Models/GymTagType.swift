@@ -7,6 +7,6 @@
 
 enum GymTagType {
     case none
-    case gym(gym: String)
+    case gym(gym: Gym)
     case plus
 }

@@ -11,6 +11,7 @@ struct UserProfileView: View {
     let manager = SupabaseManager.shared
     let userProfile: UserProfile
     @State private var posts: [Post]?
+    @State private var memberships: [Gym]?
     @State private var hasLoadedProfile: Bool = false
     @State private var profileTab: ProfileTab = .posts
     
@@ -18,6 +19,7 @@ struct UserProfileView: View {
         ProfileContentView(
             userProfile: userProfile,
             posts: posts,
+            memberships: memberships,
             profileTab: $profileTab
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -32,10 +34,13 @@ struct UserProfileView: View {
 
     private func loadProfile() async {
         do {
+            // Fetch memberships
+            LOG.debug("Fetching users memberships")
+            memberships = await manager.fetchGymMemberships(for: userProfile.id)
+            
             // Fetch posts
             LOG.debug("Fetching users posts")
             posts = try await manager.fetchPosts(for: userProfile.id)
-            LOG.debug("Fetched users posts")
         } catch {
             LOG.error(error.localizedDescription.debugDescription)
         }
@@ -48,6 +53,7 @@ struct UserIdProfileView: View {
     
     @State private var userProfile: UserProfile?
     @State private var posts: [Post]?
+    @State private var memberships: [Gym]?
     @State private var hasLoadedProfile: Bool = false
     @State private var profileTab: ProfileTab = .posts
     
@@ -57,6 +63,7 @@ struct UserIdProfileView: View {
                 ProfileContentView(
                     userProfile: userProfile,
                     posts: posts,
+                    memberships: memberships,
                     profileTab: $profileTab
                 )
             } else {
@@ -77,16 +84,17 @@ struct UserIdProfileView: View {
     
     private func loadProfile() async {
         do {
+            // Fetch memberships
+            LOG.debug("Fetching users memberships")
+            memberships = await manager.fetchGymMemberships(for: userId)
+            
             // Fetch posts
             LOG.debug("Fetching users posts")
             posts = try await manager.fetchPosts(for: userId)
-            LOG.debug("Fetched users posts")
             
             // Fetch profile
             LOG.debug("Fetching user profile")
             userProfile = try await manager.fetchUserProfile(for: userId)
-            LOG.debug("Fetched user profile")
-    
         } catch {
             LOG.error(error.localizedDescription.debugDescription)
         }
@@ -96,6 +104,7 @@ struct UserIdProfileView: View {
 private struct ProfileContentView: View {
     let userProfile: UserProfile
     let posts: [Post]?
+    let memberships: [Gym]?
     @Binding var profileTab: ProfileTab
     @State private var followed: Bool = false
 
@@ -211,9 +220,9 @@ private struct ProfileContentView: View {
 
         VStack(alignment: .leading, spacing: 15) {
             HiddenScrollView(.horizontal) {
-                if !userProfile.gym_memberships.isEmpty {
+                if let memberships = memberships {
                     HStack {
-                        ForEach(userProfile.gym_memberships, id: \.self) { gym in
+                        ForEach(memberships, id: \.self) { gym in
                             GymTagButton(gymTagType: .gym(gym: gym))
                         }
                         
