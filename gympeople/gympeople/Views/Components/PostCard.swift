@@ -11,11 +11,10 @@ struct PostCard: View {
     @State private var showEditingPost: Bool = false
     @State private var showDeletingAlert: Bool = false
     
-    let post: Post
+    @State var post: Post
     let displayName: String
     let username: String
     let avatarURL: String?
-    @State var likeState: Bool
     var feed: Bool = false
 
     var body: some View {
@@ -104,18 +103,18 @@ struct PostCard: View {
                     HStack(spacing: 40) {
                         Button {
                             Task {
-                                if !likeState {
+                                if !post.is_liked {
                                     await SupabaseManager.shared.likePost(for: post.id)
                                 } else {
                                     await SupabaseManager.shared.unlikePost(for: post.id)
                                 }
                                 
-                                likeState.toggle()
+                                post.is_liked.toggle()
                             }
                         } label: {
                             HStack {
-                                Image(systemName: likeState ? "heart.fill" : "heart")
-                                Text("\(post.like_count + (likeState ? 1 : 0))")
+                                Image(systemName: post.is_liked ? "heart.fill" : "heart")
+                                Text("\(post.like_count + (post.is_liked ? 1 : 0))")
                             }
                             .font(.caption)
                         }
@@ -198,8 +197,7 @@ struct AvatarView: View {
                     post: POSTS[0],
                     displayName: "Nathanael Tesfaye",
                     username: "nate",
-                    avatarURL: "https://picsum.photos/seed/nate/200",
-                    likeState: true
+                    avatarURL: "https://picsum.photos/seed/nate/200"
                 )
 //                Divider()
 //            }

@@ -25,12 +25,12 @@ struct FollowingView: View {
                                 created_at: post.post_created_at,
                                 updated_at: post.post_updated_at,
                                 like_count: post.post_like_count,
-                                comment_count: post.post_comment_count
+                                comment_count: post.post_comment_count,
+                                is_liked: post.is_liked
                             ),
                             displayName: post.first_name + " " + post.last_name,
                             username: post.user_name,
                             avatarURL: post.pfp_url,
-                            likeState: post.is_liked,
                             feed: true
                         )
                         .padding()

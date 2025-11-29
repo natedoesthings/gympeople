@@ -65,12 +65,12 @@ struct FeedView: View {
                                     created_at: post.created_at,
                                     updated_at: post.updated_at,
                                     like_count: post.like_count,
-                                    comment_count: post.comment_count
+                                    comment_count: post.comment_count,
+                                    is_liked: post.is_liked
                                 ),
                                 displayName: post.displayName,
                                 username: post.author_user_name,
                                 avatarURL: post.author_pfp_url,
-                                likeState: post.is_liked,
                                 feed: true
                             )
                             .padding()

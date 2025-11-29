@@ -304,22 +304,15 @@ extension SupabaseManager {
             return
         }
 
-        let post = Post(
-            id: UUID(),
-            user_id: userID,
-            content: content,
-            created_at: Date(),
-            updated_at: Date(),
-            like_count: 0,
-            comment_count: 0
-        )
+        let data: [String: AnyEncodable] = [
+            "id": AnyEncodable(UUID()),
+            "user_id": AnyEncodable(userID),
+            "content": AnyEncodable(content),
+            "created_at": AnyEncodable(Date()),
+            "updated_at": AnyEncodable(Date())
+        ]
 
-        try await client
-            .from("posts")
-            .insert(post)
-            .select()
-            .single()
-            .execute()
+        try await client.from("posts").insert(data).execute()
     }
     
     func checkUserName(userName: String) async -> Bool {
@@ -347,16 +340,35 @@ extension SupabaseManager {
         }
     }
     
-    func fetchPosts(for userId: UUID) async throws -> [Post] {
-        let posts = try await client
-            .from("posts")
-            .select()
-            .eq("user_id", value: userId.uuidString)
-            .order("created_at", ascending: false)
-            .execute()
-            .value as [Post]
-
-        return posts
+    func fetchPosts(for authorId: UUID, viewing viewerId: UUID? = nil) async throws -> [Post] {
+        if let viewerId = viewerId {
+            let posts = try await client
+                .rpc("fetch_user_posts", params: [
+                    "viewer_id": viewerId.uuidString,
+                    "author_id": authorId.uuidString
+                ])
+                .execute()
+                .value as [Post]
+            
+            return posts
+            
+        } else {
+            guard let currentUserId = client.auth.currentUser?.id else {
+                LOG.error("No authenticated user found")
+                return []
+            }
+            
+            let posts = try await client
+                .rpc("fetch_user_posts", params: [
+                    "viewer_id": currentUserId.uuidString,
+                    "author_id": authorId.uuidString
+                ])
+                .execute()
+                .value as [Post]
+            
+            return posts
+            
+        }
     }
 
     func fetchMyPosts() async throws -> [Post] {
@@ -365,7 +377,7 @@ extension SupabaseManager {
             return []
         }
         
-        return try await fetchPosts(for: userId)
+        return try await fetchPosts(for: userId, viewing: userId)
     }
     
     

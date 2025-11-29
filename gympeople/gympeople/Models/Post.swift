@@ -15,4 +15,5 @@ struct Post: Codable, Identifiable, Hashable {
     let updated_at: Date
     let like_count: Int
     let comment_count: Int
+    var is_liked: Bool
 }
