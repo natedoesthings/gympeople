@@ -10,7 +10,6 @@ import SwiftUI
 struct SearchView: View {
     @StateObject private var viewModel = SearchViewModel()
     @State private var searchText: String = ""
-    @Binding var hideTabBar: Bool
     @FocusState private var isFocused: Bool
 
     var body: some View {
@@ -43,12 +42,6 @@ struct SearchView: View {
         .navigationTitle("Search")
         .onChange(of: searchText) { _, newValue in
             viewModel.search(query: newValue)
-        }
-        .onChange(of: isFocused) { _, isFocused in
-            hideTabBar = isFocused
-        }
-        .onDisappear {
-            hideTabBar = false
         }
         .frame(maxHeight: .infinity, alignment: .top)
     }
