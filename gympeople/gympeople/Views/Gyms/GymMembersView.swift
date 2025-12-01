@@ -17,6 +17,7 @@ struct GymMembersView: View {
                 if let members = members {
                     ForEach(members, id: \.self) { member in
                         UserRow(profile: member)
+                        Divider()
                     }
                 } else {
                     Text("No members at this gym.")

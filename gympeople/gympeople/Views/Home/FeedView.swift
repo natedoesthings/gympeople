@@ -9,8 +9,9 @@ import SwiftUI
 
 struct FeedView: View {
     let manager = SupabaseManager.shared
+    @StateObject var nearbyPostsVM: ListViewModel<NearbyPost>
     @State private var userProfile: UserProfile?
-    @State private var nearbyPosts: [NearbyPost]?
+//    @State private var nearbyPosts: [NearbyPost]?
     @State private var showPostView: Bool = false
     @State private var fetched: Bool = false
     
@@ -55,8 +56,8 @@ struct FeedView: View {
                 
                 Divider()
                 
-                if let posts = nearbyPosts {
-                    ForEach(posts) { post in
+//                if let posts = nearbyPosts {
+                    ForEach(nearbyPostsVM.items) { post in
                         
                         // TODO: https://github.com/natedoesthings/gympeople/issues/42
 //                        let _ = print(post.is_liked)
@@ -84,28 +85,45 @@ struct FeedView: View {
                         
                         Divider()
                     }
-                } else {
-                    // TODO: account for no posts nearby
-                    Text("No posts nearby.")
-                }
+//                } else {
+//                    // TODO: account for no posts nearby
+//                    Text("No posts nearby.")
+//                }
             }
         }
-        .refreshable {
-            Task {
-                userProfile = try await manager.fetchMyUserProfile()
-                nearbyPosts = try await manager.fetchNearbyPosts()
-            }
-        }
+        .overlay { if nearbyPostsVM.isLoading { ProgressView() } }
         .task {
             Task {
                 if !fetched {
                     userProfile = try await manager.fetchMyUserProfile()
-                    nearbyPosts = try await manager.fetchNearbyPosts()
+//                    nearbyPosts = try await manager.fetchNearbyPosts()
+                    nearbyPostsVM.load()
                 }
                 
                 fetched = true
             }
         }
+        .alert(isPresented: Binding(
+                    get: { nearbyPostsVM.currentError != nil },
+                    set: { _ in nearbyPostsVM.currentError = nil }
+                )) {
+                    let info = ErrorPresenter.message(for: nearbyPostsVM.currentError ?? .unexpected)
+                    return Alert(
+                        title: Text(info.title),
+                        message: Text(info.detail),
+                        dismissButton: .default(Text(info.action ?? "OK")) {
+                            if info.action != nil { nearbyPostsVM.refresh() }
+                        }
+                    )
+                }
+        .refreshable {
+            Task {
+                userProfile = try await manager.fetchMyUserProfile()
+//                nearbyPosts = try await manager.fetchNearbyPosts()
+                nearbyPostsVM.refresh()
+            }
+        }
+        
         .sheet(isPresented: $showPostView) {
             PostView()
         }

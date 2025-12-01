@@ -409,8 +409,7 @@ extension SupabaseManager {
 
             return posts
         } catch {
-            LOG.error("Error fetching nearby posts: \(error)")
-            throw error
+            throw mapToAppError(error)
         }
     }
     
@@ -634,7 +633,8 @@ extension SupabaseManager {
             return gyms
             
         } catch {
-            LOG.error("Failed to find memberships.")
+            // TODO: https://github.com/natedoesthings/gympeople/issues/52
+            LOG.error("Failed to find memberships. \(error.localizedDescription)")
             return []
         }
     }
@@ -750,8 +750,6 @@ extension SupabaseManager {
         }
     }
 
-
-
     private func storagePath(fromPublicURL urlString: String, bucket: String) -> String? {
         guard let url = URL(string: urlString) else { return nil }
         let components = url.pathComponents
@@ -761,6 +759,35 @@ extension SupabaseManager {
         let path = pathComponents.joined(separator: "/")
         return path.isEmpty ? nil : path
     }
+    
+    private func mapToAppError(_ error: Error) -> AppError {
+            // Supabase Swift uses PostgrestError / URLError / DecodingError, adjust as needed
+            if let pg = error as? PostgrestError {
+                switch pg.code {
+                case "23505": return .conflict                          // unique violation
+                case "23503": return .validationFailed(reason: "Missing related item")
+                case "23514": return .validationFailed(reason: "Input violates constraint")
+                case "42501": return .unauthorized
+                default:       return .unexpected
+                }
+            } else if let urlErr = error as? URLError {
+                switch urlErr.code {
+                case .notConnectedToInternet, .timedOut: return .networkUnavailable
+                default: return .unexpected
+                }
+            } else if let httpErr = error as? HTTPError {
+                switch httpErr.response.statusCode {
+                case 401, 403: return .unauthorized
+                case 404: return .notFound
+                case 500...599: return .serverError
+                default: return .unexpected
+                }
+            } else if error is DecodingError {
+                return .unexpected
+            }
+
+            return .unexpected
+        }
 }
 
 nonisolated

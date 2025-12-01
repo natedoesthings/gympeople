@@ -74,6 +74,8 @@ struct HomeView: View {
 }
 
 struct ExploreView: View {
+    @StateObject private var nearbyPostsVM = ListViewModel<NearbyPost>(fetcher: { try await SupabaseManager.shared.fetchNearbyPosts() })
+    
     @State private var homeTab: HomeViewTab = .explore
     
     var body: some View {
@@ -110,7 +112,7 @@ struct ExploreView: View {
                 .padding()
                 
                 TabView(selection: $homeTab) {
-                    FeedView().tag(HomeViewTab.explore)
+                    FeedView(nearbyPostsVM: nearbyPostsVM).tag(HomeViewTab.explore)
                     FollowingView().tag(HomeViewTab.following)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
