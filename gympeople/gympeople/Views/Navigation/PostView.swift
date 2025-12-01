@@ -15,6 +15,8 @@ struct PostView: View {
     
     @FocusState private var isEditorFocused: Bool
     
+    var gymTag: UUID? = nil
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -58,7 +60,7 @@ struct PostView: View {
                     Button {
                         Task {
                             do {
-                                try await SupabaseManager.shared.createPost(content: content)
+                                try await SupabaseManager.shared.createPost(content: content, gym_id: gymTag)
                                 
                                 dismiss()
                             } catch {

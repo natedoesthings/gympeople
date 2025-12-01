@@ -6,7 +6,7 @@
 //
 
 
-enum HomeTab {
+enum HomeViewTab {
     case explore
     case following
 }

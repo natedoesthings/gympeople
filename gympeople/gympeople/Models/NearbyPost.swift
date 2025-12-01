@@ -16,24 +16,12 @@ struct NearbyPost: Decodable, Identifiable {
     let like_count: Int
     let comment_count: Int
     let is_liked: Bool
+    let gym_id: UUID?
 
     let author_first_name: String
-    let author_last_name: String?
+    let author_last_name: String
     let author_user_name: String
     let author_pfp_url: String?
 
-    let distance_meters: Double
-
     var id: UUID { post_id }
-
-    var displayName: String {
-        if let last = author_last_name {
-            return "\(author_first_name) \(last)"
-        }
-        return author_first_name
-    }
-
-    var distanceMiles: Double {
-        distance_meters / 1609.34
-    }
 }

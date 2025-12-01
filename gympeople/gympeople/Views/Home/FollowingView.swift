@@ -26,7 +26,8 @@ struct FollowingView: View {
                                 updated_at: post.post_updated_at,
                                 like_count: post.post_like_count,
                                 comment_count: post.post_comment_count,
-                                is_liked: post.is_liked
+                                is_liked: post.is_liked,
+                                gym_id: post.post_gym_id
                             ),
                             displayName: post.first_name + " " + post.last_name,
                             username: post.user_name,

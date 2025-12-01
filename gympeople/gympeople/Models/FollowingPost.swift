@@ -15,6 +15,7 @@ struct FollowingPost: Decodable, Identifiable {
     let post_updated_at: Date
     let post_like_count: Int
     let post_comment_count: Int
+    let post_gym_id: UUID?
     
     let user_name: String
     let first_name: String

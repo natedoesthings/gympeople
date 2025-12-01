@@ -57,6 +57,11 @@ struct FeedView: View {
                 
                 if let posts = nearbyPosts {
                     ForEach(posts) { post in
+                        
+                        // TODO: https://github.com/natedoesthings/gympeople/issues/42
+//                        let _ = print(post.is_liked)
+//                        let _ = print(post.is_liked)
+//                        
                         PostCard(
                                 post: Post(
                                     id: post.post_id,
@@ -66,9 +71,10 @@ struct FeedView: View {
                                     updated_at: post.updated_at,
                                     like_count: post.like_count,
                                     comment_count: post.comment_count,
-                                    is_liked: post.is_liked
+                                    is_liked: post.is_liked,
+                                    gym_id: post.gym_id
                                 ),
-                                displayName: post.displayName,
+                                displayName: post.author_first_name + post.author_last_name,
                                 username: post.author_user_name,
                                 avatarURL: post.author_pfp_url,
                                 feed: true

@@ -177,7 +177,7 @@ struct GymEditingView: View {
     private func updateMemberships() async {
         for suggestion in selectedGyms {
             if let item = await mapItem(from: suggestion) {
-                gym_memberships.append(Gym(id: UUID(), name: item.name ?? nil,phone_number: item.phoneNumber ?? nil, url: item.url?.absoluteString, latitude: item.location.coordinate.latitude, longitude: item.location.coordinate.longitude, address: item.addressRepresentations?.fullAddress(includingRegion: true, singleLine: false), member_count: 0, post_count: 0))
+                gym_memberships.append(Gym.from(mapItem: item))
             }
         }
     }

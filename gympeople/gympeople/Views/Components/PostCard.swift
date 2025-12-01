@@ -108,13 +108,21 @@ struct PostCard: View {
                                 } else {
                                     await SupabaseManager.shared.unlikePost(for: post.id)
                                 }
-                                
-                                post.is_liked.toggle()
                             }
+                            
+                            if !post.is_liked {
+                                post.like_count += 1
+                                post.is_liked = true
+                            } else {
+                                post.like_count -= 1
+                                post.is_liked = false
+                            }
+                            
                         } label: {
                             HStack {
+                                let _ = print(post.like_count)
                                 Image(systemName: post.is_liked ? "heart.fill" : "heart")
-                                Text("\(post.like_count + (post.is_liked ? 1 : 0))")
+                                Text("\(post.like_count)")
                             }
                             .font(.caption)
                         }
@@ -189,20 +197,20 @@ struct AvatarView: View {
     }
 }
 
-#Preview {
-//    ScrollView {
-//        LazyVStack(spacing: 0) {
-//            ForEach(POSTS, id: \.self) { post in
-                PostCard(
-                    post: POSTS[0],
-                    displayName: "Nathanael Tesfaye",
-                    username: "nate",
-                    avatarURL: "https://picsum.photos/seed/nate/200"
-                )
-//                Divider()
-//            }
-//            
-//        }
-//
-//    }
-}
+//#Preview {
+////    ScrollView {
+////        LazyVStack(spacing: 0) {
+////            ForEach(POSTS, id: \.self) { post in
+//                PostCard(
+//                    post: $POSTS[0],
+//                    displayName: "Nathanael Tesfaye",
+//                    username: "nate",
+//                    avatarURL: "https://picsum.photos/seed/nate/200"
+//                )
+////                Divider()
+////            }
+////            
+////        }
+////
+////    }
+//}

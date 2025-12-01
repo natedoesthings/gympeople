@@ -77,7 +77,7 @@ struct HomeView: View {
 
 struct ExploreView: View {
     @Binding var hideTabBar: Bool
-    @State private var homeTab: HomeTab = .explore
+    @State private var homeTab: HomeViewTab = .explore
     
     var body: some View {
         NavigationStack {
@@ -113,8 +113,8 @@ struct ExploreView: View {
                 .padding()
                 
                 TabView(selection: $homeTab) {
-                    FeedView().tag(HomeTab.explore)
-                    FollowingView().tag(HomeTab.following)
+                    FeedView().tag(HomeViewTab.explore)
+                    FollowingView().tag(HomeViewTab.following)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }

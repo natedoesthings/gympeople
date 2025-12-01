@@ -13,7 +13,8 @@ struct Post: Codable, Identifiable, Hashable {
     let content: String
     let created_at: Date
     let updated_at: Date
-    let like_count: Int
+    var like_count: Int
     let comment_count: Int
     var is_liked: Bool
+    let gym_id: UUID?
 }

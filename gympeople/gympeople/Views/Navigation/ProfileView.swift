@@ -139,6 +139,7 @@ struct ProfileView: View {
                                     LazyVStack {
                                         if let posts = posts {
                                             ForEach(posts, id: \.self) { post in
+                                                let _ = print(post.is_liked)
                                                 PostCard(post: post, displayName: userProfile.first_name, username: userProfile.user_name, avatarURL: userProfile.pfp_url)
                                                 
                                                 Divider()
@@ -228,7 +229,7 @@ struct ProfileView: View {
         do {
             // Fetch memberships
             LOG.debug("Fetching users memberships")
-            memberships = try await manager.fetchMyGymMemberships()
+            memberships = await manager.fetchMyGymMemberships()
             
             // Fetch posts
             LOG.debug("Fetching users posts")

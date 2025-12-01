@@ -216,14 +216,7 @@ struct GymStepView: View {
 
         for suggestion in selectedGyms {
             if let item = await mapItem(from: suggestion) {
-                gymPayloads.append([
-                    "name": AnyEncodable(item.name ?? nil),
-                    "address": AnyEncodable(item.addressRepresentations?.fullAddress(includingRegion: true, singleLine: false)),
-                    "latitude": AnyEncodable(item.location.coordinate.latitude),
-                    "longitude": AnyEncodable(item.location.coordinate.longitude),
-                    "url": AnyEncodable(item.url?.absoluteString),
-                    "phone_number": AnyEncodable(item.phoneNumber ?? nil)
-                ])
+                gymPayloads.append(Gym.payload(mapItem: item))
             }
         }
 

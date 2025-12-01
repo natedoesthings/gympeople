@@ -130,24 +130,28 @@ extension SupabaseManager {
         try await client.from("user_profiles").insert(data).execute()
     }
 
-    func fetchUserProfile(for userID: UUID) async throws -> UserProfile? {
+    func fetchUserProfile(for userID: UUID) async -> UserProfile? {
         LOG.debug("Calling Fetch Request for user profile")
-        
-        let response = try await client
-            .from("user_profiles")
-            .select()
-            .eq("id", value: userID)
-            .single()
-            .execute()
-        
-        let data = response.data
-        
-        let decoder = makeUserProfileDecoder()
-        let profile = try decoder.decode(UserProfile.self, from: data)
-        return profile
+        do {
+            let response = try await client
+                .from("user_profiles")
+                .select()
+                .eq("id", value: userID)
+                .single()
+                .execute()
+            
+            let data = response.data
+            
+            let decoder = makeUserProfileDecoder()
+            let profile = try decoder.decode(UserProfile.self, from: data)
+            return profile
+        } catch {
+            LOG.error("Error loading profile: \(error.localizedDescription)")
+            return nil
+        }
     }
     
-    func fetchMyUserProfile(refresh: Bool = false) async throws -> UserProfile? {
+    func fetchMyUserProfile(refresh: Bool = false) async -> UserProfile? {
         guard let userID = client.auth.currentUser?.id else {
             LOG.notice("No authenticated user found")
             return nil
@@ -160,7 +164,7 @@ extension SupabaseManager {
             }
         }
 
-        let profile = try await fetchUserProfile(for: userID)
+        let profile = await fetchUserProfile(for: userID)
         if let profile {
             await profileCache.store(profile, for: userID)
         }
@@ -244,7 +248,7 @@ extension SupabaseManager {
         let bucket = "profile_pictures"
 
         // Try to clean up any existing profile picture before uploading a new one.
-        if let currentProfile = try? await fetchMyUserProfile(),
+        if let currentProfile = await fetchMyUserProfile(),
            let currentURLString = currentProfile.pfp_url,
            let path = storagePath(fromPublicURL: currentURLString, bucket: bucket) {
             do {
@@ -298,7 +302,7 @@ extension SupabaseManager {
         await profileCache.clear()
     }
     
-    func createPost(content: String) async throws {
+    func createPost(content: String, gym_id: UUID? = nil) async throws {
         guard let userID = client.auth.currentUser?.id else {
             LOG.notice("No authenticated user found")
             return
@@ -309,7 +313,8 @@ extension SupabaseManager {
             "user_id": AnyEncodable(userID),
             "content": AnyEncodable(content),
             "created_at": AnyEncodable(Date()),
-            "updated_at": AnyEncodable(Date())
+            "updated_at": AnyEncodable(Date()),
+            "gym_id": AnyEncodable(gym_id)
         ]
 
         try await client.from("posts").insert(data).execute()
@@ -616,12 +621,12 @@ extension SupabaseManager {
         }
     }
     
-    func fetchGymMemberships(for userId: UUID) async -> [Gym] {
+    func fetchGymMemberships(for userId: UUID, lat: Double? = nil, lon: Double? = nil) async -> [Gym] {
         do {
             let gyms = try await client
                 .rpc(
                     "fetch_gyms_for_user",
-                    params: ["p_user_id": userId]
+                    params: FetchGymMembershipsParams(p_user_id: userId, user_lat: lat, user_lon: lon)
                 )
                 .execute()
                 .value as [Gym]
@@ -635,27 +640,47 @@ extension SupabaseManager {
     }
     
     func fetchMyGymMemberships() async -> [Gym] {
-        guard let currentUserId = client.auth.currentUser?.id else {
+        guard let currentUser = await fetchMyUserProfile() else {
             LOG.error("No authenticated user found")
             return []
         }
         
+        return await fetchGymMemberships(for: currentUser.id, lat: currentUser.latitude, lon: currentUser.longitude)
+    }
+    
+    func fetchNearbyGyms(lat: Double, lon: Double) async -> [Gym]? {
+        LOG.info("Fetching nearby gyms")
+        
         do {
-            let gyms = try await client
-                .rpc(
-                    "fetch_gyms_for_user",
-                    params: ["p_user_id": currentUserId]
-                )
+            let gyms: [Gym] = try await client
+                .rpc("fetch_gyms_by_distance", params: [
+                    "user_lat": lat,
+                    "user_lon": lon,
+                    "radius_km": 30,
+                    "max_results": 20
+                ])
                 .execute()
-                .value as [Gym]
+                .value
             
+            LOG.info("Fetched \(gyms.count) gyms.")
             return gyms
-            
+        
         } catch {
-            LOG.error("Failed to find memberships.")
-            return []
+            LOG.error("Error fetching nearby gyms: \(error.localizedDescription)")
+            return nil
         }
     }
+    
+    func fetchMyNearbyGyms() async -> [Gym]? {
+        guard let currentUser = await fetchMyUserProfile() else {
+            LOG.error("No authenticated user found")
+            return nil
+        }
+        
+        return await fetchNearbyGyms(lat: currentUser.latitude, lon: currentUser.longitude)
+        
+    }
+
     
     func likePost(for postId: UUID) async {
         guard let currentUserId = client.auth.currentUser?.id else {
@@ -665,7 +690,7 @@ extension SupabaseManager {
         
         do {
             try await client
-                .from("likes")
+                .from("post_likes")
                 .insert(["user_id": AnyEncodable(currentUserId), "post_id": AnyEncodable(postId)])
                 .execute()
             
@@ -684,7 +709,7 @@ extension SupabaseManager {
         
         do {
             try await client
-                .from("likes")
+                .from("post_likes")
                 .delete()
                 .eq("user_id", value: currentUserId.uuidString)
                 .eq("post_id", value: postId.uuidString)
@@ -697,6 +722,19 @@ extension SupabaseManager {
         }
     }
     
+    func fetchGymPosts(for gymId: UUID) async -> [NearbyPost]? {
+        do {
+            let posts: [NearbyPost] = try await client
+                .rpc("fetch_posts_for_gym", params: ["p_gym_id": gymId.uuidString])
+                .execute()
+                .value
+            
+            return posts
+        } catch {
+            LOG.error("Error fetching gym posts: \(error.localizedDescription)")
+            return nil
+        }
+    }
 
 
 
@@ -715,4 +753,11 @@ nonisolated
 struct SyncGymMembershipsParams: Encodable, Sendable {
     let p_gym_ids: [UUID]
     let p_user_id: UUID
+}
+
+nonisolated
+struct FetchGymMembershipsParams: Encodable, Sendable {
+    let p_user_id: UUID
+    let user_lat: Double?
+    let user_lon: Double?
 }
