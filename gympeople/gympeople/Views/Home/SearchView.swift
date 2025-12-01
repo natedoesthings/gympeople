@@ -31,7 +31,7 @@ struct SearchView: View {
                     HiddenScrollView {
                         LazyVStack(alignment: .leading, spacing: 12) {
                             ForEach(viewModel.results) { profile in
-                                userRow(profile)
+                                UserRow(profile: profile)
                                 Divider()
                             }
                         }
@@ -82,32 +82,5 @@ struct SearchView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func userRow(_ profile: UserProfile) -> some View {
-        NavigationStack {
-            HStack(spacing: 12) {
-                NavigationLink {
-                    UserProfileView(userProfile: profile)
-                } label: {
-                    AvatarView(url: profile.pfp_url)
-                        .frame(width: 48, height: 48)
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("@\(profile.user_name)")
-                            .font(.headline)
-                            .foregroundStyle(.invertedPrimary)
-                        
-                        Text("\(profile.first_name) \(profile.last_name)")
-                            .font(.subheadline)
-                            .foregroundStyle(Color(.systemGray))
-                    }
-                    
-                    
-                    Spacer()
-                }
-            }
-            .padding(.vertical, 4)
-        }
     }
 }

@@ -50,4 +50,15 @@ extension Gym {
             "phone_number": AnyEncodable(mapItem.phoneNumber)
         ]
     }
+    
+    static func payload(gym: Gym) -> [String: AnyEncodable] {
+        return [
+            "name": AnyEncodable(gym.name),
+            "address": AnyEncodable(gym.address),
+            "latitude": AnyEncodable(gym.latitude),
+            "longitude": AnyEncodable(gym.longitude),
+            "url": AnyEncodable(gym.url),
+            "phone_number": AnyEncodable(gym.phone_number)
+        ]
+    }
 }

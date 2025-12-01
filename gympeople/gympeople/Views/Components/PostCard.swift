@@ -120,7 +120,7 @@ struct PostCard: View {
                             
                         } label: {
                             HStack {
-                                let _ = print(post.like_count)
+//                                let _ = print(post.like_count)
                                 Image(systemName: post.is_liked ? "heart.fill" : "heart")
                                 Text("\(post.like_count)")
                             }

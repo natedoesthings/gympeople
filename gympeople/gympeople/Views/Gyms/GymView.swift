@@ -179,16 +179,26 @@ struct GymView: View {
                     }
                 }
                 .padding()
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .background(Color(.systemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .shadow(color: .black.opacity(0.06), radius: 5, x: 0, y: 3)
                 
                 // Stats row
                 HStack(spacing: 16) {
-                    statCard(
-                        icon: "person.3.fill",
-                        title: "Members",
-                        value: "\(gym.member_count)"
-                    )
+                    NavigationLink {
+                        if gym.member_count > 0 {
+                            GymMembersView(gym_id: gym.id)
+                        } else {
+                            Text("No members at this gym.")
+                        }
+                    } label: {
+                        statCard(
+                            icon: "person.3.fill",
+                            title: "Members",
+                            value: "\(gym.member_count)"
+                        )
+                    }
+                    
                     
                     statCard(
                         icon: "text.bubble.fill",
@@ -285,14 +295,16 @@ struct GymView: View {
             HStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.subheadline)
+                    .foregroundStyle(.standardSecondary)
                 Text(title)
                     .font(.subheadline)
+                    .foregroundStyle(.invertedPrimary)
             }
-            .foregroundStyle(.secondary)
-            
+        
             Text(value)
                 .font(.title3)
                 .fontWeight(.semibold)
+                .foregroundStyle(.invertedPrimary)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -160,26 +160,34 @@ struct GymEditingView: View {
         .onDisappear {
             Task {
                 await updateMemberships()
-                
-                // inserting gyms
-                guard let insertedGyms = await SupabaseManager.shared.insertGyms(gym_memberships) else {
-                    LOG.error("Failed to insert gyms.")
-                    return
-                }
-                
-                // syncing gym memberships for user
-                await manager.syncGymMemberships(gyms: insertedGyms)
-                
             }
         }
     }
     
     private func updateMemberships() async {
+        var payload: [[String: AnyEncodable]] = []
+        
+        // any newly added memberships
         for suggestion in selectedGyms {
             if let item = await mapItem(from: suggestion) {
-                gym_memberships.append(Gym.from(mapItem: item))
+                payload.append(Gym.payload(mapItem: item))
             }
         }
+        
+        // existing memberships
+        for membership in gym_memberships {
+            payload.append(Gym.payload(gym: membership))
+        }
+        
+        
+        // inserting gyms
+        guard let insertedGyms = await SupabaseManager.shared.insertGyms(payload) else {
+            LOG.error("Failed to insert gyms.")
+            return
+        }
+        
+        // syncing gym memberships for user
+        await manager.syncGymMemberships(gyms: insertedGyms)
     }
     
     private func toggleSelection(for gym: MKLocalSearchCompletion) {

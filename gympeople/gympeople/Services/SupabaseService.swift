@@ -735,6 +735,20 @@ extension SupabaseManager {
             return nil
         }
     }
+    
+    func fetchGymMembers(for gymId: UUID) async -> [UserProfile]? {
+        do {
+            let response = try await client
+                .rpc("fetch_user_profiles_for_gym", params: ["p_gym_id": gymId])
+                .execute()
+            
+            let decoder = makeUserProfileDecoder()
+            return try decoder.decode([UserProfile].self, from: response.data)
+        } catch {
+            LOG.error("Error fetching gym members: \(error.localizedDescription)")
+            return nil
+        }
+    }
 
 
 
