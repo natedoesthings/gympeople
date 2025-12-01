@@ -2,36 +2,42 @@
 Find your GymPeople.
 The biggest and most intuitive social media gym app that allows users to connect with others going to the gym.
 
-# Current Developments 11/24/25!!!
-
-## Geolocated Feed that fetches nearby users posts!
-<img width="295" height="639" alt="IMG_6715" src="https://github.com/user-attachments/assets/06c42ec9-a48c-449d-8fde-3788f68501bf" />
-
-
-## Profile searching!
-<img width="295" height="639" alt="IMG_6717" src="https://github.com/user-attachments/assets/3cadba5d-07bb-424d-ba64-897ddaa003f9" />
+# Updates 12/1/25!!!
+## GymsView
+### Find gyms nearby, trending, or just keep up with the gyms you currently hold memberships for
+<img width="147" height="319" alt="IMG_6750" src="https://github.com/user-attachments/assets/965f7067-3600-4e3d-b5dd-46f4d8dfc8e4" />
+<img width="147" height="319" alt="IMG_6751" src="https://github.com/user-attachments/assets/c815f8fc-fbb0-4167-bbba-eb54ec30b3b7" />
+<img width="147" height="319" alt="IMG_6752" src="https://github.com/user-attachments/assets/e8422be2-94c1-49d4-b2ac-18b6a3ba09bb" />
 
 
-## Dark Mode Support!
-<img width="295" height="639" alt="IMG_6721" src="https://github.com/user-attachments/assets/675f2dd6-d5bf-4d6d-abc6-defab83f7230" />
 
 # Feature Set
-
 ## Authentication
-<img width="295" height="639" alt="IMG_6712" src="https://github.com/user-attachments/assets/a6a10042-24e9-41c3-8ffe-6c4f4737e680" />
-<img width="295" height="639" alt="IMG_6713" src="https://github.com/user-attachments/assets/b325dc7b-cf4d-4949-a6eb-9613b8959c48" />
-<img width="295" height="639" alt="IMG_6714" src="https://github.com/user-attachments/assets/904ca384-c97c-4e3c-8299-b4477d3e73cf" />
+<img width="147" height="319" alt="IMG_6712" src="https://github.com/user-attachments/assets/a6a10042-24e9-41c3-8ffe-6c4f4737e680" />
+<img width="147" height="319" alt="IMG_6713" src="https://github.com/user-attachments/assets/b325dc7b-cf4d-4949-a6eb-9613b8959c48" />
+<img width="147" height="319" alt="IMG_6714" src="https://github.com/user-attachments/assets/904ca384-c97c-4e3c-8299-b4477d3e73cf" />
 
 ## Onboarding
 https://github.com/user-attachments/assets/3b765d55-54f6-4c91-876b-2fbf39423a21
 
 ## Posting
-<img width="295" height="639" alt="Screenshot 2025-11-24 at 14 50 08" src="https://github.com/user-attachments/assets/58e2142a-edb2-48b4-8547-b4a93f18a395" />
+<img width="147" height="319" alt="Screenshot 2025-11-24 at 14 50 08" src="https://github.com/user-attachments/assets/58e2142a-edb2-48b4-8547-b4a93f18a395" />
 
 ## Profile
-<img width="295" height="639" alt="IMG_6716" src="https://github.com/user-attachments/assets/7057a7d5-d2b9-471b-9ac3-f3277f5c6938" />
-<img width="295" height="639" alt="IMG_6719" src="https://github.com/user-attachments/assets/86ce2223-a855-424d-988b-26c39afe8b33" />
-<img width="295" height="639" alt="IMG_6718" src="https://github.com/user-attachments/assets/3a8bf2cd-134a-419c-8b10-185aa86e02b9" />
+<img width="147" height="319" alt="IMG_6716" src="https://github.com/user-attachments/assets/7057a7d5-d2b9-471b-9ac3-f3277f5c6938" />
+<img width="147" height="319" alt="IMG_6719" src="https://github.com/user-attachments/assets/86ce2223-a855-424d-988b-26c39afe8b33" />
+<img width="147" height="319" alt="IMG_6718" src="https://github.com/user-attachments/assets/3a8bf2cd-134a-419c-8b10-185aa86e02b9" />
+
+## Geolocated Feed that fetches nearby users posts!
+<img width="147" height="319" alt="IMG_6715" src="https://github.com/user-attachments/assets/06c42ec9-a48c-449d-8fde-3788f68501bf" />
+
+
+## Profile searching!
+<img width="147" height="319" alt="IMG_6717" src="https://github.com/user-attachments/assets/3cadba5d-07bb-424d-ba64-897ddaa003f9" />
+
+
+## Dark Mode Support!
+<img width="147" height="319" alt="IMG_6721" src="https://github.com/user-attachments/assets/675f2dd6-d5bf-4d6d-abc6-defab83f7230" />
 
 # App Icon
 
