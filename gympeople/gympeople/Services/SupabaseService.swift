@@ -27,8 +27,6 @@ class SupabaseManager {
 actor UserProfileCache {
     private var cachedProfile: UserProfile?
     private var cachedUserID: UUID?
-    private var cachedUserPosts: [Post]?
-    private var cachedMemberships: [Gym]?
 
     func get(for userID: UUID) -> UserProfile? {
         guard userID == cachedUserID else { return nil }
@@ -39,68 +37,14 @@ actor UserProfileCache {
         cachedUserID = userID
         cachedProfile = profile
     }
-    
-    func storePosts(_ posts: [Post]) {
-        cachedUserPosts = posts
-    }
-    
-    func storeMemberships(_ memberships: [Gym]) {
-        cachedMemberships = memberships
-    }
 
     func clear() {
         cachedProfile = nil
         cachedUserID = nil
-        cachedUserPosts = nil
-        cachedMemberships = nil
     }
 }
 
 extension SupabaseManager {
-    private func makeUserProfileDecoder() -> JSONDecoder {
-        let decoder = JSONDecoder()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-        formatter.calendar = Calendar(identifier: .iso8601)
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-
-        // Supabase/PostgREST returns timestamps with fractional seconds (e.g. 2024-12-13T02:19:28.123456+00:00)
-        let isoFormatterWithFractional = ISO8601DateFormatter()
-        isoFormatterWithFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        decoder.dateDecodingStrategy = .custom { decoder in
-            let container = try decoder.singleValueContainer()
-            let dateString = try container.decode(String.self)
-
-            // Try ISO8601 with fractional seconds first (Supabase default)
-            if let date = isoFormatterWithFractional.date(from: dateString) {
-                return date
-            }
-            // Try standard ISO8601
-            if let date = ISO8601DateFormatter().date(from: dateString) {
-                return date
-            }
-            // Try yyyy-MM-dd'T'HH:mm:ssZZZZZ
-            if let date = formatter.date(from: dateString) {
-                return date
-            }
-            // Try yyyy-MM-dd (date-only)
-            let shortFormatter = DateFormatter()
-            shortFormatter.dateFormat = "yyyy-MM-dd"
-            if let date = shortFormatter.date(from: dateString) {
-                return date
-            }
-
-            throw DecodingError.dataCorruptedError(
-                in: container,
-                debugDescription: "Unrecognized date format: \(dateString)"
-            )
-        }
-
-        return decoder
-    }
-
     func saveUserProfile(
         firstName: String,
         lastName: String,
@@ -110,8 +54,7 @@ extension SupabaseManager {
         phone: String,
         latitude: Double,
         longitude: Double,
-        location: String,
-        gyms: [String]
+        location: String
     ) async throws {
         let data: [String: AnyEncodable] = [
             "id": AnyEncodable(client.auth.currentUser?.id),
@@ -130,13 +73,14 @@ extension SupabaseManager {
         try await client.from("user_profiles").insert(data).execute()
     }
 
-    func fetchUserProfile(for userID: UUID) async -> UserProfile? {
-        LOG.debug("Calling Fetch Request for user profile")
+    func fetchUserProfile(for userId: UUID) async throws -> [UserProfile] {
+        LOG.debug("Fetching user with following tag")
+        
         do {
             let response = try await client
-                .from("user_profiles")
-                .select()
-                .eq("id", value: userID)
+                .rpc("fetch_user_profile", params: [
+                    "p_user_id": userId.uuidString
+                ])
                 .single()
                 .execute()
             
@@ -144,32 +88,35 @@ extension SupabaseManager {
             
             let decoder = makeUserProfileDecoder()
             let profile = try decoder.decode(UserProfile.self, from: data)
-            return profile
+            
+            return [profile]
         } catch {
-            LOG.error("Error loading profile: \(error.localizedDescription)")
-            return nil
+            LOG.error("Error loading profile via RPC: \(error.localizedDescription)")
+            throw mapToAppError(error)
         }
     }
     
-    func fetchMyUserProfile(refresh: Bool = false) async -> UserProfile? {
+    func fetchMyUserProfile(refresh: Bool = false) async throws -> [UserProfile] {
         guard let userID = client.auth.currentUser?.id else {
             LOG.notice("No authenticated user found")
-            return nil
+            return []
         }
 
         if !refresh {
             if let cached = await profileCache.get(for: userID) {
                 LOG.debug("Returning cached profile for current user")
-                return cached
+                return [cached]
             }
         }
 
-        let profile = await fetchUserProfile(for: userID)
-        if let profile {
+        let profile = try await fetchUserProfile(for: userID)
+        
+        if let profile = profile.first {
             await profileCache.store(profile, for: userID)
         }
-
+        
         return profile
+ 
     }
 
     func searchUserProfiles(matching query: String, limit: Int = 20) async throws -> [UserProfile] {
@@ -202,8 +149,8 @@ extension SupabaseManager {
             .execute()
         
         try await Task.sleep(nanoseconds: 250_000_000)
-
-        if let updatedProfile = try await fetchUserProfile(for: userID) {
+        
+        if let updatedProfile = try await fetchUserProfile(for: userID).first {
             await profileCache.store(updatedProfile, for: userID)
         }
     }
@@ -220,7 +167,6 @@ extension SupabaseManager {
             "last_name": AnyEncodable(userProfile.last_name),
             "user_name": AnyEncodable(userProfile.user_name),
             "biography": AnyEncodable(userProfile.biography),
-            "email": AnyEncodable(userProfile.email),
             "date_of_birth": AnyEncodable(ISO8601DateFormatter().string(from: userProfile.date_of_birth)),
             "phone_number": AnyEncodable(userProfile.phone_number),
             "location": AnyEncodable(userProfile.location),
@@ -248,7 +194,7 @@ extension SupabaseManager {
         let bucket = "profile_pictures"
 
         // Try to clean up any existing profile picture before uploading a new one.
-        if let currentProfile = await fetchMyUserProfile(),
+        if let currentProfile = try await fetchMyUserProfile().first,
            let currentURLString = currentProfile.pfp_url,
            let path = storagePath(fromPublicURL: currentURLString, bucket: bucket) {
             do {
@@ -330,7 +276,7 @@ extension SupabaseManager {
                 }
             }
             
-            let _ = try await client
+            try await client
                 .from("user_profiles")
                 .select("id")
                 .eq("user_name", value: userName)
@@ -346,33 +292,38 @@ extension SupabaseManager {
     }
     
     func fetchPosts(for authorId: UUID, viewing viewerId: UUID? = nil) async throws -> [Post] {
-        if let viewerId = viewerId {
-            let posts = try await client
-                .rpc("fetch_user_posts", params: [
-                    "viewer_id": viewerId.uuidString,
-                    "author_id": authorId.uuidString
-                ])
-                .execute()
-                .value as [Post]
-            
-            return posts
-            
-        } else {
-            guard let currentUserId = client.auth.currentUser?.id else {
-                LOG.error("No authenticated user found")
-                return []
+        do {
+            if let viewerId = viewerId {
+                let posts = try await client
+                    .rpc("fetch_user_posts", params: [
+                        "viewer_id": viewerId.uuidString,
+                        "author_id": authorId.uuidString
+                    ])
+                    .execute()
+                    .value as [Post]
+                
+                return posts
+                
+            } else {
+                guard let currentUserId = client.auth.currentUser?.id else {
+                    LOG.error("No authenticated user found")
+                    return []
+                }
+                
+                let posts = try await client
+                    .rpc("fetch_user_posts", params: [
+                        "viewer_id": currentUserId.uuidString,
+                        "author_id": authorId.uuidString
+                    ])
+                    .execute()
+                    .value as [Post]
+                
+                return posts
+                
             }
-            
-            let posts = try await client
-                .rpc("fetch_user_posts", params: [
-                    "viewer_id": currentUserId.uuidString,
-                    "author_id": authorId.uuidString
-                ])
-                .execute()
-                .value as [Post]
-            
-            return posts
-            
+        } catch {
+            LOG.error("Error fetching user posts: \(error.localizedDescription)")
+            throw mapToAppError(error)
         }
     }
 
@@ -386,15 +337,15 @@ extension SupabaseManager {
     }
     
     
-    func fetchNearbyPosts() async throws -> [NearbyPost] {
+    func fetchNearbyPosts() async throws -> [Post] {
         guard let userId = client.auth.currentUser?.id else {
             LOG.error("No authenticated user found")
             return []
         }
-
+        
         // 10 miles to meters
         let radiusMeters = 10.0 * 1609.34
-
+        
         do {
             let posts = try await client
                 .rpc(
@@ -405,34 +356,12 @@ extension SupabaseManager {
                     ]
                 )
                 .execute()
-                .value as [NearbyPost]
-
+                .value as [Post]
+            
             return posts
         } catch {
             throw mapToAppError(error)
         }
-    }
-    
-    func checkIfFollowing(userId: UUID) async throws -> Bool {
-        guard let currentUserId = client.auth.currentUser?.id else {
-            LOG.error("No authenticated user found")
-            return false
-        }
-        
-        LOG.debug("Checking if following \(userId)")
-        
-        let response = try await client
-            .rpc("is_following",
-                 params: [
-                    "follower": currentUserId.uuidString,
-                    "followee": userId.uuidString
-            ])
-            .execute()
-            .value as Bool
-        
-        LOG.debug("Is following: \(response)")
-        
-        return response
     }
     
     func removeFollowee(userId: UUID) async {
@@ -481,7 +410,7 @@ extension SupabaseManager {
         }
     }
     
-    func fetchFollowingPosts() async -> [FollowingPost] {
+    func fetchFollowingPosts() async throws -> [Post] {
         guard let currentUserId = client.auth.currentUser?.id else {
             LOG.error("No authenticated user found")
             return []
@@ -495,7 +424,7 @@ extension SupabaseManager {
                     "user_id_param": currentUserId.uuidString
                 ])
                 .execute()
-                .value as [FollowingPost]
+                .value as [Post]
             
             LOG.debug("Fetched \(posts.count) posts")
 
@@ -503,7 +432,7 @@ extension SupabaseManager {
             
         } catch {
             LOG.error("Error fetching following posts \(error.localizedDescription)")
-            return []
+            throw mapToAppError(error)
         }
         
     }
@@ -620,7 +549,7 @@ extension SupabaseManager {
         }
     }
     
-    func fetchGymMemberships(for userId: UUID, lat: Double? = nil, lon: Double? = nil) async -> [Gym] {
+    func fetchGymMemberships(for userId: UUID, lat: Double? = nil, lon: Double? = nil) async throws -> [Gym] {
         do {
             let gyms = try await client
                 .rpc(
@@ -635,20 +564,20 @@ extension SupabaseManager {
         } catch {
             // TODO: https://github.com/natedoesthings/gympeople/issues/52
             LOG.error("Failed to find memberships. \(error.localizedDescription)")
-            return []
+            throw mapToAppError(error)
         }
     }
     
-    func fetchMyGymMemberships() async -> [Gym] {
-        guard let currentUser = await fetchMyUserProfile() else {
+    func fetchMyGymMemberships() async throws -> [Gym] {
+        guard let currentUser = try await fetchMyUserProfile().first else {
             LOG.error("No authenticated user found")
             return []
         }
         
-        return await fetchGymMemberships(for: currentUser.id, lat: currentUser.latitude, lon: currentUser.longitude)
+        return try await fetchGymMemberships(for: currentUser.id, lat: currentUser.latitude, lon: currentUser.longitude)
     }
     
-    func fetchNearbyGyms(lat: Double, lon: Double) async -> [Gym]? {
+    func fetchNearbyGyms(lat: Double, lon: Double) async throws -> [Gym] {
         LOG.info("Fetching nearby gyms")
         
         do {
@@ -667,17 +596,17 @@ extension SupabaseManager {
         
         } catch {
             LOG.error("Error fetching nearby gyms: \(error.localizedDescription)")
-            return nil
+            throw mapToAppError(error)
         }
     }
     
-    func fetchMyNearbyGyms() async -> [Gym]? {
-        guard let currentUser = await fetchMyUserProfile() else {
+    func fetchMyNearbyGyms() async throws -> [Gym] {
+        guard let currentUser = try await fetchMyUserProfile().first else {
             LOG.error("No authenticated user found")
-            return nil
+            return []
         }
         
-        return await fetchNearbyGyms(lat: currentUser.latitude, lon: currentUser.longitude)
+        return try await fetchNearbyGyms(lat: currentUser.latitude, lon: currentUser.longitude)
         
     }
 
@@ -722,9 +651,9 @@ extension SupabaseManager {
         }
     }
     
-    func fetchGymPosts(for gymId: UUID) async -> [NearbyPost]? {
+    func fetchGymPosts(for gymId: UUID) async throws -> [Post] {
         do {
-            let posts: [NearbyPost] = try await client
+            let posts: [Post] = try await client
                 .rpc("fetch_posts_for_gym", params: ["p_gym_id": gymId.uuidString])
                 .execute()
                 .value
@@ -732,11 +661,11 @@ extension SupabaseManager {
             return posts
         } catch {
             LOG.error("Error fetching gym posts: \(error.localizedDescription)")
-            return nil
+            throw mapToAppError(error)
         }
     }
     
-    func fetchGymMembers(for gymId: UUID) async -> [UserProfile]? {
+    func fetchGymMembers(for gymId: UUID) async throws -> [UserProfile] {
         do {
             let response = try await client
                 .rpc("fetch_user_profiles_for_gym", params: ["p_gym_id": gymId])
@@ -746,8 +675,54 @@ extension SupabaseManager {
             return try decoder.decode([UserProfile].self, from: response.data)
         } catch {
             LOG.error("Error fetching gym members: \(error.localizedDescription)")
-            return nil
+            throw mapToAppError(error)
         }
+    }
+    
+    // MARK: Helpers
+    
+    private func makeUserProfileDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+
+        // Supabase/PostgREST returns timestamps with fractional seconds (e.g. 2024-12-13T02:19:28.123456+00:00)
+        let isoFormatterWithFractional = ISO8601DateFormatter()
+        isoFormatterWithFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let dateString = try container.decode(String.self)
+
+            // Try ISO8601 with fractional seconds first (Supabase default)
+            if let date = isoFormatterWithFractional.date(from: dateString) {
+                return date
+            }
+            // Try standard ISO8601
+            if let date = ISO8601DateFormatter().date(from: dateString) {
+                return date
+            }
+            // Try yyyy-MM-dd'T'HH:mm:ssZZZZZ
+            if let date = formatter.date(from: dateString) {
+                return date
+            }
+            // Try yyyy-MM-dd (date-only)
+            let shortFormatter = DateFormatter()
+            shortFormatter.dateFormat = "yyyy-MM-dd"
+            if let date = shortFormatter.date(from: dateString) {
+                return date
+            }
+
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unrecognized date format: \(dateString)"
+            )
+        }
+
+        return decoder
     }
 
     private func storagePath(fromPublicURL urlString: String, bucket: String) -> String? {
@@ -801,4 +776,15 @@ struct FetchGymMembershipsParams: Encodable, Sendable {
     let p_user_id: UUID
     let user_lat: Double?
     let user_lon: Double?
+
+    enum CodingKeys: String, CodingKey { case p_user_id, user_lat, user_lon }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(p_user_id, forKey: .p_user_id)
+        if let lat = user_lat { try c.encode(lat, forKey: .user_lat) }
+        else { try c.encodeNil(forKey: .user_lat) }
+        if let lon = user_lon { try c.encode(lon, forKey: .user_lon) }
+        else { try c.encodeNil(forKey: .user_lon) }
+    }
 }

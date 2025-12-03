@@ -8,16 +8,26 @@
 import SwiftUI
 
 struct HomeView: View {
+    @StateObject private var userProfilesVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyUserProfile() })
+    
+    @StateObject private var postsVM = ListViewModel<Post>(fetcher: { try await SupabaseManager.shared.fetchMyPosts() })
+    
+    @StateObject private var gymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyGymMemberships() })
+    
     @State private var tabSelected: Tab = .home
     @State private var showPostView: Bool = false
     
     var body: some View {
         ZStack {
             TabView(selection: $tabSelected) {
-                ExploreView().tag(Tab.home)
+                ExploreView(userProfilesVM: userProfilesVM).tag(Tab.home)
                 EmptyView().tag(Tab.chat)
-                GymsView().tag(Tab.gyms)
-                ProfileView().tag(Tab.profile)
+                GymsView(userGymsVM: gymsVM).tag(Tab.gyms)
+                ProfileView(
+                    userProfilesVM: userProfilesVM,
+                    postsVM: postsVM,
+                    gymsVM: gymsVM
+                ).tag(Tab.profile)
             }
             .tabViewStyle(.page(indexDisplayMode: .never)) // hide default bar
             
@@ -74,7 +84,11 @@ struct HomeView: View {
 }
 
 struct ExploreView: View {
-    @StateObject private var nearbyPostsVM = ListViewModel<NearbyPost>(fetcher: { try await SupabaseManager.shared.fetchNearbyPosts() })
+    @StateObject var userProfilesVM: ListViewModel<UserProfile>
+    
+    @StateObject private var nearbyPostsVM = ListViewModel<Post>(fetcher: { try await SupabaseManager.shared.fetchNearbyPosts() })
+    
+    @StateObject private var followingPostsVM = ListViewModel<Post>(fetcher: { try await SupabaseManager.shared.fetchFollowingPosts() })
     
     @State private var homeTab: HomeViewTab = .explore
     
@@ -112,8 +126,8 @@ struct ExploreView: View {
                 .padding()
                 
                 TabView(selection: $homeTab) {
-                    FeedView(nearbyPostsVM: nearbyPostsVM).tag(HomeViewTab.explore)
-                    FollowingView().tag(HomeViewTab.following)
+                    FeedView(nearbyPostsVM: nearbyPostsVM, userProfilesVM: userProfilesVM).tag(HomeViewTab.explore)
+                    FollowingView(followingPostsVM: followingPostsVM).tag(HomeViewTab.following)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }

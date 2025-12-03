@@ -7,147 +7,71 @@
 
 import SwiftUI
 
-struct UserProfileView: View {
-    let manager = SupabaseManager.shared
-    let userProfile: UserProfile
-    @State private var posts: [Post]?
-    @State private var memberships: [Gym]?
-    @State private var hasLoadedProfile: Bool = false
-    @State private var profileTab: ProfileTab = .posts
-    
-    var body: some View {
-        ProfileContentView(
-            userProfile: userProfile,
-            posts: posts,
-            memberships: memberships,
-            profileTab: $profileTab
-        )
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .onAppear(perform: loadOnce)
-    }
-    
-    private func loadOnce() {
-        guard !hasLoadedProfile else { return }
-        hasLoadedProfile = true
-        Task { await loadProfile() }
-    }
-
-    private func loadProfile() async {
-        do {
-            // Fetch memberships
-            LOG.debug("Fetching users memberships")
-            memberships = await manager.fetchGymMemberships(for: userProfile.id)
-            
-            // Fetch posts
-            LOG.debug("Fetching users posts")
-            posts = try await manager.fetchPosts(for: userProfile.id)
-        } catch {
-            LOG.error(error.localizedDescription.debugDescription)
-        }
-    }
-}
-
 struct UserIdProfileView: View {
-    let userId: UUID
-    let manager = SupabaseManager.shared
-    
-    @State private var userProfile: UserProfile?
-    @State private var posts: [Post]?
-    @State private var memberships: [Gym]?
+    @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
     @State private var hasLoadedProfile: Bool = false
-    @State private var profileTab: ProfileTab = .posts
     
     var body: some View {
-        VStack {
-            if let userProfile = userProfile {
-                ProfileContentView(
-                    userProfile: userProfile,
-                    posts: posts,
-                    memberships: memberships,
-                    profileTab: $profileTab
-                )
+        Group {
+            if let profile = userProfilesVM.items.first {
+                ProfileContentView(userProfile: profile)
+            } else if userProfilesVM.isLoading {
+                ProgressView()
             } else {
-                ProgressView("Loading Profile...")
+                Text("No profile found")
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .onAppear {
+        .overlay { if userProfilesVM.isLoading { ProgressView() } }
+        .task {
             if !hasLoadedProfile {
-                Task {
-                    await loadProfile()
-                }
-                hasLoadedProfile = true
+                await userProfilesVM.load()
             }
+            hasLoadedProfile = true
         }
-        
-    }
-    
-    private func loadProfile() async {
-        do {
-            // Fetch memberships
-            LOG.debug("Fetching users memberships")
-            memberships = await manager.fetchGymMemberships(for: userId)
-            
-            // Fetch posts
-            LOG.debug("Fetching users posts")
-            posts = try await manager.fetchPosts(for: userId)
-            
-            // Fetch profile
-            LOG.debug("Fetching user profile")
-            userProfile = try await manager.fetchUserProfile(for: userId)
-        } catch {
-            LOG.error(error.localizedDescription.debugDescription)
-        }
+        .listErrorAlert(vm: userProfilesVM, onRetry: { await userProfilesVM.refresh() })
+
     }
 }
 
-private struct ProfileContentView: View {
+struct ProfileContentView: View {
     let userProfile: UserProfile
-    let posts: [Post]?
-    let memberships: [Gym]?
-    @Binding var profileTab: ProfileTab
+    @StateObject private var postsVM: ListViewModel<Post>
+    @StateObject private var gymsVM: ListViewModel<Gym>
+    @State private var profileTab: ProfileTab = .posts
     @State private var followed: Bool = false
+    
+    init(userProfile: UserProfile) {
+        self.userProfile = userProfile
+        _postsVM = StateObject(wrappedValue: ListViewModel<Post> {
+            try await SupabaseManager.shared.fetchPosts(for: userProfile.id)
+        })
+        _gymsVM = StateObject(wrappedValue: ListViewModel<Gym> {
+            try await SupabaseManager.shared.fetchGymMemberships(for: userProfile.id)
+        })
+    }
 
     var body: some View {
-        VStack {
-            VStack(alignment: .leading, spacing: 4) {
-                header()
-                
-                Picker("", selection: $profileTab) {
-                    ForEach(ProfileTab.allCases) { tab in
-                        Text(tab.rawValue).tag(tab)
-                    }
+        VStack(alignment: .leading, spacing: 4) {
+            header()
+            
+            Picker("", selection: $profileTab) {
+                ForEach(ProfileTab.allCases) { tab in
+                    Text(tab.rawValue).tag(tab)
                 }
-                .pickerStyle(SegmentedPickerStyle())
-                
-                switch profileTab {
-                case .posts:
-                    HiddenScrollView {
-                        LazyVStack {
-                            if let posts = posts {
-                                ForEach(posts, id: \.self) { post in
-                                    PostCard(
-                                        post: post,
-                                        displayName: userProfile.first_name,
-                                        username: userProfile.user_name,
-                                        avatarURL: userProfile.pfp_url
-                                    )
-                                    
-                                    Divider()
-                                }
-                            }
-                        }
-                    }
-                case .mentions:
-                    Text("Mentions")
-                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            
+            switch profileTab {
+            case .posts:
+                PostsView(postsVM: postsVM, feed: true)
+            case .mentions:
+                Text("Mentions")
             }
         }
         .padding()
-        .onAppear {
-            Task {
-                followed = try await SupabaseManager.shared.checkIfFollowing(userId: userProfile.id)
-            }
+        .task {
+            followed = userProfile.is_following ?? false
         }
     }
 
@@ -219,23 +143,9 @@ private struct ProfileContentView: View {
         .foregroundStyle(Color.standardSecondary)
 
         VStack(alignment: .leading, spacing: 15) {
-            HiddenScrollView(.horizontal) {
-                if let memberships = memberships {
-                    HStack {
-                        ForEach(memberships, id: \.self) { gym in
-                            GymTagButton(gymTagType: .gym(gym: gym))
-                        }
-                        
-                    }
-                    .padding(1)
-                }
-            }
+            GymTagsView(gymsVM: gymsVM)
         }
         .padding(.vertical, 15)
     }
 }
 
-
-#Preview {
-    UserProfileView(userProfile: .placeholder())
-}

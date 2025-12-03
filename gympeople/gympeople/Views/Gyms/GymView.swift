@@ -84,13 +84,24 @@ struct GymSuggestionView: View {
 struct GymView: View {
     @Environment(\.openURL) var openURL
     let gym: Gym
-    @State private var posts: [NearbyPost]?
+    @StateObject private var userProfilesVM: ListViewModel<UserProfile>
+    @StateObject private var postsVM: ListViewModel<Post>
     @State private var showPostView: Bool = false
     
     var formattedDistance: String? {
         guard let meters = gym.distance_meters else { return nil }
         let miles = meters / 1609.34
         return String(format: "%.1f mi away", miles)
+    }
+    
+    init(gym: Gym) {
+        self.gym = gym
+        _userProfilesVM = StateObject(wrappedValue: ListViewModel<UserProfile> {
+            try await SupabaseManager.shared.fetchGymMembers(for: gym.id)
+        })
+        _postsVM = StateObject(wrappedValue: ListViewModel<Post> {
+            try await SupabaseManager.shared.fetchGymPosts(for: gym.id)
+        })
     }
     
     var body: some View {
@@ -187,7 +198,7 @@ struct GymView: View {
                 HStack(spacing: 16) {
                     NavigationLink {
                         if gym.member_count > 0 {
-                            GymMembersView(gym_id: gym.id)
+                            GymMembersView(userProfilesVM: userProfilesVM)
                         } else {
                             Text("No members at this gym.")
                         }
@@ -238,39 +249,7 @@ struct GymView: View {
                         Spacer()
                     }
                     
-                    if let posts = posts, !posts.isEmpty {
-                        ForEach(posts) { post in
-                            PostCard(
-                                    post: Post(
-                                        id: post.post_id,
-                                        user_id: post.post_user_id,
-                                        content: post.content,
-                                        created_at: post.created_at,
-                                        updated_at: post.updated_at,
-                                        like_count: post.like_count,
-                                        comment_count: post.comment_count,
-                                        is_liked: post.is_liked,
-                                        gym_id: post.gym_id
-                                    ),
-                                    displayName: post.author_first_name + post.author_last_name,
-                                    username: post.author_user_name,
-                                    avatarURL: post.author_pfp_url,
-                                    feed: true
-                                )
-                                .padding()
-                                .padding(.vertical, -10)
-                            
-                            Divider()
-                        }
-                    } else {
-                        Text("Posts from this gym will show up here.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.systemGray6))
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    }
+                    PostsView(postsVM: postsVM, feed: true)
                 }
             }
             .padding()
@@ -279,11 +258,6 @@ struct GymView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showPostView) {
             PostView(gymTag: gym.id)
-        }
-        .onAppear {
-            Task {
-                posts = await SupabaseManager.shared.fetchGymPosts(for: gym.id)
-            }
         }
     }
     

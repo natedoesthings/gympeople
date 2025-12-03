@@ -8,14 +8,13 @@
 import SwiftUI
 
 struct GymMembersView: View {
-    let gym_id: UUID
-    @State private var members: [UserProfile]?
+    @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
     
     var body: some View {
         HiddenScrollView {
             LazyVStack {
-                if let members = members {
-                    ForEach(members, id: \.self) { member in
+                if !userProfilesVM.items.isEmpty {
+                    ForEach(userProfilesVM.items, id: \.self) { member in
                         UserRow(profile: member)
                         Divider()
                     }
@@ -26,11 +25,14 @@ struct GymMembersView: View {
             }
         }
         .padding()
-        .onAppear {
-            Task {
-                members = await SupabaseManager.shared.fetchGymMembers(for: gym_id)
-            }
+        .overlay { if userProfilesVM.isLoading { ProgressView() } }
+        .task {
+            await userProfilesVM.load()
         }
+        .refreshable {
+            await userProfilesVM.refresh()
+        }
+        .listErrorAlert(vm: userProfilesVM, onRetry: { await userProfilesVM.refresh() })
     }
     
 }

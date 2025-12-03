@@ -8,30 +8,29 @@
 import SwiftUI
 
 struct UserGymsView: View {
-    @State private var memberships: [Gym]?
+    @ObservedObject var gymsVM: ListViewModel<Gym>
     
     var body: some View {
         HiddenScrollView {
             LazyVStack {
-                if let gyms = memberships {
-                    ForEach(gyms, id: \.self) { gym in
-                        NavigationLink {
-                            GymView(gym: gym)
-                        } label: {
-                            GymCard(gym: gym)
-                        }
-                        
+                ForEach(gymsVM.items, id: \.self) { gym in
+                    NavigationLink {
+                        GymView(gym: gym)
+                    } label: {
+                        GymCard(gym: gym)
                     }
                 }
-                
             }
         }
         .padding()
-        .onAppear {
-            Task {
-                memberships = await SupabaseManager.shared.fetchMyGymMemberships()
-            }
+        .overlay { if gymsVM.isLoading { ProgressView() } }
+        .task {
+            await gymsVM.load()
         }
+        .refreshable {
+            await gymsVM.refresh()
+        }
+        .listErrorAlert(vm: gymsVM, onRetry: { await gymsVM.refresh() })
     }
     
     

@@ -190,8 +190,7 @@ struct GymStepView: View {
                 phone: phone,
                 latitude: latitude,
                 longitude: longitude,
-                location: location,
-                gyms: []
+                location: location
             )
             LOG.info("Profile saved successfully for \(email)")
             

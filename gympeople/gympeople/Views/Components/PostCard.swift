@@ -8,14 +8,20 @@
 import SwiftUI
 
 struct PostCard: View {
+    @StateObject private var userProfileVM: ListViewModel<UserProfile>
     @State private var showEditingPost: Bool = false
     @State private var showDeletingAlert: Bool = false
-    
     @State var post: Post
-    let displayName: String
-    let username: String
-    let avatarURL: String?
+
     var feed: Bool = false
+    
+    init(post: Post, feed: Bool = false) {
+        _post = State(initialValue: post)
+        self.feed = feed
+        _userProfileVM = StateObject(wrappedValue: ListViewModel<UserProfile> {
+            try await SupabaseManager.shared.fetchUserProfile(for: post.user_id)
+        })
+    }
 
     var body: some View {
         NavigationStack {
@@ -23,13 +29,13 @@ struct PostCard: View {
                 // Avatar
                 if feed {
                     NavigationLink {
-                        UserIdProfileView(userId: post.user_id)
+                        UserIdProfileView(userProfilesVM: userProfileVM)
                     } label: {
-                        AvatarView(url: avatarURL)
+                        AvatarView(url: post.author_pfp_url)
                             .frame(width: 36, height: 36)
                     }
                 } else {
-                    AvatarView(url: avatarURL)
+                    AvatarView(url: post.author_pfp_url)
                         .frame(width: 36, height: 36)
                 }
                 
@@ -37,7 +43,7 @@ struct PostCard: View {
                 // Main column
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text(displayName)
+                        Text(post.author_first_name + " " + post.author_last_name)
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .lineLimit(1)
@@ -76,7 +82,7 @@ struct PostCard: View {
                         
                     }
                     HStack(alignment: .firstTextBaseline, spacing: 3) {
-                        Text("@\(username)")
+                        Text("@\(post.author_user_name)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -196,21 +202,3 @@ struct AvatarView: View {
             .foregroundStyle(Color.gray.opacity(0.6))
     }
 }
-
-//#Preview {
-////    ScrollView {
-////        LazyVStack(spacing: 0) {
-////            ForEach(POSTS, id: \.self) { post in
-//                PostCard(
-//                    post: $POSTS[0],
-//                    displayName: "Nathanael Tesfaye",
-//                    username: "nate",
-//                    avatarURL: "https://picsum.photos/seed/nate/200"
-//                )
-////                Divider()
-////            }
-////            
-////        }
-////
-////    }
-//}

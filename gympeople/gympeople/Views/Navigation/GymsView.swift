@@ -9,7 +9,8 @@ import SwiftUI
 import MapKit
 
 struct GymsView: View {
-    @State private var nearbyGyms: [Gym]?
+    @StateObject var nearbyGymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyGyms() })
+    @StateObject var userGymsVM: ListViewModel<Gym>
     @State private var gymTab: GymsViewTab = .nearby
     
     var body: some View {
@@ -47,16 +48,11 @@ struct GymsView: View {
                 }
                 
                 TabView(selection: $gymTab) {
-                    NearbyGymsView(gyms: $nearbyGyms).tag(GymsViewTab.nearby)
-                    TrendingGymsView(gyms: $nearbyGyms).tag(GymsViewTab.trending)
-                    UserGymsView().tag(GymsViewTab.userGyms)
+                    NearbyGymsView(nearbyGymsVM: nearbyGymsVM).tag(GymsViewTab.nearby)
+                    TrendingGymsView(nearbyGymsVM: nearbyGymsVM).tag(GymsViewTab.trending)
+                    UserGymsView(gymsVM: userGymsVM).tag(GymsViewTab.userGyms)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
-            }
-            .onAppear {
-                Task {
-                    nearbyGyms = await SupabaseManager.shared.fetchMyNearbyGyms()
-                }
             }
         }
         
@@ -64,7 +60,3 @@ struct GymsView: View {
 
 }
 
-
-#Preview {
-    GymsView()
-}

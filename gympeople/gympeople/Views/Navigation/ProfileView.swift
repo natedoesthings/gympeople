@@ -9,9 +9,9 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @State private var userProfile: UserProfile = .placeholder()
-    @State private var posts: [Post]?
-    @State private var memberships: [Gym] = []
+    @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
+    @ObservedObject var postsVM: ListViewModel<Post>
+    @ObservedObject var gymsVM: ListViewModel<Gym>
 
     @State private var errorMessage: String?
     
@@ -22,8 +22,6 @@ struct ProfileView: View {
     @State private var profileTab: ProfileTab = .posts
     @State private var outerDisabled = false
     
-    let manager = SupabaseManager.shared
-    
     var body: some View {
         VStack(spacing: 20) {
             if hasLoadedProfile {
@@ -31,130 +29,123 @@ struct ProfileView: View {
                 NavigationStack {
                     HiddenScrollView {
                         VStack(alignment: .leading, spacing: 4) {
-                            // Profile Picture
-                            HStack(spacing: 30) {
-                                PhotosPicker(selection: $photosPickerItem, matching: .images) {
-                                    ZStack(alignment: .bottomTrailing) {
-                                        AvatarView(url: userProfile.pfp_url)
-                                            .frame(width: 75, height: 75)
-                                            .clipShape(Circle())
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(Color.gray.opacity(0.3), lineWidth: 2)
-                                            )
-                                        
-                                        // Edit badge
-                                        Circle()
-                                            .fill(Color.invertedPrimary)
-                                            .frame(width: 26, height: 26)
-                                            .overlay(
-                                                Image(systemName: "pencil")
-                                                    .font(.system(size: 12, weight: .medium))
-                                                    .foregroundColor(.standardPrimary)
-                                            )
-                                            .offset(x: 4, y: 4)  // small outward offset
+                            if let userProfile = userProfilesVM.items.first {
+                                // Profile Picture
+                                HStack(spacing: 30) {
+                                    PhotosPicker(selection: $photosPickerItem, matching: .images) {
+                                        ZStack(alignment: .bottomTrailing) {
+                                            AvatarView(url: userProfile.pfp_url)
+                                                .frame(width: 75, height: 75)
+                                                .clipShape(Circle())
+                                                .overlay(
+                                                    Circle()
+                                                        .stroke(Color.gray.opacity(0.3), lineWidth: 2)
+                                                )
+                                            
+                                            // Edit badge
+                                            Circle()
+                                                .fill(Color.invertedPrimary)
+                                                .frame(width: 26, height: 26)
+                                                .overlay(
+                                                    Image(systemName: "pencil")
+                                                        .font(.system(size: 12, weight: .medium))
+                                                        .foregroundColor(.standardPrimary)
+                                                )
+                                                .offset(x: 4, y: 4)  // small outward offset
+                                        }
+                                        .frame(width: 75, height: 75)
                                     }
-                                    .frame(width: 75, height: 75)
+                                    
+                                    VStack(alignment: .leading) {
+                                        Text("\(userProfile.post_count)")
+                                        Text("posts")
+                                    }
+                                    
+                                    VStack(alignment: .leading) {
+                                        Text("\(userProfile.follower_count)")
+                                        Text("followers")
+                                    }
+                                    
+                                    VStack(alignment: .leading) {
+                                        Text("\(userProfile.following_count)")
+                                        Text("following")
+                                    }
                                 }
                                 
-                                VStack(alignment: .leading) {
-                                    Text("\(userProfile.post_count)")
-                                    Text("posts")
-                                }
                                 
-                                VStack(alignment: .leading) {
-                                    Text("\(userProfile.follower_count)")
-                                    Text("followers")
+                                // Name, user, bio
+                                HStack {
+                                    Text(userProfile.first_name)
+                                    Text(userProfile.last_name)
                                 }
+                                .padding(.top, 5)
+                                .font(.title3)
+                                .fontWeight(.semibold)
                                 
-                                VStack(alignment: .leading) {
-                                    Text("\(userProfile.following_count)")
-                                    Text("following")
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Text("@\(userProfile.user_name)")
+                                    if let bio = userProfile.biography {
+                                        Text("\(bio)")
+                                    }
                                 }
-                            }
-                            
-                            
-                            // Name, user, bio
-                            HStack {
-                                Text(userProfile.first_name)
-                                Text(userProfile.last_name)
-                            }
-                            .padding(.top, 5)
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                            
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text("@\(userProfile.user_name)")
-                                if let bio = userProfile.biography {
-                                    Text("\(bio)")
-                                }
-                            }
-                            .font(.caption)
-                            .foregroundStyle(Color.standardSecondary)
-                            
-                            
-                            // Gym Tags
-                            VStack(alignment: .leading, spacing: 15) {
-                                HiddenScrollView(.horizontal) {
-                                    HStack {
-                                        if !memberships.isEmpty {
-                                            ForEach(memberships, id: \.self) { gym in
-                                                Button {
-                                                    showProfileEditingPage = true
-                                                } label: {
-                                                    GymTagButton(gymTagType: .gym(gym: gym))
+                                .font(.caption)
+                                .foregroundStyle(Color.standardSecondary)
+                                
+                                
+                                // Gym Tags
+                                VStack(alignment: .leading, spacing: 15) {
+                                    HiddenScrollView(.horizontal) {
+                                        HStack {
+                                            if !gymsVM.items.isEmpty {
+                                                ForEach(gymsVM.items, id: \.self) { gym in
+                                                    Button {
+                                                        showProfileEditingPage = true
+                                                    } label: {
+                                                        GymTagButton(gymTagType: .gym(gym: gym))
+                                                    }
                                                 }
-                                            }
-                                            
-                                            NavigationLink {
-                                                GymEditingView(gym_memberships: $memberships)
-                                            } label: {
-                                                GymTagButton(gymTagType: .plus)
-                                            }
-                                        } else {
-                                            NavigationLink {
-                                                GymEditingView(gym_memberships: $memberships)
-                                            } label: {
-                                                GymTagButton(gymTagType: .none)
-                                            }
-                                            
-                                        }
-                                    }
-                                    .padding(1)
-                                }
-                            }
-                            .padding(.vertical, 15)
-                            
-                            Picker("", selection: $profileTab) {
-                                ForEach(ProfileTab.allCases) { tab in
-                                    Text(tab.rawValue).tag(tab)
-                                }
-                            }
-                            .pickerStyle(SegmentedPickerStyle())
-                            
-                            
-                            switch profileTab {
-                            case .posts:
-                                HiddenScrollView {
-                                    LazyVStack {
-                                        if let posts = posts {
-                                            ForEach(posts, id: \.self) { post in
-//                                                let _ = print(post.is_liked)
-                                                PostCard(post: post, displayName: userProfile.first_name, username: userProfile.user_name, avatarURL: userProfile.pfp_url)
                                                 
-                                                Divider()
+                                                NavigationLink {
+                                                    GymEditingView(gym_memberships: $gymsVM.items)
+                                                } label: {
+                                                    GymTagButton(gymTagType: .plus)
+                                                }
+                                            } else {
+                                                NavigationLink {
+                                                    GymEditingView(gym_memberships: $gymsVM.items)
+                                                } label: {
+                                                    GymTagButton(gymTagType: .none)
+                                                }
+                                                
                                             }
                                         }
+                                        .padding(1)
                                     }
                                 }
-                                .gesture(
-                                    DragGesture()
-                                        .onChanged { _ in outerDisabled = true }
-                                        .onEnded { _ in outerDisabled = false }
-                                )
-                                .frame(height: 500)
-                            case .mentions:
-                                Text("Your mentions")
+                                .padding(.vertical, 15)
+                                
+                                Picker("", selection: $profileTab) {
+                                    ForEach(ProfileTab.allCases) { tab in
+                                        Text(tab.rawValue).tag(tab)
+                                    }
+                                }
+                                .pickerStyle(SegmentedPickerStyle())
+                                
+                                
+                                switch profileTab {
+                                case .posts:
+                                    HiddenScrollView {
+                                        PostsView(postsVM: postsVM)
+                                    }
+                                    .gesture(
+                                        DragGesture()
+                                            .onChanged { _ in outerDisabled = true }
+                                            .onEnded { _ in outerDisabled = false }
+                                    )
+                                    .frame(height: 500)
+                                case .mentions:
+                                    Text("Your mentions")
+                                }
                             }
                             
                         }
@@ -170,7 +161,9 @@ struct ProfileView: View {
                                     }
                                     
                                     NavigationLink {
-                                        ProfileSettingsPageView(userProfile: userProfile)
+                                        if let userProfile = userProfilesVM.items.first {
+                                            ProfileSettingsPageView(userProfile: userProfile)
+                                        }
                                     } label: {
                                         Image(systemName: "slider.horizontal.3")
                                     }
@@ -179,18 +172,14 @@ struct ProfileView: View {
                         }
                     }
                     .refreshable {
-                        Task {
-                            await loadProfile(refresh: true)
-                        }
+                        await loadProfile()
                     }
                 }
                 .sheet(isPresented: $showProfileEditingPage) {
-                    ProfileEditingPageView(userProfile: userProfile, memberships: memberships)
+                    if let userProfile = userProfilesVM.items.first {
+                        ProfileEditingPageView(userProfile: userProfile, memberships: gymsVM.items)
+                    }
                 }
-                
-            } else if let error = errorMessage {
-                Text("Error: \(error)")
-                    .foregroundColor(.red)
             } else {
                 ProgressView("Loading Profile...")
             }
@@ -200,6 +189,7 @@ struct ProfileView: View {
                 Task {
                     await loadProfile()
                 }
+                
                 hasLoadedProfile = true
             }
         }
@@ -209,7 +199,7 @@ struct ProfileView: View {
                     if let data = try? await photosPickerItem.loadTransferable(type: Data.self) {
                         if let image = UIImage(data: data) {
                             do {
-                                try await manager.uploadProfilePicture(image)
+                                try await SupabaseManager.shared.uploadProfilePicture(image)
                                 await loadProfile()
                             } catch {
                                 LOG.error("Could not upload profile picture: \(error)")
@@ -225,26 +215,9 @@ struct ProfileView: View {
         }
     }
     
-    private func loadProfile(refresh: Bool = false) async {
-        do {
-            // Fetch memberships
-            LOG.debug("Fetching users memberships")
-            memberships = await manager.fetchMyGymMemberships()
-            
-            // Fetch posts
-            LOG.debug("Fetching users posts")
-            posts = try await manager.fetchMyPosts()
-            
-            // Fetch profile
-            LOG.debug("Fetching user profile")
-            userProfile = try await manager.fetchMyUserProfile(refresh: refresh) ?? .placeholder()
-            
-        } catch {
-            errorMessage = error.localizedDescription.debugDescription
-        }
+    private func loadProfile() async {
+        await userProfilesVM.load()
+        await gymsVM.load()
+        await postsVM.load()
     }
 }
-
- #Preview {
-     ProfileView()
- }

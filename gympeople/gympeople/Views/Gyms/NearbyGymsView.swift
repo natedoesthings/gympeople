@@ -9,9 +9,9 @@ import SwiftUI
 import MapKit
 
 struct NearbyGymsView: View {
+    @ObservedObject var nearbyGymsVM: ListViewModel<Gym>
     @StateObject private var gymSearch = LocalSearchService()
     @State private var searchText: String = ""
-    @Binding var gyms: [Gym]?
     @FocusState private var isFocused: Bool
     
     var body: some View {
@@ -60,8 +60,8 @@ struct NearbyGymsView: View {
             
             HiddenScrollView {
                 LazyVStack {
-                    if let gyms = gyms, !gyms.isEmpty {
-                        ForEach(gyms, id: \.self) { gym in
+                    if !nearbyGymsVM.items.isEmpty {
+                        ForEach(nearbyGymsVM.items, id: \.self) { gym in
                             NavigationLink {
                                 GymView(gym: gym)
                             } label: {
@@ -72,10 +72,8 @@ struct NearbyGymsView: View {
                     } else {
                         Button {
                             Task {
-                                gyms = try await findNearbyGyms()
-                                
-                                guard let gyms = gyms else { return }
-                                await SupabaseManager.shared.insertGyms(gyms)
+                                await nearbyGymsVM.load()
+                                await SupabaseManager.shared.insertGyms(nearbyGymsVM.items)
                             }
                         } label: {
                             Text("Load gyms...")
@@ -93,12 +91,19 @@ struct NearbyGymsView: View {
                 gymSearch.suggestions.removeAll()
             }
         }
+        .task {
+            await nearbyGymsVM.load()
+        }
+        .refreshable {
+            await nearbyGymsVM.refresh()
+        }
+        .listErrorAlert(vm: nearbyGymsVM, onRetry: { await nearbyGymsVM.refresh() })
     }
     
     private func findNearbyGyms() async throws -> [Gym]? {
         LOG.debug("Fetching nearby gyms")
         
-        if let currentProfile = await SupabaseManager.shared.fetchMyUserProfile() {
+        if let currentProfile = try await SupabaseManager.shared.fetchMyUserProfile().first {
             //TODO: search gyms from gyms table first, then mapkit
             let coordinate = CLLocationCoordinate2D(latitude: currentProfile.latitude, longitude: currentProfile.longitude)
             

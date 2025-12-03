@@ -14,7 +14,7 @@ struct UserRow: View {
         NavigationStack {
             HStack(spacing: 12) {
                 NavigationLink {
-                    UserProfileView(userProfile: profile)
+                    ProfileContentView(userProfile: profile)
                 } label: {
                     AvatarView(url: profile.pfp_url)
                         .frame(width: 48, height: 48)

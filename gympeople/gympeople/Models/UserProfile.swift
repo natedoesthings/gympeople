@@ -27,6 +27,7 @@ struct UserProfile: Codable, Identifiable, Hashable {
     let follower_count: Int
     let following_count: Int
     let post_count: Int
+    let is_following: Bool?
 }
 
 extension UserProfile {
@@ -49,7 +50,8 @@ extension UserProfile {
             is_private: false,
             follower_count: 0,
             following_count: 0,
-            post_count: 0
+            post_count: 0,
+            is_following: nil
             
         )
     }

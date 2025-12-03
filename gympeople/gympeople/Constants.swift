@@ -6,8 +6,6 @@
 //
 import Foundation
 
-let POSTS = [Post(id: UUID(), user_id: UUID(), content: "Morning cardio at the track. 5K in 24:10. Progress! Also started incorporating some mobility drills.", created_at: Date().addingTimeInterval(-60 * 7), updated_at: Date(), like_count: 123123, comment_count: 32, is_liked: false, gym_id: nil)]
-
 let GYMS = [Gym(
     id: UUID(uuidString: "d7aa8a1e-9c1c-4af5-9cd1-92b58b37f48c")!,
     name: "Equinox Madison Avenue",

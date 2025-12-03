@@ -20,7 +20,7 @@ final class ListViewModel<Item>: ObservableObject {
         self.fetcher = fetcher
     }
 
-    func load() {
+    func load() async {
         Task {
             isLoading = true
             defer { isLoading = false }
@@ -34,7 +34,7 @@ final class ListViewModel<Item>: ObservableObject {
         }
     }
 
-    func refresh() {
-        load() // or add custom logic before/after
+    func refresh() async {
+        await load() // or add custom logic before/after
     }
 }
