@@ -34,4 +34,3 @@ struct PostsView: View {
         .listErrorAlert(vm: postsVM, onRetry: { await postsVM.refresh() })
     }
 }
-

@@ -29,7 +29,6 @@ struct UserRow: View {
                             .foregroundStyle(Color(.systemGray))
                     }
                     
-                    
                     Spacer()
                 }
             }

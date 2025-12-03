@@ -19,4 +19,3 @@ enum MKPOIError: LocalizedError, Identifiable {
         }
     }
 }
-

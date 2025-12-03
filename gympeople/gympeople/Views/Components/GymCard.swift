@@ -116,7 +116,6 @@ struct GymCard: View {
     }
 }
 
-
 #Preview {
     GymCard(gym: GYMS[0])
 }

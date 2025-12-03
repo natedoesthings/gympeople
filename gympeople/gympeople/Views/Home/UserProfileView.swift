@@ -130,7 +130,6 @@ struct ProfileContentView: View {
             .frame(width: 150)
         }
         
-
         VStack(alignment: .leading, spacing: 5) {
             Text("@\(userProfile.user_name)")
             if let bio = userProfile.biography {
@@ -148,4 +147,3 @@ struct ProfileContentView: View {
         .padding(.vertical, 15)
     }
 }
-

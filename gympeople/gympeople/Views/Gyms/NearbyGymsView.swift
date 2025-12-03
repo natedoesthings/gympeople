@@ -85,7 +85,7 @@ struct NearbyGymsView: View {
             
         }
         .padding()
-        .onChange(of: isFocused) { _,_ in
+        .onChange(of: isFocused) { _, _ in
             if !isFocused {
                 searchText = ""
                 gymSearch.suggestions.removeAll()
@@ -104,7 +104,7 @@ struct NearbyGymsView: View {
         LOG.debug("Fetching nearby gyms")
         
         if let currentProfile = try await SupabaseManager.shared.fetchMyUserProfile().first {
-            //TODO: search gyms from gyms table first, then mapkit
+            // TODO: search gyms from gyms table first, then mapkit
             let coordinate = CLLocationCoordinate2D(latitude: currentProfile.latitude, longitude: currentProfile.longitude)
             
             let request = MKLocalSearch.Request()

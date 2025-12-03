@@ -30,7 +30,6 @@ struct GymStepView: View {
     @State private var submissionError: String?
     @FocusState private var isFocused: Bool
     
-
     var body: some View {
         ZStack {
             VStack(spacing: 24) {

@@ -72,7 +72,6 @@ struct ProfileView: View {
                                     }
                                 }
                                 
-                                
                                 // Name, user, bio
                                 HStack {
                                     Text(userProfile.first_name)
@@ -90,7 +89,6 @@ struct ProfileView: View {
                                 }
                                 .font(.caption)
                                 .foregroundStyle(Color.standardSecondary)
-                                
                                 
                                 // Gym Tags
                                 VStack(alignment: .leading, spacing: 15) {
@@ -130,7 +128,6 @@ struct ProfileView: View {
                                     }
                                 }
                                 .pickerStyle(SegmentedPickerStyle())
-                                
                                 
                                 switch profileTab {
                                 case .posts:

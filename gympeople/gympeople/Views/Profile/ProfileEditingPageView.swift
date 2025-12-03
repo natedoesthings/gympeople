@@ -71,7 +71,6 @@ struct ProfileEditingPageView: View {
                         ), systemName: "text.book.closed"
                         )
                         
-                        
                         Text("First Name")
                             .font(.caption)
                         
@@ -158,8 +157,6 @@ struct ProfileEditingPageView: View {
                         
                         CustomTextField(placeholder: "Email", field: $userProfile.email, systemName: "envelope")
 
-                        
-                        
                     }
                     .padding()
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -209,10 +206,9 @@ struct ProfileEditingPageView: View {
         }
     }
     
-    
 }
 
 //
-//#Preview {
+// #Preview {
 //    ProfileEditingPageView(userProfile: .constant(nil), hasLoadedProfile: .constant(false))
-//}
+// }

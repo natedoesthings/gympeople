@@ -39,7 +39,6 @@ struct PostCard: View {
                         .frame(width: 36, height: 36)
                 }
                 
-                
                 // Main column
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -133,7 +132,6 @@ struct PostCard: View {
                             .font(.caption)
                         }
                        
-                        
                         Button {
                             
                         } label: {

@@ -115,7 +115,6 @@ struct GymEditingView: View {
                                 }
                                 Divider()
                                 
-                                
                             }
                         }
                         // any newley selected memberships
@@ -145,7 +144,6 @@ struct GymEditingView: View {
                                     }
                                 }
                                 Divider()
-                                
                                 
                             }
                         }
@@ -178,7 +176,6 @@ struct GymEditingView: View {
         for membership in gym_memberships {
             payload.append(Gym.payload(gym: membership))
         }
-        
         
         // inserting gyms
         guard let insertedGyms = await SupabaseManager.shared.insertGyms(payload) else {

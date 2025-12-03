@@ -15,7 +15,6 @@ class SupabaseManager {
     let client: SupabaseClient
     private let profileCache = UserProfileCache()
 
-
     private init() {
         client = SupabaseClient(
             supabaseURL: URL(string: Env.supabaseURL)!,
@@ -171,7 +170,7 @@ extension SupabaseManager {
             "phone_number": AnyEncodable(userProfile.phone_number),
             "location": AnyEncodable(userProfile.location),
             "latitude": AnyEncodable(userProfile.latitude),
-            "longitude": AnyEncodable(userProfile.longitude),
+            "longitude": AnyEncodable(userProfile.longitude)
         ]
 
         try await client
@@ -336,7 +335,6 @@ extension SupabaseManager {
         return try await fetchPosts(for: userId, viewing: userId)
     }
     
-    
     func fetchNearbyPosts() async throws -> [Post] {
         guard let userId = client.auth.currentUser?.id else {
             LOG.error("No authenticated user found")
@@ -385,7 +383,6 @@ extension SupabaseManager {
         }
     }
 
-    
     func addFollowee(userId: UUID) async {
         guard let currentUserId = client.auth.currentUser?.id else {
             LOG.error("No authenticated user found")
@@ -610,7 +607,6 @@ extension SupabaseManager {
         
     }
 
-    
     func likePost(for postId: UUID) async {
         guard let currentUserId = client.auth.currentUser?.id else {
             LOG.error("No authenticated user found")
@@ -782,9 +778,7 @@ struct FetchGymMembershipsParams: Encodable, Sendable {
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(p_user_id, forKey: .p_user_id)
-        if let lat = user_lat { try c.encode(lat, forKey: .user_lat) }
-        else { try c.encodeNil(forKey: .user_lat) }
-        if let lon = user_lon { try c.encode(lon, forKey: .user_lon) }
-        else { try c.encodeNil(forKey: .user_lon) }
+        if let lat = user_lat { try c.encode(lat, forKey: .user_lat) } else { try c.encodeNil(forKey: .user_lat) }
+        if let lon = user_lon { try c.encode(lon, forKey: .user_lon) } else { try c.encodeNil(forKey: .user_lon) }
     }
 }

@@ -80,7 +80,6 @@ struct GymSuggestionView: View {
     }
 }
 
-
 struct GymView: View {
     @Environment(\.openURL) var openURL
     let gym: Gym
@@ -172,7 +171,6 @@ struct GymView: View {
                         .buttonStyle(.plain)
                     }
 
-                    
                     if let urlString = gym.url,
                        let websiteURL = URL(string: urlString) {
                         HStack(spacing: 8) {
@@ -209,7 +207,6 @@ struct GymView: View {
                             value: "\(gym.member_count)"
                         )
                     }
-                    
                     
                     statCard(
                         icon: "text.bubble.fill",

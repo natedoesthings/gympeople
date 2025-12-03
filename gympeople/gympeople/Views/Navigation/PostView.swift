@@ -15,7 +15,7 @@ struct PostView: View {
     
     @FocusState private var isEditorFocused: Bool
     
-    var gymTag: UUID? = nil
+    var gymTag: UUID?
     
     var body: some View {
         NavigationView {
@@ -187,8 +187,6 @@ struct EditingPostView: View {
         
     }
 }
-
-
 
 #Preview {
     PostView()

@@ -196,8 +196,8 @@ struct ProfileSettingsPageView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //         let userProfile = UserProfile.init(id: UUID(), first_name: "Nate", last_name: "dasd", user_name: "lajsfdslf", biography: "ds", email: "dsd", date_of_birth: Date(), phone_number: "", created_at: Date())
 //    
 //    ProfileSettingsPageView(userProfile: userProfile)
-//}
+// }

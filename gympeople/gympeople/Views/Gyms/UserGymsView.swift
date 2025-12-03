@@ -33,5 +33,4 @@ struct UserGymsView: View {
         .listErrorAlert(vm: gymsVM, onRetry: { await gymsVM.refresh() })
     }
     
-    
 }
