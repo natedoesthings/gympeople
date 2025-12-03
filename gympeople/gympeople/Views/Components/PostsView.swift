@@ -14,15 +14,20 @@ struct PostsView: View {
     var feed: Bool = false
     
     var body: some View {
-        LazyVStack {
-            ForEach(postsVM.items, id: \.self) { post in
-                PostCard(
-                    post: post,
-                    feed: feed
-                )
-                
-                Divider()
+        HiddenScrollView {
+            LazyVStack {
+                ForEach(postsVM.items, id: \.self) { post in
+                    PostCard(
+                        post: post,
+                        feed: feed
+                    )
+                    
+                    Divider()
+                }
             }
+        }
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: 100)
         }
         .overlay { if postsVM.isLoading { ProgressView() } }
         .task {

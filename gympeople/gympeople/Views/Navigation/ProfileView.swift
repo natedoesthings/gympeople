@@ -131,9 +131,7 @@ struct ProfileView: View {
                                 
                                 switch profileTab {
                                 case .posts:
-                                    HiddenScrollView {
-                                        PostsView(postsVM: postsVM)
-                                    }
+                                    PostsView(postsVM: postsVM)
                                     .gesture(
                                         DragGesture()
                                             .onChanged { _ in outerDisabled = true }

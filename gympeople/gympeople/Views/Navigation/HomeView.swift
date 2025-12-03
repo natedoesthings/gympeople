@@ -29,7 +29,7 @@ struct HomeView: View {
                     gymsVM: gymsVM
                 ).tag(Tab.profile)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never)) // hide default bar
+            .tabViewStyle(.page(indexDisplayMode: .never))
             
             HStack {
                 Group {
