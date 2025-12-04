@@ -11,6 +11,7 @@ import PhotosUI
 struct ProfileView: View {
     @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
     @ObservedObject var postsVM: ListViewModel<Post>
+    @ObservedObject var mentionsVM: ListViewModel<Post>
     @ObservedObject var gymsVM: ListViewModel<Gym>
 
     @State private var errorMessage: String?
@@ -214,5 +215,6 @@ struct ProfileView: View {
         await userProfilesVM.load()
         await gymsVM.load()
         await postsVM.load()
+        await mentionsVM.load()
     }
 }

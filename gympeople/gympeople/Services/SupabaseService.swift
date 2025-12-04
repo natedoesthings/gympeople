@@ -335,6 +335,31 @@ extension SupabaseManager {
         return try await fetchPosts(for: userId, viewing: userId)
     }
     
+    func fetchMentions(for userId: UUID) async throws -> [Post] {
+        LOG.debug("fetching user mentions")
+        
+        do {
+            let posts: [Post] = try await client
+                .rpc("fetch_user_mentions", params: ["p_user_id": userId])
+                .execute()
+                .value
+            
+            return posts
+        } catch {
+            LOG.error("Error fetching posts: \(error.localizedDescription)")
+            throw mapToAppError(error)
+        }
+    }
+    
+    func fetchMyMentions() async throws -> [Post] {
+        guard let userId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return []
+        }
+        
+        return try await fetchMentions(for: userId)
+    }
+    
     func fetchNearbyPosts() async throws -> [Post] {
         guard let userId = client.auth.currentUser?.id else {
             LOG.error("No authenticated user found")

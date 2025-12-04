@@ -11,6 +11,7 @@ struct HomeView: View {
     @StateObject private var userProfilesVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyUserProfile() })
     
     @StateObject private var postsVM = ListViewModel<Post>(fetcher: { try await SupabaseManager.shared.fetchMyPosts() })
+    @StateObject private var mentionsVM = ListViewModel<Post>(fetcher: { try await SupabaseManager.shared.fetchMyMentions() })
     
     @StateObject private var gymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyGymMemberships() })
     
@@ -26,6 +27,7 @@ struct HomeView: View {
                 ProfileView(
                     userProfilesVM: userProfilesVM,
                     postsVM: postsVM,
+                    mentionsVM: mentionsVM,
                     gymsVM: gymsVM
                 ).tag(Tab.profile)
             }

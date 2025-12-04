@@ -37,6 +37,7 @@ struct UserIdProfileView: View {
 struct ProfileContentView: View {
     let userProfile: UserProfile
     @StateObject private var postsVM: ListViewModel<Post>
+    @StateObject private var mentionsVM: ListViewModel<Post>
     @StateObject private var gymsVM: ListViewModel<Gym>
     @State private var profileTab: ProfileTab = .posts
     @State private var followed: Bool = false
@@ -45,6 +46,9 @@ struct ProfileContentView: View {
         self.userProfile = userProfile
         _postsVM = StateObject(wrappedValue: ListViewModel<Post> {
             try await SupabaseManager.shared.fetchPosts(for: userProfile.id)
+        })
+        _mentionsVM = StateObject(wrappedValue: ListViewModel<Post> {
+            try await SupabaseManager.shared.fetchMentions(for: userProfile.id)
         })
         _gymsVM = StateObject(wrappedValue: ListViewModel<Gym> {
             try await SupabaseManager.shared.fetchGymMemberships(for: userProfile.id)
@@ -66,7 +70,7 @@ struct ProfileContentView: View {
             case .posts:
                 PostsView(postsVM: postsVM, feed: true)
             case .mentions:
-                Text("Mentions")
+                PostsView(postsVM: mentionsVM, feed: true)
             }
         }
         .padding()
