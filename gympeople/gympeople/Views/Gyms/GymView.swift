@@ -195,11 +195,7 @@ struct GymView: View {
                 // Stats row
                 HStack(spacing: 16) {
                     NavigationLink {
-                        if gym.member_count > 0 {
-                            GymMembersView(userProfilesVM: userProfilesVM)
-                        } else {
-                            Text("No members at this gym.")
-                        }
+                        UserProfileRowsView(userProfilesVM: userProfilesVM)
                     } label: {
                         statCard(
                             icon: "person.3.fill",

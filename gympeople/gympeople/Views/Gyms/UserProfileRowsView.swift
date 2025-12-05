@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GymMembersView: View {
+struct UserProfileRowsView: View {
     @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
     
     var body: some View {
@@ -19,7 +19,7 @@ struct GymMembersView: View {
                         Divider()
                     }
                 } else {
-                    Text("No members at this gym.")
+                    Text("No User Profiles.")
                 }
                 
             }

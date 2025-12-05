@@ -35,6 +35,8 @@ struct UserIdProfileView: View {
 
 struct ProfileContentView: View {
     let userProfile: UserProfile
+    @StateObject private var followersVM: ListViewModel<UserProfile>
+    @StateObject private var followingVM: ListViewModel<UserProfile>
     @StateObject private var postsVM: ListViewModel<Post>
     @StateObject private var mentionsVM: ListViewModel<Post>
     @StateObject private var gymsVM: ListViewModel<Gym>
@@ -46,6 +48,12 @@ struct ProfileContentView: View {
     init(userProfile: UserProfile, hasLoadedAvatar: Binding<Bool>) {
         self.userProfile = userProfile
         _hasLoadedAvatar = hasLoadedAvatar
+        _followersVM = StateObject(wrappedValue: ListViewModel<UserProfile> {
+            try await SupabaseManager.shared.fetchFollowers(for: userProfile.id)
+        })
+        _followingVM = StateObject(wrappedValue: ListViewModel<UserProfile> {
+            try await SupabaseManager.shared.fetchFollowing(for: userProfile.id)
+        })
         _postsVM = StateObject(wrappedValue: ListViewModel<Post> {
             try await SupabaseManager.shared.fetchPosts(for: userProfile.id)
         })
@@ -94,14 +102,25 @@ struct ProfileContentView: View {
                 Text("posts")
             }
             
-            VStack(alignment: .leading) {
-                Text("\(userProfile.follower_count)")
-                Text("followers")
+            NavigationLink {
+                UserProfileRowsView(userProfilesVM: followersVM)
+            } label: {
+                VStack(alignment: .leading) {
+                    Text("\(userProfile.follower_count)")
+                    Text("followers")
+                }
+                .foregroundStyle(.invertedPrimary)
             }
             
-            VStack(alignment: .leading) {
-                Text("\(userProfile.following_count)")
-                Text("following")
+            
+            NavigationLink {
+                UserProfileRowsView(userProfilesVM: followingVM)
+            } label: {
+                VStack(alignment: .leading) {
+                    Text("\(userProfile.following_count)")
+                    Text("following")
+                }
+                .foregroundStyle(.invertedPrimary)
             }
         }
 

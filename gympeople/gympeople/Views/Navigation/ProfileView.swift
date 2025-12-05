@@ -110,7 +110,7 @@ struct ProfileView: View {
                             }
                             
                             NavigationLink {
-                                GymMembersView(userProfilesVM: followersVM)
+                                UserProfileRowsView(userProfilesVM: followersVM)
                             } label: {
                                 VStack(alignment: .leading) {
                                     Text("\(userProfile.follower_count)")
@@ -121,7 +121,7 @@ struct ProfileView: View {
                             
                             
                             NavigationLink {
-                                GymMembersView(userProfilesVM: followingVM)
+                                UserProfileRowsView(userProfilesVM: followingVM)
                             } label: {
                                 VStack(alignment: .leading) {
                                     Text("\(userProfile.following_count)")
