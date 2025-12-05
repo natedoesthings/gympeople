@@ -71,6 +71,7 @@ struct FeedView: View {
             Color.clear.frame(height: 80)
         }
         .overlay { if nearbyPostsVM.isLoading || userProfilesVM.isLoading { ProgressView() } }
+//        .loading(nearbyPostsVM.isLoading || userProfilesVM.isLoading)
         .task {
             if !userProfilesVM.fetched && !nearbyPostsVM.fetched {
                 await userProfilesVM.load()

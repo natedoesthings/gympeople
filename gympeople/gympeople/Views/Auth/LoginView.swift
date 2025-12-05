@@ -13,17 +13,7 @@ struct LoginView: View {
     
     var body: some View {
         VStack(spacing: 24) {
-            if authVM.isLoading {
-                VStack {
-                    ProgressView("Signing in...")
-                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
-                        .padding()
-                    Text("Please wait a moment")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                }
-                .transition(.opacity)
-            } else if !authVM.isSignedIn {
+            if !authVM.isSignedIn {
                 LandingPageView()
             } else {
                 if !authVM.needsOnboarding {
