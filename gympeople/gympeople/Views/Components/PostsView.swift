@@ -45,7 +45,7 @@ struct PostsView: View {
         .safeAreaInset(edge: .bottom) {
             Color.clear.frame(height: 100)
         }
-        .overlay { if postsVM.isLoading { ProgressView() } }
+//        .overlay { if postsVM.isLoading { ProgressView() } }
         .task {
             if !postsVM.fetched {
                 await postsVM.load()

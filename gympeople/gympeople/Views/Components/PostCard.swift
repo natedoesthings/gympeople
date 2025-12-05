@@ -158,6 +158,14 @@ struct PostCard: View {
 
 struct AvatarView: View {
     let url: String?
+    var onImageLoaded: (() -> Void)?
+
+    @State private var didNotifyLoad = false
+
+    init(url: String?, onImageLoaded: (() -> Void)? = nil) {
+        self.url = url
+        self.onImageLoaded = onImageLoaded
+    }
 
     var body: some View {
         Group {
@@ -170,14 +178,26 @@ struct AvatarView: View {
                         image
                             .resizable()
                             .scaledToFill()
+                            .onAppear {
+                                notifyLoadedIfNeeded()
+                            }
                     case .failure:
                         placeholder
+                            .onAppear {
+                                notifyLoadedIfNeeded()
+                            }
                     @unknown default:
                         placeholder
+                            .onAppear {
+                                notifyLoadedIfNeeded()
+                            }
                     }
                 }
             } else {
                 placeholder
+                    .onAppear {
+                        notifyLoadedIfNeeded()
+                    }
             }
         }
         .clipShape(Circle())
@@ -188,5 +208,12 @@ struct AvatarView: View {
             .resizable()
             .scaledToFill()
             .foregroundStyle(Color.gray.opacity(0.6))
+    }
+
+    private func notifyLoadedIfNeeded() {
+        if !didNotifyLoad {
+            didNotifyLoad = true
+            onImageLoaded?()
+        }
     }
 }

@@ -10,19 +10,18 @@ import SwiftUI
 struct UserIdProfileView: View {
     @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
     @State private var hasLoadedProfile: Bool = false
+    @State private var hasLoadedAvatar: Bool = false
     
     var body: some View {
         Group {
             if let profile = userProfilesVM.items.first {
-                ProfileContentView(userProfile: profile)
-            } else if userProfilesVM.isLoading {
-                ProgressView()
+                ProfileContentView(userProfile: profile, hasLoadedAvatar: $hasLoadedAvatar)
             } else {
                 Text("No profile found")
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .overlay { if userProfilesVM.isLoading { ProgressView() } }
+        .overlay { if !hasLoadedProfile || !hasLoadedAvatar { ProgressView() } }
         .task {
             if !hasLoadedProfile {
                 await userProfilesVM.load()
@@ -42,8 +41,11 @@ struct ProfileContentView: View {
     @State private var profileTab: ProfileTab = .posts
     @State private var followed: Bool = false
     
-    init(userProfile: UserProfile) {
+    @Binding var hasLoadedAvatar: Bool
+    
+    init(userProfile: UserProfile, hasLoadedAvatar: Binding<Bool>) {
         self.userProfile = userProfile
+        _hasLoadedAvatar = hasLoadedAvatar
         _postsVM = StateObject(wrappedValue: ListViewModel<Post> {
             try await SupabaseManager.shared.fetchPosts(for: userProfile.id)
         })
@@ -82,8 +84,10 @@ struct ProfileContentView: View {
     @ViewBuilder
     private func header() -> some View {
         HStack(spacing: 30) {
-            AvatarView(url: userProfile.pfp_url)
-                .frame(width: 75, height: 75)
+            AvatarView(url: userProfile.pfp_url) {
+                hasLoadedAvatar = true
+            }
+            .frame(width: 75, height: 75)
             
             VStack(alignment: .leading) {
                 Text("\(userProfile.post_count)")

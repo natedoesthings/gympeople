@@ -9,15 +9,18 @@ import SwiftUI
 
 struct UserRow: View {
     let profile: UserProfile
+    @State private var hasLoadedAvatar: Bool = false
     
     var body: some View {
         NavigationStack {
             HStack(spacing: 12) {
                 NavigationLink {
-                    ProfileContentView(userProfile: profile)
+                    ProfileContentView(userProfile: profile, hasLoadedAvatar: $hasLoadedAvatar)
                 } label: {
-                    AvatarView(url: profile.pfp_url)
-                        .frame(width: 48, height: 48)
+                    AvatarView(url: profile.pfp_url) {
+                        hasLoadedAvatar = true
+                    }
+                    .frame(width: 48, height: 48)
                     
                     VStack(alignment: .leading, spacing: 4) {
                         Text("@\(profile.user_name)")

@@ -797,6 +797,62 @@ extension SupabaseManager {
         }
     }
     
+    func fetchFollowing(for userId: UUID) async throws -> [UserProfile] {
+        LOG.debug("fetching following")
+        
+        do {
+            let response = try await client
+                .rpc("fetch_user_following", params: ["p_user_id": userId.uuidString])
+                .execute()
+            
+            let decoder = makeUserProfileDecoder()
+            return try decoder.decode([UserProfile].self, from: response.data)
+        } catch {
+            LOG.error("Error fetching following \(error.localizedDescription)")
+            throw mapToAppError(error)
+        }
+        
+    }
+    
+    func fetchFollowers(for userId: UUID) async throws -> [UserProfile] {
+        LOG.debug("fetching followers")
+        
+        do {
+            let response = try await client
+                .rpc("fetch_user_followers", params: ["p_user_id": userId.uuidString])
+                .execute()
+            
+            let decoder = makeUserProfileDecoder()
+            return try decoder.decode([UserProfile].self, from: response.data)
+        } catch {
+            LOG.error("Error fetching followers \(error.localizedDescription)")
+            throw mapToAppError(error)
+        }
+        
+    }
+    
+    func fetchMyFollowing() async throws -> [UserProfile] {
+        LOG.debug("fetching my following")
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            throw AppError.unauthorized
+        }
+        
+        return try await fetchFollowing(for: currentUserId)
+        
+    }
+    
+    func fetchMyFollowers() async throws -> [UserProfile] {
+        LOG.debug("fetching my followers")
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            throw AppError.unauthorized
+        }
+        
+        return try await fetchFollowers(for: currentUserId)
+        
+    }
+    
     // MARK: Helpers
     
     private func makeUserProfileDecoder() -> JSONDecoder {
