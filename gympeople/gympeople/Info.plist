@@ -19,6 +19,10 @@
 	<string>$(SUPABASE_ANON_KEY)</string>
 	<key>SUPABASE_URL</key>
 	<string>https://$(SUPABASE_URL)</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>font.ttf</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>
