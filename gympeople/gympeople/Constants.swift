@@ -104,5 +104,4 @@ let COMMENTS: [Comment] = [
     )
 ]
 
-
 // let DUMMY_USER_PROFILE =

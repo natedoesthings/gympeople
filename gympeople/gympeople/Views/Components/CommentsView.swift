@@ -46,7 +46,6 @@ struct CommentsView: View {
             }
             .listErrorAlert(vm: commentsVM, onRetry: { await commentsVM.refresh() })
             
-            
             // ➤ Comment Textfield Section
             commentInputBar
                 .padding()
@@ -55,7 +54,6 @@ struct CommentsView: View {
         .padding()
 
     }
-    
     
     // MARK: - Submit Comment / Reply
     private func submitComment() async {
@@ -117,7 +115,6 @@ struct CommentsView: View {
         )
     }
 }
-
 
 #Preview {
     CommentsView(commentsVM: ListViewModel<Comment>(fetcher: {return []}), post_id: UUID())

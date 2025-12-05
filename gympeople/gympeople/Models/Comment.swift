@@ -26,4 +26,3 @@ struct Comment: Decodable, Identifiable, Hashable {
     let author_user_name: String
     let author_pfp_url: String?
 }
-
