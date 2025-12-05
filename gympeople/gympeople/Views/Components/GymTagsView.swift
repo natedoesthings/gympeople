@@ -9,7 +9,6 @@ import SwiftUI
 
 struct GymTagsView: View {
     @ObservedObject var gymsVM: ListViewModel<Gym>
-    @State private var fetched: Bool = false
     
     var body: some View {
         HiddenScrollView(.horizontal) {
@@ -23,11 +22,9 @@ struct GymTagsView: View {
         .overlay { if gymsVM.isLoading { ProgressView() } }
         .task {
             Task {
-                if !fetched {
+                if !gymsVM.fetched {
                     await gymsVM.load()
                 }
-                
-                fetched = true
             }
         }
         .listErrorAlert(vm: gymsVM, onRetry: { await gymsVM.refresh() })

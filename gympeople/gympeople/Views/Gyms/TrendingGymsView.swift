@@ -27,7 +27,9 @@ struct TrendingGymsView: View {
         }
         .padding()
         .task {
-            await nearbyGymsVM.load()
+            if !nearbyGymsVM.fetched {
+                await nearbyGymsVM.load()
+            }
         }
         .refreshable {
             await nearbyGymsVM.refresh()

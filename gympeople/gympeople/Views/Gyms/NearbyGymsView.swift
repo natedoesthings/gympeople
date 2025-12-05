@@ -92,7 +92,10 @@ struct NearbyGymsView: View {
             }
         }
         .task {
-            await nearbyGymsVM.load()
+            if !nearbyGymsVM.fetched {
+                await nearbyGymsVM.load()
+            }
+           
         }
         .refreshable {
             await nearbyGymsVM.refresh()

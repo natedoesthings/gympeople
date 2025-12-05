@@ -11,7 +11,7 @@ struct FeedView: View {
     @ObservedObject var nearbyPostsVM: ListViewModel<Post>
     @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
     @State private var showPostView: Bool = false
-    @State private var fetched: Bool = false
+    @State private var selectedPost: Post?
     
     var body: some View {
         HiddenScrollView {
@@ -57,7 +57,8 @@ struct FeedView: View {
                     // TODO: https://github.com/natedoesthings/gympeople/issues/42
                     PostCard(
                         post: post,
-                        feed: true
+                        feed: true,
+                        onCommentsTap: { selectedPost = post }
                     )
                     .padding()
                     .padding(.vertical, -10)
@@ -71,18 +72,27 @@ struct FeedView: View {
         }
         .overlay { if nearbyPostsVM.isLoading || userProfilesVM.isLoading { ProgressView() } }
         .task {
-            if !fetched {
+            if !userProfilesVM.fetched && !nearbyPostsVM.fetched {
                 await userProfilesVM.load()
                 await nearbyPostsVM.load()
             }
-            
-            fetched = true
         }
         .listErrorAlert(vm: nearbyPostsVM, onRetry: { await nearbyPostsVM.refresh() })
         .listErrorAlert(vm: userProfilesVM, onRetry: { await userProfilesVM.refresh() })
         .refreshable {
                 await userProfilesVM.refresh()
                 await nearbyPostsVM.refresh()
+        }
+        .sheet(item: $selectedPost) { post in
+            CommentsView(
+                commentsVM: ListViewModel<Comment> {
+                    try await SupabaseManager.shared.fetchComments(for: post.id)
+                },
+                post_id: post.id
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+            .presentationBackgroundInteraction(.enabled)
         }
         .sheet(isPresented: $showPostView) {
             PostView()

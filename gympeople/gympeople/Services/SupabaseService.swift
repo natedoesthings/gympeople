@@ -369,6 +369,8 @@ extension SupabaseManager {
         // 10 miles to meters
         let radiusMeters = 10.0 * 1609.34
         
+        LOG.debug("Fetching nearby posts")
+        
         do {
             let posts = try await client
                 .rpc(
@@ -697,6 +699,101 @@ extension SupabaseManager {
         } catch {
             LOG.error("Error fetching gym members: \(error.localizedDescription)")
             throw mapToAppError(error)
+        }
+    }
+    
+    func createComment(for postId: UUID, with comment: String, parent parent_id: UUID? = nil) async throws {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return
+        }
+        
+        do {
+            let data: [String: AnyEncodable] = [
+                "post_id": AnyEncodable(postId),
+                "parent_comment_id": AnyEncodable(parent_id),
+                "user_id": AnyEncodable(currentUserId),
+                "content": AnyEncodable(comment)
+            ]
+            
+            try await client.from("comments").insert(data).execute()
+            
+        } catch {
+            LOG.error("Error creating post: \(error.localizedDescription)")
+            throw mapToAppError(error)
+        }
+    }
+    
+    func fetchComments(for postId: UUID) async throws -> [Comment] {
+        do {
+            let comments: [Comment] = try await client
+                .rpc("fetch_comments_for_post", params: [
+                    "p_post_id": postId.uuidString
+                ])
+                .execute()
+                .value
+            
+            return comments
+        } catch {
+            LOG.error("Error fetching comments \(error.localizedDescription)")
+            throw mapToAppError(error)
+        }
+    }
+    
+    func fetchReplies(for commentId: UUID) async throws -> [Comment] {
+        do {
+            let replies: [Comment] = try await client
+                .rpc("fetch_replies_for_comment", params: [
+                    "p_comment_id": commentId.uuidString
+                ])
+                .execute()
+                .value
+            
+            return replies
+            
+        } catch {
+            LOG.error("Error fetching replies \(error.localizedDescription)")
+            throw mapToAppError(error)
+        }
+    }
+    
+    func likeComment(for commentId: UUID) async {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return
+        }
+        
+        do {
+            try await client
+                .from("comment_likes")
+                .insert(["user_id": AnyEncodable(currentUserId), "comment_id": AnyEncodable(commentId)])
+                .execute()
+            
+            LOG.info("Liked comment with id: \(commentId)")
+            
+        } catch {
+            LOG.error("Failed to like. \(error.localizedDescription)")
+        }
+    }
+    
+    func unlikeComment(for commentId: UUID) async {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            return
+        }
+        
+        do {
+            try await client
+                .from("comment_likes")
+                .delete()
+                .eq("user_id", value: currentUserId.uuidString)
+                .eq("comment_id", value: commentId.uuidString)
+                .execute()
+            
+            LOG.info("Unliked comment with id: \(commentId)")
+            
+        } catch {
+            LOG.error("Failed to unlike. \(error.localizedDescription)")
         }
     }
     

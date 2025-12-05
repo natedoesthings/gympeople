@@ -61,7 +61,6 @@ struct PostView: View {
                         Task {
                             do {
                                 try await SupabaseManager.shared.createPost(content: content, gym_id: gymTag)
-                                
                                 dismiss()
                             } catch {
                                 errorMessage = error.localizedDescription
@@ -73,9 +72,11 @@ struct PostView: View {
                             .foregroundColor(.white)
                             .frame(width: 50)
                             .padding()
-                            .background(Color.brandOrange)
+                            .background(content.isEmpty ? Color.standardSecondary : Color.brandOrange)
                             .cornerRadius(30)
+                            
                     }
+                    .disabled(content.isEmpty)
                 }
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)

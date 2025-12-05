@@ -10,7 +10,7 @@ import SwiftUI
 struct FollowingView: View {
     @ObservedObject var followingPostsVM: ListViewModel<Post>
     @State private var showPostView: Bool = false
-    @State private var fetched: Bool = false
+    @State private var selectedPost: Post?
     
     var body: some View {
         HiddenScrollView {
@@ -18,7 +18,8 @@ struct FollowingView: View {
                 ForEach(followingPostsVM.items) { post in
                     PostCard(
                         post: post,
-                        feed: true
+                        feed: true,
+                        onCommentsTap: { selectedPost = post }
                     )
                     .padding()
                     .padding(.vertical, -10)
@@ -27,14 +28,13 @@ struct FollowingView: View {
                 }
             }
         }
+        .frame(maxHeight: .infinity, alignment: .top)
         .overlay { if followingPostsVM.isLoading { ProgressView() } }
         .task {
             Task {
-                if !fetched {
+                if !followingPostsVM.fetched {
                     await followingPostsVM.load()
                 }
-                
-                fetched = true
             }
         }
         .listErrorAlert(vm: followingPostsVM, onRetry: { await followingPostsVM.refresh() })
@@ -43,6 +43,16 @@ struct FollowingView: View {
                 await followingPostsVM.refresh()
             }
         }
-        .frame(maxHeight: .infinity, alignment: .top)
+        .sheet(item: $selectedPost) { post in
+            CommentsView(
+                commentsVM: ListViewModel<Comment> {
+                    try await SupabaseManager.shared.fetchComments(for: post.id)
+                },
+                post_id: post.id
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+            .presentationBackgroundInteraction(.enabled)
+        }
     }
 }

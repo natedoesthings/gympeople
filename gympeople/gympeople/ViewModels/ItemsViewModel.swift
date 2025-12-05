@@ -13,6 +13,7 @@ final class ListViewModel<Item>: ObservableObject {
     @Published var items: [Item] = []
     @Published var currentError: AppError?
     @Published var isLoading = false
+    @Published var fetched = false
 
     private let fetcher: () async throws -> [Item]
 
@@ -26,6 +27,7 @@ final class ListViewModel<Item>: ObservableObject {
             defer { isLoading = false }
             do {
                 items = try await fetcher()
+                fetched = true
             } catch let err as AppError {
                 currentError = err
             } catch {

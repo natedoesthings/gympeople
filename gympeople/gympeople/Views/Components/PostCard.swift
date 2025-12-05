@@ -10,17 +10,22 @@ import SwiftUI
 struct PostCard: View {
     @StateObject private var userProfileVM: ListViewModel<UserProfile>
     @State private var showEditingPost: Bool = false
-    @State private var showDeletingAlert: Bool = false
+    @Binding var showDeletingAlert: Bool
     @State var post: Post
 
     var feed: Bool = false
+    var onCommentsTap: (() -> Void)?
+    var onDeleteTap: (() -> Void)?
     
-    init(post: Post, feed: Bool = false) {
+    init(post: Post, feed: Bool = false, onCommentsTap: (() -> Void)? = nil, onDeleteTap: (() -> Void)? = nil, showDeletingAlert: Binding<Bool> = .constant(false)) {
         _post = State(initialValue: post)
         self.feed = feed
+        self.onCommentsTap = onCommentsTap
+        self.onDeleteTap = onDeleteTap
         _userProfileVM = StateObject(wrappedValue: ListViewModel<UserProfile> {
             try await SupabaseManager.shared.fetchUserProfile(for: post.user_id)
         })
+        _showDeletingAlert = showDeletingAlert
     }
 
     var body: some View {
@@ -68,6 +73,7 @@ struct PostCard: View {
                                 }
                                 
                                 Button {
+                                    onDeleteTap?()
                                     showDeletingAlert = true
                                 } label: {
                                     Text("Delete")
@@ -90,7 +96,7 @@ struct PostCard: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         
-                        Text(post.created_at, style: .relative) // e.g. “5m ago”
+                        Text(timeAgo(post.created_at))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         
@@ -107,20 +113,16 @@ struct PostCard: View {
                     
                     HStack(spacing: 40) {
                         Button {
-                            Task {
+                            Task {                                
                                 if !post.is_liked {
                                     await SupabaseManager.shared.likePost(for: post.id)
+                                    post.like_count += 1
+                                    post.is_liked = true
                                 } else {
                                     await SupabaseManager.shared.unlikePost(for: post.id)
+                                    post.like_count -= 1
+                                    post.is_liked = false
                                 }
-                            }
-                            
-                            if !post.is_liked {
-                                post.like_count += 1
-                                post.is_liked = true
-                            } else {
-                                post.like_count -= 1
-                                post.is_liked = false
                             }
                             
                         } label: {
@@ -133,7 +135,7 @@ struct PostCard: View {
                         }
                        
                         Button {
-                            
+                            onCommentsTap?()
                         } label: {
                             HStack {
                                 Image(systemName: "message")
@@ -149,18 +151,6 @@ struct PostCard: View {
             .padding(.vertical, 10)
             .sheet(isPresented: $showEditingPost) {
                 EditingPostView(post_id: post.id, content: post.content)
-            }
-            .alert(isPresented: $showDeletingAlert) {
-                Alert(
-                    title: Text("Delete Post"),
-                    message: Text("Are you sure you want to delete this post? This action cannot be undone."),
-                    primaryButton: .cancel(Text("Cancel")),
-                    secondaryButton: .destructive(Text("Delete"), action: {
-                        Task {
-                            await SupabaseManager.shared.deletePost(post_id: post.id)
-                        }
-                    })
-                )
             }
         }
     }

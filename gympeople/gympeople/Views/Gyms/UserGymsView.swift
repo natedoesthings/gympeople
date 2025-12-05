@@ -25,7 +25,9 @@ struct UserGymsView: View {
         .padding()
         .overlay { if gymsVM.isLoading { ProgressView() } }
         .task {
-            await gymsVM.load()
+            if !gymsVM.fetched {
+                await gymsVM.load()
+            }
         }
         .refreshable {
             await gymsVM.refresh()
