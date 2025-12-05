@@ -16,13 +16,15 @@ final class SearchViewModel: ObservableObject {
 
     private let manager = SupabaseManager.shared
     private var searchTask: Task<Void, Never>?
+    private let minQueryLength = 3
+    private let debounceDelay: UInt64 = 400_000_000 // 400ms in nanoseconds
 
     func search(query: String) {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Cancel any in-flight search and clear results if the query is empty.
         searchTask?.cancel()
-        guard !trimmed.isEmpty else {
+        guard trimmed.count >= minQueryLength else {
             results = []
             errorMessage = nil
             return
@@ -30,7 +32,7 @@ final class SearchViewModel: ObservableObject {
 
         searchTask = Task { [weak self] in
             // Small debounce to avoid hammering the backend while the user is typing quickly.
-            try? await Task.sleep(nanoseconds: 250_000_000)
+            try? await Task.sleep(nanoseconds: debounceDelay)
             guard let self else { return }
             guard !Task.isCancelled else { return }
 
