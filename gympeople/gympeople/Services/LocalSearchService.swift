@@ -11,7 +11,7 @@ import Combine
 class LocalSearchService: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     @Published var suggestions: [MKLocalSearchCompletion] = []
     
-    private let completer: MKLocalSearchCompleter
+    let completer: MKLocalSearchCompleter
     
     init(resultTypes: MKLocalSearchCompleter.ResultType = .pointOfInterest) {
         self.completer = MKLocalSearchCompleter()
@@ -19,6 +19,7 @@ class LocalSearchService: NSObject, ObservableObject, MKLocalSearchCompleterDele
         
         completer.delegate = self
         completer.resultTypes = resultTypes
+        
     }
     
     func update(query: String) {

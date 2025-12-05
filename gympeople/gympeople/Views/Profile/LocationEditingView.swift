@@ -92,6 +92,7 @@ struct LocationEditingView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+        .withLocalSearchRegion(citySearch)
     }
     
     private func selectSuggestion(_ suggestion: MKLocalSearchCompletion) {

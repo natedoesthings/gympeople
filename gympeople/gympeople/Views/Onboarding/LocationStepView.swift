@@ -120,6 +120,7 @@ struct LocationStepView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+        .withLocalSearchRegion(citySearch)
 
     }
     

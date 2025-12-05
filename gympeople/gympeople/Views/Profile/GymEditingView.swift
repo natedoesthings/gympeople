@@ -160,6 +160,7 @@ struct GymEditingView: View {
                 await updateMemberships()
             }
         }
+        .withLocalSearchRegion(gymSearch)
     }
     
     private func updateMemberships() async {

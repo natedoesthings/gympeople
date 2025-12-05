@@ -165,6 +165,7 @@ struct GymStepView: View {
             
         }
         .padding()
+        .withLocalSearchRegion(gymSearch)
     }
 
     private func toggleSelection(for gym: MKLocalSearchCompletion) {

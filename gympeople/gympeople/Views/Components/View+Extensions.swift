@@ -26,3 +26,10 @@ extension View {
         }
     }
 }
+
+extension View {
+    func withLocalSearchRegion(_ service: LocalSearchService) -> some View {
+        self.modifier(LocalSearchRegionModifier(service: service))
+    }
+}
+

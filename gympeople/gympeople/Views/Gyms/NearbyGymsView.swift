@@ -101,6 +101,7 @@ struct NearbyGymsView: View {
             await nearbyGymsVM.refresh()
         }
         .listErrorAlert(vm: nearbyGymsVM, onRetry: { await nearbyGymsVM.refresh() })
+        .withLocalSearchRegion(gymSearch)
     }
     
     private func findNearbyGyms() async throws -> [Gym]? {
