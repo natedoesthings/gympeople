@@ -37,6 +37,9 @@ struct ProfileView: View {
                     .opacity(hasLoadedAvatar ? 1 : 0)
             }
             
+            let _ = print("profile \(hasLoadedProfile)")
+            let _ = print("avatar \(hasLoadedAvatar)")
+            
             if !hasLoadedProfile || !hasLoadedAvatar {
                 ProgressView("Loading Profile...")
             }

@@ -57,6 +57,7 @@ struct GymSuggestionView: View {
     
     func selectSuggestion(_ suggestion: MKLocalSearchCompletion) async throws -> Gym? {
         let request = MKLocalSearch.Request(completion: suggestion)
+        
         let search = MKLocalSearch(request: request)
         
         let response = try await search.start()

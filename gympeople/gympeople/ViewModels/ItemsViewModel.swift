@@ -39,4 +39,5 @@ final class ListViewModel<Item>: ObservableObject {
     func refresh() async {
         await load() // or add custom logic before/after
     }
+    
 }

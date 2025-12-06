@@ -73,9 +73,10 @@ struct CommentCard: View {
                                         await repliesVM.load()
                                         hasLoadedReplies = true
                                     }
-                                    withAnimation(.easeInOut) {
-                                        showReplies.toggle()
-                                    }
+//                                    withAnimation(.easeInOut) {
+//                                        showReplies.toggle()
+//                                    }
+                                    showReplies.toggle()
                                 }
                             } label: {
                                 HStack(spacing: 4) {
@@ -124,43 +125,78 @@ struct CommentCard: View {
             if showReplies, !repliesVM.items.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(repliesVM.items, id: \.self) { reply in
-                        HStack(alignment: .top, spacing: 8) {
-                            // Indent to align under main comment text, not avatar
-                            Spacer()
-                                .frame(width: 36 + 12) // same as avatar + spacing
-                            
-                            HStack(alignment: .top, spacing: 8) {
-                                AsyncImage(url: URL(string: reply.author_pfp_url ?? "")) { img in
-                                    img.resizable().scaledToFill()
-                                } placeholder: {
-                                    Circle().fill(Color.gray.opacity(0.3))
-                                }
-                                .frame(width: 28, height: 28)
-                                .clipShape(Circle())
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    HStack(spacing: 6) {
-                                        Text(reply.author_user_name)
-                                            .font(.caption)
-                                            .fontWeight(.semibold)
-                                        
-                                        Text(timeAgo(reply.created_at))
-                                            .font(.caption2)
-                                            .foregroundColor(.gray)
-                                    }
-                                    
-                                    Text(reply.content)
-                                        .font(.caption)
-                                }
-                                
-                                Spacer()
-                            }
-                        }
+                        ReplyCard(reply: reply)
                     }
                 }
-                .transition(.opacity.combined(with: .move(edge: .top)))
+//                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
         .padding(.bottom)
+    }
+}
+
+
+struct ReplyCard: View {
+    @State var reply: Comment
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            // Indent to align under main comment text, not avatar
+            Spacer()
+                .frame(width: 36 + 12) // same as avatar + spacing
+            
+            HStack(alignment: .top, spacing: 8) {
+                AsyncImage(url: URL(string: reply.author_pfp_url ?? "")) { img in
+                    img.resizable().scaledToFill()
+                } placeholder: {
+                    Circle().fill(Color.gray.opacity(0.3))
+                }
+                .frame(width: 28, height: 28)
+                .clipShape(Circle())
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text(reply.author_user_name)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        
+                        Text(timeAgo(reply.created_at))
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                    
+                    Text(reply.content)
+                        .font(.subheadline)
+                }
+                
+                Spacer()
+                
+                // Likes
+                Button {
+                    Task {
+                        if !reply.is_liked {
+                            await SupabaseManager.shared.likeComment(for: reply.id)
+                            reply.like_count += 1
+                            reply.is_liked = true
+                        } else {
+                            await SupabaseManager.shared.unlikeComment(for: reply.id)
+                            reply.like_count -= 1
+                            reply.is_liked = false
+                        }
+                    }
+                } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: reply.is_liked ? "heart.fill" : "heart")
+                            .foregroundColor(reply.is_liked ? .red : .primary)
+                        
+                        if reply.like_count > 0 {
+                            Text("\(reply.like_count)")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
