@@ -28,7 +28,7 @@ class TabBarVisibilityManager: ObservableObject {
     @Published var isVisible: Bool = true
     
     private var lastScrollOffset: CGFloat = 0
-    private let threshold: CGFloat = 15 // Minimum scroll distance to trigger hide/show
+    private let threshold: CGFloat = 100 // Minimum scroll distance to trigger hide/show
     private var hasInitialized: Bool = false
     
     func updateVisibility(for scrollOffset: CGFloat) {
