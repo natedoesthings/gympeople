@@ -16,20 +16,19 @@ struct PostsView: View {
     var feed: Bool = false
     
     var body: some View {
-        HiddenScrollView {
-            LazyVStack {
-                ForEach(postsVM.items, id: \.self) { post in
-                    PostCard(
-                        post: post,
-                        feed: feed,
-                        onCommentsTap: { selectedPost = post },
-                        onDeleteTap: { selectedDeletedPost = post },
-                        showDeletingAlert: $showDeletingAlert,
-                    )
-                    
-                    Divider()
-                }
+        LazyVStack {
+            ForEach(postsVM.items, id: \.self) { post in
+                PostCard(
+                    post: post,
+                    feed: feed,
+                    onCommentsTap: { selectedPost = post },
+                    onDeleteTap: { selectedDeletedPost = post },
+                    showDeletingAlert: $showDeletingAlert,
+                )
+                
+                Divider()
             }
+            
         }
         .sheet(item: $selectedPost) { post in
             CommentsView(
@@ -45,7 +44,6 @@ struct PostsView: View {
         .safeAreaInset(edge: .bottom) {
             Color.clear.frame(height: 100)
         }
-//        .overlay { if postsVM.isLoading { ProgressView() } }
         .task {
             if !postsVM.fetched {
                 await postsVM.load()

@@ -66,26 +66,25 @@ struct ProfileContentView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            header()
-            
-            Picker("", selection: $profileTab) {
-                ForEach(ProfileTab.allCases) { tab in
-                    Text(tab.rawValue).tag(tab)
+        HiddenScrollView {
+            VStack(alignment: .leading, spacing: 4) {
+                header()
+                
+                VStack(spacing: 4) {
+                    profileTabBar
+
+                    switch profileTab {
+                    case .posts:
+                        PostsView(postsVM: postsVM)
+                    case .mentions:
+                        PostsView(postsVM: mentionsVM)
+                    }
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
-            
-            switch profileTab {
-            case .posts:
-                PostsView(postsVM: postsVM, feed: true)
-            case .mentions:
-                PostsView(postsVM: mentionsVM, feed: true)
+            .padding()
+            .task {
+                followed = userProfile.is_following ?? false
             }
-        }
-        .padding()
-        .task {
-            followed = userProfile.is_following ?? false
         }
     }
 
@@ -172,5 +171,30 @@ struct ProfileContentView: View {
             GymTagsView(gymsVM: gymsVM)
         }
         .padding(.vertical, 15)
+    }
+    
+    private var profileTabBar: some View {
+        HStack(spacing: 40) {
+            tabButton(.posts)
+            tabButton(.mentions)
+        }
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    private func tabButton(_ tab: ProfileTab) -> some View {
+        Button {
+            profileTab = tab
+        } label: {
+            VStack(spacing: 6) {
+                Text(tab.rawValue)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(profileTab == tab ? .primary : .gray)
+
+                Capsule()
+                    .fill(profileTab == tab ? Color.brandOrange : Color.clear)
+                    .frame(width: 28, height: 3)
+            }
+        }
     }
 }

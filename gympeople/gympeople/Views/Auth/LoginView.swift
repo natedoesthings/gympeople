@@ -10,18 +10,28 @@ import SwiftUI
 struct LoginView: View {
     @EnvironmentObject var authVM: AuthViewModel
     @State private var showOnboarding = false
+    @State private var hasCheckedInitialSession = false
     
     var body: some View {
         VStack(spacing: 24) {
-            if !authVM.isSignedIn {
+            if !hasCheckedInitialSession {
+                // Show loading view during initial session check
+                LoadingView()
+            } else if !authVM.isSignedIn {
                 LandingPageView()
             } else {
                 if !authVM.needsOnboarding {
-                    HomeView()
+                    GymPeopleView()
                 } else {
                     // Possible that user still needs to onboard
                     EmptyView()
                 }
+            }
+        }
+        .onChange(of: authVM.isLoading) { _, isLoading in
+            // Once we've finished the initial loading check, mark it as done
+            if !isLoading && !hasCheckedInitialSession {
+                hasCheckedInitialSession = true
             }
         }
         .onChange(of: authVM.needsOnboarding) { _, needsOnboarding in
@@ -61,6 +71,8 @@ struct LoginView: View {
                 }
             )
         }
-        .animation(.easeInOut, value: authVM.isLoading)
+        .animation(.easeInOut(duration: 0.3), value: authVM.isLoading)
+        .animation(.easeInOut(duration: 0.3), value: authVM.isSignedIn)
+        .animation(.easeInOut(duration: 0.3), value: authVM.needsOnboarding)
     }
 }

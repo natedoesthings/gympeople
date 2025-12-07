@@ -15,20 +15,23 @@ struct ProfileView: View {
     @StateObject private var followingVM = ListViewModel<UserProfile>(fetcher: {
         try await SupabaseManager.shared.fetchMyFollowing()
     })
-    @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
-    @ObservedObject var postsVM: ListViewModel<Post>
-    @ObservedObject var mentionsVM: ListViewModel<Post>
-    @ObservedObject var gymsVM: ListViewModel<Gym>
-
-    @State private var errorMessage: String?
+    @StateObject var userProfilesVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyUserProfile(refresh: true) })
+    
+    @StateObject var postsVM = ListViewModel<Post>(fetcher: { try await SupabaseManager.shared.fetchMyPosts() })
+    
+    @StateObject var mentionsVM = ListViewModel<Post>(fetcher: { try await SupabaseManager.shared.fetchMyMentions() })
+    
+    @StateObject var gymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyGymMemberships() })
     
     @State private var photosPickerItem: PhotosPickerItem?
     @State private var hasLoadedProfile: Bool = false
     @State private var hasLoadedAvatar: Bool = false
+    @State private var refreshID = UUID()
     
     @State private var showProfileEditingPage: Bool = false
     @State private var profileTab: ProfileTab = .posts
-    @State private var outerDisabled = false
+    
+    
     
     var body: some View {
         ZStack {
@@ -36,9 +39,6 @@ struct ProfileView: View {
                 profileContent
                     .opacity(hasLoadedAvatar ? 1 : 0)
             }
-            
-            let _ = print("profile \(hasLoadedProfile)")
-            let _ = print("avatar \(hasLoadedAvatar)")
             
             if !hasLoadedProfile || !hasLoadedAvatar {
                 ProgressView("Loading Profile...")
@@ -86,6 +86,7 @@ struct ProfileView: View {
                                     AvatarView(url: userProfile.pfp_url) {
                                         hasLoadedAvatar = true
                                     }
+                                    .id(refreshID)
                                     .frame(width: 75, height: 75)
                                     .clipShape(Circle())
                                     .overlay(
@@ -184,24 +185,16 @@ struct ProfileView: View {
                         }
                         .padding(.vertical, 15)
                         
-                        Picker("", selection: $profileTab) {
-                            ForEach(ProfileTab.allCases) { tab in
-                                Text(tab.rawValue).tag(tab)
+                        VStack(spacing: 4) {
+                            profileTabBar
+                            
+
+                            switch profileTab {
+                            case .posts:
+                                PostsView(postsVM: postsVM)
+                            case .mentions:
+                                PostsView(postsVM: mentionsVM)
                             }
-                        }
-                        .pickerStyle(SegmentedPickerStyle())
-                        
-                        switch profileTab {
-                        case .posts:
-                            PostsView(postsVM: postsVM)
-                            .gesture(
-                                DragGesture()
-                                    .onChanged { _ in outerDisabled = true }
-                                    .onEnded { _ in outerDisabled = false }
-                            )
-                            .frame(height: 500)
-                        case .mentions:
-                            Text("Your mentions")
                         }
                     }
                     
@@ -242,10 +235,34 @@ struct ProfileView: View {
     @MainActor
     private func loadProfile() async {
         hasLoadedAvatar = false
+        refreshID = UUID()
         await userProfilesVM.load()
         await gymsVM.load()
-        await postsVM.load()
-        await mentionsVM.load()
         hasLoadedProfile = true
+    }
+    
+    private var profileTabBar: some View {
+        HStack(spacing: 40) {
+            tabButton(.posts)
+            tabButton(.mentions)
+        }
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    private func tabButton(_ tab: ProfileTab) -> some View {
+        Button {
+            profileTab = tab
+        } label: {
+            VStack(spacing: 6) {
+                Text(tab.rawValue)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(profileTab == tab ? .primary : .gray)
+
+                Capsule()
+                    .fill(profileTab == tab ? Color.brandOrange : Color.clear)
+                    .frame(width: 28, height: 3)
+            }
+        }
     }
 }

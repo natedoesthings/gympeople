@@ -10,7 +10,7 @@ import MapKit
 
 struct GymsView: View {
     @StateObject var nearbyGymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyGyms() })
-    @StateObject var userGymsVM: ListViewModel<Gym>
+    @StateObject var userGymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyGymMemberships() })
     @State private var gymTab: GymsViewTab = .nearby
     
     var body: some View {

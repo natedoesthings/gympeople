@@ -42,8 +42,8 @@ struct SignInView: View {
             // --- FORM ---
             VStack(spacing: 16) {
                 VStack {
-                    appleSignInButton()
-                    googleSignInButton()
+                    appleSignInButton
+                    googleSignInButton
                 }
                 
                 Text("or continue with email")
@@ -120,7 +120,7 @@ struct SignInView: View {
                     .padding(.top, 40)
                     .disabled(email.isEmpty || !validEmail)
                 } else {
-                    signInButton()
+                    signInButton
                         .disabled(email.isEmpty || !validEmail)
                 }
                 
@@ -155,7 +155,7 @@ struct SignInView: View {
         
     }
     
-    private func appleSignInButton() -> some View {
+    private var appleSignInButton: some View {
         Button {
             Task { await authVM.signInWithGoogle() }
         } label: {
@@ -179,7 +179,7 @@ struct SignInView: View {
         }
     }
     
-    private func googleSignInButton() -> some View {
+    private var googleSignInButton: some View {
         Button {
             Task { await authVM.signInWithGoogle() }
         } label: {
@@ -203,7 +203,7 @@ struct SignInView: View {
         }
     }
     
-    private func signInButton() -> some View {
+    private var signInButton: some View {
         Button {
             Task {
                 await authVM.signInWithEmail(email: email, password: password)

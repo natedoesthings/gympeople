@@ -7,8 +7,7 @@
 
 enum Tab {
     case home
-    case chat
-    case post
-    case gyms
+    case feed
+    case discover
     case profile
 }
