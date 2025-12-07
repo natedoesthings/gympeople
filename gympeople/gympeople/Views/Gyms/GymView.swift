@@ -50,7 +50,7 @@ struct GymSuggestionView: View {
         } catch let error as MKPOIError {
             self.poiError = error
         } catch {
-            print("Unexpected error:", error)
+            LOG.error("Unexpected error: \(error)")
             self.poiError = .incorrectCategory
         }
     }

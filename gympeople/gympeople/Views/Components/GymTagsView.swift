@@ -11,7 +11,7 @@ struct GymTagsView: View {
     @ObservedObject var gymsVM: ListViewModel<Gym>
     
     var body: some View {
-        HiddenScrollView(.horizontal) {
+        HiddenScrollView(.horizontal, trackScrollForTabBar: false) {
             HStack {
                 ForEach(gymsVM.items, id: \.self) { gym in
                     GymTagButton(gymTagType: .gym(gym: gym))

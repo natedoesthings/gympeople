@@ -16,7 +16,7 @@ struct GymsView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                HiddenScrollView(.horizontal) {
+                HiddenScrollView(.horizontal, trackScrollForTabBar: false) {
                     HStack {
                         Group {
                             Button {

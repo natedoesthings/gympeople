@@ -10,6 +10,7 @@ import SwiftUI
 
 struct GymPeopleView: View {
     @StateObject private var userProfileVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyUserProfile() })
+    @EnvironmentObject var tabBarManager: TabBarVisibilityManager
     @State private var selectedFilter: UserFilter = .all
     @State private var tabSelected: Tab = .home
     @State private var showPostView: Bool = false
@@ -25,6 +26,10 @@ struct GymPeopleView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .ignoresSafeArea()
+            .onChange(of: tabSelected) { _, _ in
+                // Reset tab bar visibility when switching tabs
+                tabBarManager.reset()
+            }
             
             floatingTabBar
         }
@@ -78,6 +83,8 @@ struct GymPeopleView: View {
         )
         .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .offset(y: tabBarManager.isVisible ? 0 : 120)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: tabBarManager.isVisible)
     }
 
     

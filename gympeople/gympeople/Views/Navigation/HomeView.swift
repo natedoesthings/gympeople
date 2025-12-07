@@ -41,6 +41,9 @@ struct HomeView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 10)
                 }
+                .safeAreaInset(edge: .bottom) {
+                    Color.clear.frame(height: 80)
+                }
             }
             .refreshable {
                 await nearbyGymsVM.refresh()
@@ -111,7 +114,7 @@ extension HomeView {
                 .fontDesign(.rounded)
                 .foregroundColor(.primary)
 
-            HiddenScrollView(.horizontal) {
+            HiddenScrollView(.horizontal, trackScrollForTabBar: false) {
                 HStack(spacing: 16) {
                     ForEach(nearbyGymsVM.items, id: \.self) { gym in
                         NavigationLink {
@@ -177,7 +180,7 @@ extension HomeView {
     }
 
     private var filterBar: some View {
-        HiddenScrollView(.horizontal) {
+        HiddenScrollView(.horizontal, trackScrollForTabBar: false) {
             HStack(spacing: 12) {
                 ForEach(UserFilter.allCases) { filter in
                     Button {

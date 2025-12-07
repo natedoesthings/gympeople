@@ -155,7 +155,7 @@ struct ProfileView: View {
                         
                         // Gym Tags
                         VStack(alignment: .leading, spacing: 15) {
-                            HiddenScrollView(.horizontal) {
+                            HiddenScrollView(.horizontal, trackScrollForTabBar: false) {
                                 HStack {
                                     if !gymsVM.items.isEmpty {
                                         ForEach(gymsVM.items, id: \.self) { gym in
@@ -220,6 +220,9 @@ struct ProfileView: View {
                         }
                     }
                 }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Color.clear.frame(height: 80)
             }
             .refreshable {
                 await loadProfile()

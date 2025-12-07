@@ -108,7 +108,7 @@ struct ProfileEditingPageView: View {
                             .font(.caption)
                         
                         VStack(alignment: .leading, spacing: 15) {
-                            HiddenScrollView(.horizontal) {
+                            HiddenScrollView(.horizontal, trackScrollForTabBar: false) {
                                 HStack {
                                     if !memberships.isEmpty {
                                         ForEach(memberships, id: \.self) { gym in

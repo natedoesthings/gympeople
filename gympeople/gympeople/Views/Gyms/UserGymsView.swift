@@ -22,6 +22,9 @@ struct UserGymsView: View {
                 }
             }
         }
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: 80)
+        }
         .padding()
         .overlay { if gymsVM.isLoading { ProgressView() } }
         .task {

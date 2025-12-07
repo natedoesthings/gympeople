@@ -11,6 +11,7 @@ import UIKit
 @main
 struct GymPeopleApp: App {
     @StateObject var authVM = AuthViewModel()
+    @StateObject var tabBarManager = TabBarVisibilityManager()
 
 //    init() {
 //        applyGlobalUIFont()
@@ -20,6 +21,7 @@ struct GymPeopleApp: App {
         WindowGroup {
             LoginView()
                 .environmentObject(authVM)
+                .environmentObject(tabBarManager)
 //                .environment(\.font, .app(.body))
                 .onOpenURL { url in
                     Task { await authVM.handleAuthCallback(url: url) }
