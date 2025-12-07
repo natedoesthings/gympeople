@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
+    @ObservedObject var userProfileVM: ListViewModel<UserProfile>
+    
     @StateObject private var nearbyGymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyGyms() })
     @StateObject private var nearbyUsersVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyUsers() })
     @State private var selectedFilter: UserFilter = .all
@@ -27,7 +29,7 @@ struct HomeView: View {
             .ignoresSafeArea()
             
             NavigationStack {
-                ScrollView(showsIndicators: false) {
+                HiddenScrollView {
                     VStack(alignment: .leading, spacing: 24) {
                         
                         headerSection
@@ -39,6 +41,10 @@ struct HomeView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 10)
                 }
+            }
+            .refreshable {
+                await nearbyGymsVM.refresh()
+                await nearbyUsersVM.refresh()
             }
         }
     }
@@ -72,7 +78,7 @@ extension HomeView {
             )
             
             Button { tabSelected = .profile } label: {
-                AvatarView(url: nil)
+                AvatarView(url: userProfileVM.items.first?.pfp_url)
                     .frame(width: 36, height: 36)
             }
         }

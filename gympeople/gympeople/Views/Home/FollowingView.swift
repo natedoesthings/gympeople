@@ -28,7 +28,9 @@ struct FollowingView: View {
                 }
             }
         }
-        .frame(maxHeight: .infinity, alignment: .top)
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: 80)
+        }
         .overlay { if followingPostsVM.isLoading { ProgressView() } }
         .task {
             Task {

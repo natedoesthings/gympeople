@@ -188,7 +188,3 @@ struct EditingPostView: View {
         
     }
 }
-
-#Preview {
-    PostView()
-}

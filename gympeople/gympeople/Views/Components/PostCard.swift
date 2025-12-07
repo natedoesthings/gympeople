@@ -2,10 +2,11 @@
 //  PostCard.swift
 //  gympeople
 //
-//  Created by Nathanael Tesfaye on 11/22/25.
+//  Created by Nathanael Tesfaye on 11/14/24.
 //
 
 import SwiftUI
+import Kingfisher
 
 struct PostCard: View {
     @StateObject private var userProfileVM: ListViewModel<UserProfile>
@@ -169,30 +170,20 @@ struct AvatarView: View {
 
     var body: some View {
         Group {
-            if let url {
-                AsyncImage(url: URL(string: url)) { phase in
-                    switch phase {
-                    case .empty:
+            if let urlString = url, let url = URL(string: urlString) {
+                KFImage(url)
+                    .placeholder {
                         placeholder
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .onAppear {
-                                notifyLoadedIfNeeded()
-                            }
-                    case .failure:
-                        placeholder
-                            .onAppear {
-                                notifyLoadedIfNeeded()
-                            }
-                    @unknown default:
-                        placeholder
-                            .onAppear {
-                                notifyLoadedIfNeeded()
-                            }
                     }
-                }
+                    .retry(maxCount: 3, interval: .seconds(0.5))
+                    .onSuccess { _ in
+                        notifyLoadedIfNeeded()
+                    }
+                    .onFailure { _ in
+                        notifyLoadedIfNeeded()
+                    }
+                    .resizable()
+                    .scaledToFill()
             } else {
                 placeholder
                     .onAppear {

@@ -71,19 +71,12 @@ struct ExploreView: View {
             Color.clear.frame(height: 80)
         }
         .overlay { if nearbyPostsVM.isLoading || userProfilesVM.isLoading { ProgressView() } }
-//        .loading(nearbyPostsVM.isLoading || userProfilesVM.isLoading)
         .task {
-            if !userProfilesVM.fetched && !nearbyPostsVM.fetched {
-                await userProfilesVM.load()
+            if !nearbyPostsVM.fetched {
                 await nearbyPostsVM.load()
             }
         }
         .listErrorAlert(vm: nearbyPostsVM, onRetry: { await nearbyPostsVM.refresh() })
-        .listErrorAlert(vm: userProfilesVM, onRetry: { await userProfilesVM.refresh() })
-        .refreshable {
-                await userProfilesVM.refresh()
-                await nearbyPostsVM.refresh()
-        }
         .sheet(item: $selectedPost) { post in
             CommentsView(
                 commentsVM: ListViewModel<Comment> {

@@ -15,7 +15,7 @@ struct GymsView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 0) {
                 HiddenScrollView(.horizontal) {
                     HStack {
                         Group {
@@ -47,13 +47,17 @@ struct GymsView: View {
                     .padding([.leading, .trailing, .top])
                 }
                 
-                TabView(selection: $gymTab) {
-                    NearbyGymsView(nearbyGymsVM: nearbyGymsVM).tag(GymsViewTab.nearby)
-                    TrendingGymsView(nearbyGymsVM: nearbyGymsVM).tag(GymsViewTab.trending)
-                    UserGymsView(gymsVM: userGymsVM).tag(GymsViewTab.userGyms)
+                switch gymTab {
+                case .userGyms:
+                    UserGymsView(gymsVM: userGymsVM)
+                case .nearby:
+                    NearbyGymsView(nearbyGymsVM: nearbyGymsVM)
+                case .trending:
+                    TrendingGymsView(nearbyGymsVM: nearbyGymsVM)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
+                    
             }
+            .ignoresSafeArea(edges: .bottom)
         }
         
     }

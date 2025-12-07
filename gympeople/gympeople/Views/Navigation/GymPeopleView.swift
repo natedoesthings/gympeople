@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct GymPeopleView: View {
+    @StateObject private var userProfileVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyUserProfile() })
     @State private var selectedFilter: UserFilter = .all
     @State private var tabSelected: Tab = .home
     @State private var showPostView: Bool = false
@@ -17,8 +18,8 @@ struct GymPeopleView: View {
     var body: some View {
         ZStack {
             TabView(selection: $tabSelected) {
-                HomeView(tabSelected: $tabSelected).tag(Tab.home)
-                FeedView().tag(Tab.feed)
+                HomeView(userProfileVM: userProfileVM, tabSelected: $tabSelected).tag(Tab.home)
+                FeedView(userProfilesVM: userProfileVM).tag(Tab.feed)
                 GymsView().tag(Tab.discover)
                 ProfileView().tag(Tab.profile)
             }
@@ -30,6 +31,11 @@ struct GymPeopleView: View {
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .sheet(isPresented: $showPostView) {
             PostView()
+        }
+        .task {
+            if !userProfileVM.fetched {
+                await userProfileVM.load()
+            }
         }
     }
     

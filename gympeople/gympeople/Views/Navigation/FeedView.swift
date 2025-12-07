@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct FeedView: View {
-    @StateObject private var userProfilesVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyUserProfile() })
+    @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
     
     @StateObject private var nearbyPostsVM = ListViewModel<Post>(fetcher: { try await SupabaseManager.shared.fetchNearbyPosts() })
     
@@ -17,7 +17,7 @@ struct FeedView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Group {
                         Button {
@@ -48,12 +48,21 @@ struct FeedView: View {
                 }
                 .padding()
                 
-                TabView(selection: $feedTab) {
-                    ExploreView(nearbyPostsVM: nearbyPostsVM, userProfilesVM: userProfilesVM).tag(FeedViewTab.explore)
-                    FollowingView(followingPostsVM: followingPostsVM).tag(FeedViewTab.following)
+                // Use conditional rendering instead of TabView for better data loading
+                if feedTab == .explore {
+                    ExploreView(nearbyPostsVM: nearbyPostsVM, userProfilesVM: userProfilesVM)
+                } else {
+                    FollowingView(followingPostsVM: followingPostsVM)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .ignoresSafeArea()
+            }
+        }
+        .task {
+            // Ensure data loads when view appears
+            if !nearbyPostsVM.fetched {
+                await nearbyPostsVM.load()
+            }
+            if !followingPostsVM.fetched {
+                await followingPostsVM.load()
             }
         }
         
