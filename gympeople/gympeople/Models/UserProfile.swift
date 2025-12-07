@@ -28,6 +28,7 @@ struct UserProfile: Codable, Identifiable, Hashable {
     let following_count: Int
     let post_count: Int
     let is_following: Bool?
+    let distance_km: Double?  // Distance in kilometers (only populated by nearby queries)
 }
 
 extension UserProfile {
@@ -51,7 +52,8 @@ extension UserProfile {
             follower_count: 0,
             following_count: 0,
             post_count: 0,
-            is_following: nil
+            is_following: nil,
+            distance_km: nil
             
         )
     }

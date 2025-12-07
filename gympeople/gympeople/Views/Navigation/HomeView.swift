@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var nearbyGymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyGyms() })
+    @StateObject private var nearbyUsersVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyUsers() })
     @State private var selectedFilter: UserFilter = .all
     @Binding var tabSelected: Tab
     
@@ -38,12 +39,6 @@ struct HomeView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 10)
                 }
-            }
-        }
-        .listErrorAlert(vm: nearbyGymsVM, onRetry: nearbyGymsVM.refresh)
-        .task {
-            if !nearbyGymsVM.fetched {
-               await nearbyGymsVM.load()
             }
         }
     }
@@ -129,6 +124,12 @@ extension HomeView {
             .ignoresSafeArea(.container, edges: .horizontal)
         }
         .overlay { if nearbyGymsVM.isLoading { ProgressView() } }
+        .listErrorAlert(vm: nearbyGymsVM, onRetry: { await nearbyGymsVM.refresh() })
+        .task {
+            if !nearbyGymsVM.fetched {
+               await nearbyGymsVM.load()
+            }
+        }
     }
 
 
@@ -213,8 +214,8 @@ extension HomeView {
             
             
             VStack(spacing: 14) {
-                ForEach(0..<6, id: \.self) { _ in
-                    UserRow(profile: .placeholder())
+                ForEach(nearbyUsersVM.items, id: \.self) { user in
+                    UserRow(profile: user)
                         .padding(.vertical, 6)
                         .padding(.horizontal, 10)
                         .background(Color.standardPrimary)
@@ -224,6 +225,13 @@ extension HomeView {
             }
         }
         .padding(.bottom, 40)
+        .overlay { if nearbyUsersVM.isLoading { ProgressView() } }
+        .listErrorAlert(vm: nearbyUsersVM, onRetry: { await nearbyUsersVM.refresh() })
+        .task {
+            if !nearbyUsersVM.fetched {
+               await nearbyUsersVM.load()
+            }
+        }
     }
     
     

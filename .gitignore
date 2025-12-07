@@ -6,3 +6,6 @@ xcuserdata/
 *.xcuserstate
 *.xcuserdatad
 DerivedData/
+
+# Supabase
+gympeople/supabase_functions/

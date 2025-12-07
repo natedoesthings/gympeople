@@ -853,6 +853,39 @@ extension SupabaseManager {
         
     }
     
+    func fetchNearbyUsers(for userId: UUID) async throws -> [UserProfile] {
+        LOG.debug("Fetching nearby users for user: \(userId)")
+        
+        do {
+            let response = try await client
+                .rpc("fetch_nearby_users", params: [
+                    "p_user_id": userId.uuidString
+                ])
+                .execute()
+            
+            let data = response.data
+            
+            let decoder = makeUserProfileDecoder()
+            let profiles = try decoder.decode([UserProfile].self, from: data)
+            
+            LOG.debug("Found \(profiles.count) nearby users")
+            return profiles
+        } catch {
+            LOG.error("Error fetching nearby users: \(error.localizedDescription)")
+            throw mapToAppError(error)
+        }
+    }
+    
+    func fetchMyNearbyUsers() async throws -> [UserProfile] {
+        LOG.debug("fetching my nearby users")
+        guard let currentUserId = client.auth.currentUser?.id else {
+            LOG.error("No authenticated user found")
+            throw AppError.unauthorized
+        }
+        
+        return try await fetchNearbyUsers(for: currentUserId)
+    }
+    
     // MARK: Helpers
     
     private func makeUserProfileDecoder() -> JSONDecoder {
