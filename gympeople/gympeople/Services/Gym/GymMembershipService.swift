@@ -12,6 +12,7 @@ protocol GymMembershipServiceProtocol {
     func insertGymMemberships(_ gyms: [Gym]) async throws
     func syncGymMemberships(gyms: [Gym]) async throws
     func fetchGymMemberships(for userId: UUID, lat: Double?, lon: Double?) async throws -> [Gym]
+    func updateMembershipVerification(gymId: UUID, documentUrl: String) async throws
 }
 
 class GymMembershipService: GymMembershipServiceProtocol {
@@ -82,8 +83,34 @@ class GymMembershipService: GymMembershipServiceProtocol {
             
             return gyms
         } catch {
-            LOG.error("Failed to find memberships: \(error.localizedDescription)")
+            LOG.error("Failed to find memberships: \(error)")
+            if let decodingError = error as? DecodingError {
+                LOG.error("Decoding error details: \(decodingError)")
+            }
             throw error
+        }
+    }
+    
+    func updateMembershipVerification(gymId: UUID, documentUrl: String) async throws {
+        guard let currentUserId = client.auth.currentUser?.id else {
+            throw AppError.unauthorized
+        }
+        
+        do {
+            try await client
+                .from("gym_memberships")
+                .update([
+                    "verification_status": AnyEncodable("pending"),
+                    "document_url": AnyEncodable(documentUrl)
+                ])
+                .eq("user_id", value: currentUserId.uuidString)
+                .eq("gym_id", value: gymId.uuidString)
+                .execute()
+            
+            LOG.notice("Updated membership verification status to pending")
+        } catch {
+            LOG.error("Failed to update membership verification: \(error)")
+            throw SupabaseErrorMapper.map(error)
         }
     }
 }

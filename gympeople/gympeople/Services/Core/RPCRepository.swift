@@ -22,6 +22,10 @@ class RPCRepository {
             let response: T = try await client.rpc(function, params: params).execute().value
             return response
         } catch {
+            LOG.error("RPC call '\(function)' failed with error: \(error)")
+            if let decodingError = error as? DecodingError {
+                LOG.error("DecodingError details: \(decodingError)")
+            }
             throw SupabaseErrorMapper.map(error)
         }
     }

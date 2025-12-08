@@ -19,6 +19,8 @@ struct Gym: Codable, Identifiable, Hashable {
     let member_count: Int
     let post_count: Int
     let distance_meters: Double?
+    let verification_status: MembershipVerificationStatus?
+    let document_url: String?
 }
 
 extension Gym {
@@ -36,7 +38,9 @@ extension Gym {
             ),
             member_count: 0,
             post_count: 0,
-            distance_meters: nil
+            distance_meters: nil,
+            verification_status: .unverified,
+            document_url: nil
         )
     }
     

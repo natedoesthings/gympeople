@@ -191,6 +191,10 @@ extension SupabaseManager {
         try await services.gymMembership.fetchGymMemberships(for: userId, lat: lat, lon: lon)
     }
     
+    func updateMembershipVerification(gymId: UUID, documentUrl: String) async throws {
+        try await services.gymMembership.updateMembershipVerification(gymId: gymId, documentUrl: documentUrl)
+    }
+    
     func fetchMyGymMemberships() async throws -> [Gym] {
         guard let currentUser = try await fetchMyUserProfile().first else {
             throw AppError.unauthorized

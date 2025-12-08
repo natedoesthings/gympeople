@@ -212,7 +212,7 @@ struct ProfileView: View {
                             
                             NavigationLink {
                                 if let userProfile = userProfilesVM.items.first {
-                                    ProfileSettingsPageView(userProfile: userProfile)
+                                    ProfileSettingsPageView(userProfile: userProfile, gymsVM: gymsVM)
                                 }
                             } label: {
                                 Image(systemName: "slider.horizontal.3")

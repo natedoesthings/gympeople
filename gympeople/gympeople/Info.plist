@@ -19,6 +19,10 @@
 	<string>$(SUPABASE_ANON_KEY)</string>
 	<key>SUPABASE_URL</key>
 	<string>https://$(SUPABASE_URL)</string>
+	<key>R2_API_ENDPOINT</key>
+	<string>https://$(R2_API_ENDPOINT)</string>
+	<key>R2_UPLOAD_SECRET</key>
+	<string>$(R2_UPLOAD_SECRET)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>font.ttf</string>
