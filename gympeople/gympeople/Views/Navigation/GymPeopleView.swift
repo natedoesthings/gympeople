@@ -21,7 +21,7 @@ struct GymPeopleView: View {
             TabView(selection: $tabSelected) {
                 HomeView(userProfileVM: userProfileVM, tabSelected: $tabSelected).tag(Tab.home)
                 FeedView(userProfilesVM: userProfileVM).tag(Tab.feed)
-                GymsView().tag(Tab.discover)
+                DiscoverView().tag(Tab.discover)
                 ProfileView().tag(Tab.profile)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))

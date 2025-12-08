@@ -13,7 +13,7 @@ enum DiscoverCategory: String, CaseIterable {
     case people = "People"
 }
 
-struct GymsView: View {
+struct DiscoverView: View {
     @StateObject var nearbyGymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyGyms() })
     @StateObject var userGymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyGymMemberships() })
     @StateObject var nearbyUsersVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyUsers() })
