@@ -1,76 +1,167 @@
-# gympeople
-Find your GymPeople.
-The biggest and most intuitive social media gym app that allows users to connect with others going to the gym.
+# GymPeople
 
-# Updates 12/8/25!!!
-## UI Refresh!
-<img width="147" height="319" alt="IMG_6890" src="https://github.com/user-attachments/assets/b4d34957-717b-41f8-83ac-4bbf075e1cb7" />
-<img width="147" height="319" alt="IMG_6891" src="https://github.com/user-attachments/assets/9f381ceb-c223-453d-9e94-2f165b5e5d5b" />
-<img width="147" height="319" alt="IMG_6892" src="https://github.com/user-attachments/assets/3f1021df-0435-4ba1-80c5-771a110a1897" />
+A social fitness platform that connects gym-goers, helping you find workout partners and build your fitness community.
 
-## Gym Membership Verification!
-<img width="147" height="319" alt="IMG_6889" src="https://github.com/user-attachments/assets/6d48b3e2-c800-4125-8a70-948014a9c511" />
-<img width="147" height="319" alt="IMG_6888" src="https://github.com/user-attachments/assets/f0eb67f2-f854-4996-b008-8ff8f0e60954" />
-<img width="147" height="319" alt="IMG_6894" src="https://github.com/user-attachments/assets/43578b63-fa4b-4e87-8b52-0abd58b9fc7d" />
+## Overview
 
-## Commenting on Posts! w/ Replies!
-<img width="147" height="319" alt="IMG_6893" src="https://github.com/user-attachments/assets/381945f6-3d6a-46cb-8aed-bc8396f5fda5" />
+GymPeople is an iOS social networking app designed specifically for fitness enthusiasts. Connect with people at your gym, discover new workout partners, and build a supportive fitness community. Whether you're looking for a gym buddy, exploring new gyms through guest passes, or sharing your fitness journey, GymPeople brings the social aspect back to working out.
 
+## Key Features
 
+### Authentication & Onboarding
+- Secure sign-in with Apple and Google OAuth
+- Comprehensive onboarding process collecting user information
+- Location-based gym discovery and membership setup
 
-# Feature Set
-## Authentication
-<img width="147" height="319" alt="IMG_6712" src="https://github.com/user-attachments/assets/a6a10042-24e9-41c3-8ffe-6c4f4737e680" />
-<img width="147" height="319" alt="IMG_6713" src="https://github.com/user-attachments/assets/b325dc7b-cf4d-4949-a6eb-9613b8959c48" />
-<img width="147" height="319" alt="IMG_6714" src="https://github.com/user-attachments/assets/904ca384-c97c-4e3c-8299-b4477d3e73cf" />
+<img width="147" height="319" alt="Authentication Screen" src="https://github.com/user-attachments/assets/a6a10042-24e9-41c3-8ffe-6c4f4737e680" />
+<img width="147" height="319" alt="Sign In Screen" src="https://github.com/user-attachments/assets/b325dc7b-cf4d-4949-a6eb-9613b8959c48" />
+<img width="147" height="319" alt="Welcome Screen" src="https://github.com/user-attachments/assets/904ca384-c97c-4e3c-8299-b4477d3e73cf" />
 
-## Onboarding
+**Onboarding Flow:**
+
 https://github.com/user-attachments/assets/3b765d55-54f6-4c91-876b-2fbf39423a21
 
-# App Icon
+### Gym Membership Verification
+- Upload membership documentation for verification
+- Verified member badges for enhanced trust and safety
+- Support for all major gym chains and local facilities
+- Track verification status (unverified, pending, verified)
 
-<img width="256" height="256" alt="gympeople_light" src="https://github.com/user-attachments/assets/4bd2cdc1-40cd-4e65-8ab1-77ffc52bd08b" />
-<img width="256" height="256" alt="gympeople_dark" src="https://github.com/user-attachments/assets/e3f9212d-5aad-4338-9759-0d1edfd38432" />
+<img width="147" height="319" alt="Membership Verification" src="https://github.com/user-attachments/assets/6d48b3e2-c800-4125-8a70-948014a9c511" />
+<img width="147" height="319" alt="Upload Documents" src="https://github.com/user-attachments/assets/f0eb67f2-f854-4996-b008-8ff8f0e60954" />
+<img width="147" height="319" alt="Verification Status" src="https://github.com/user-attachments/assets/43578b63-fa4b-4e87-8b52-0abd58b9fc7d" />
 
-## How does this stand out from others?
-- This app will ensure user safety enforcing strict identification procedures causing people to feel safe with linking up in person
-- Users will enter in gym membership information
-- users will be allowed to offer guest passes via this app, so for people expirimenting gyms this would be a great way to try
-- Any gym that has a membership will work so, ymca, climbing gyms, gyms like planet fitness and LA fitness
+### Social Feed
+- Share posts about your gym activities and fitness journey
+- Like and comment on posts from people you follow
+- Reply to comments with threaded conversations
+- Explore feed for discovering new content from nearby users
+- Following feed for updates from your connections
 
-## Feature set:
-- User profile that contains users information such as name, contact, location, and gym memberships
-- Explore page with people in their area posting about going to the gym and looking to find their "gym people"
-- Users can follow others and chat with their followers
-- User feed containg user postings similar to x, can include pictures and videos
-- Very similar tabs to instagram
+<img width="147" height="319" alt="Comments Feature" src="https://github.com/user-attachments/assets/381945f6-3d6a-46cb-8aed-bc8396f5fda5" />
 
-### Sign in/log in page
-- be able to create or sign in with either google or apple
+### Discovery
+- Find gyms near you with detailed information and member counts
+- Discover users at your gym or in your area
+- Filter users by location and activity
+- View trending gyms based on activity and engagement
+- Search for gyms by city or zip code
 
-#### Once account is created it will need to be verified
-- name
-- dob
-- some sort of id verification
+<img width="147" height="319" alt="Discover Interface" src="https://github.com/user-attachments/assets/b4d34957-717b-41f8-83ac-4bbf075e1cb7" />
+<img width="147" height="319" alt="Gym Discovery" src="https://github.com/user-attachments/assets/9f381ceb-c223-453d-9e94-2f165b5e5d5b" />
+<img width="147" height="319" alt="User Discovery" src="https://github.com/user-attachments/assets/3f1021df-0435-4ba1-80c5-771a110a1897" />
 
-### Feed Page
-- similar to insta feed, you have user posts and user stories of whoever you follow
+### User Profiles
+- Customizable profiles with profile pictures and bios
+- Display gym memberships and verification status
+- View user posts and mentions
+- Follow/unfollow functionality
+- Track followers and following counts
+- Profile privacy settings (public/private)
 
-### Explore Page
-- you fill find people in your area posting about going to the gym,
-  this is where you can meet new people, go to the gym with them,
-  check their profile, see if anyone is handing out guest passes for the day
+### Home Feed
+- Personalized feed showing nearby gyms and users
+- Quick actions for finding gym buddies and creating groups
+- Location-based recommendations
+- Filter users by distance and activity
 
-### User profile Page
-- this can be editable, such as location, email, and current gym memberships
-- we can also have gym guest passes listed to let users know if they have guest passes available
+## What Makes GymPeople Different
 
-### Messaging Page
-- Standard messaging system
-- message other users
-- message groups
-- keep track of read and unread
+**Safety First**
+- Gym membership verification ensures authentic users
+- Verified badges build trust within the community
+- Location-based connections keep interactions relevant
 
+**Universal Compatibility**
+- Works with any gym: Planet Fitness, LA Fitness, YMCA, climbing gyms, and more
+- Support for independent and chain fitness facilities
+- Easy gym switching for users with multiple memberships
 
-### Settings Page
-- these will be system settings for the application itself
+**Guest Pass Sharing** (Coming Soon)
+- Share guest passes with the community
+- Help others try out your gym
+- Great for people exploring new fitness facilities
+
+## Tech Stack
+
+### Frontend
+- SwiftUI for native iOS development
+- Modern MVVM architecture with ListViewModel pattern
+- Custom UI components with consistent design system
+- Smooth animations and transitions
+
+### Backend
+- Supabase for authentication and database
+- PostgreSQL for data storage
+- Row Level Security for data protection
+- Cloudflare R2 for image and document storage
+
+### Key Technologies
+- MapKit for gym location services
+- PhotosPicker for image uploads
+- Async/await for modern Swift concurrency
+- Combine for reactive programming
+
+## App Icon
+
+<img width="256" height="256" alt="Light Mode Icon" src="https://github.com/user-attachments/assets/4bd2cdc1-40cd-4e65-8ab1-77ffc52bd08b" />
+<img width="256" height="256" alt="Dark Mode Icon" src="https://github.com/user-attachments/assets/e3f9212d-5aad-4338-9759-0d1edfd38432" />
+
+## Roadmap
+
+### In Development
+- Direct messaging between users
+- Group messaging for workout crews
+- Push notifications for new followers and messages
+- Guest pass management and sharing system
+
+### Planned Features
+- Gym check-ins and activity tracking
+- Workout plans and progress sharing
+- Event creation for group workouts
+- Gym reviews and ratings
+- Integration with fitness tracking apps
+
+## Project Structure
+
+```
+gympeople/
+├── gympeople/              # Main iOS app
+│   ├── Views/             # SwiftUI views and components
+│   ├── ViewModels/        # View models and business logic
+│   ├── Models/            # Data models
+│   ├── Services/          # API and service layers
+│   └── Utilities/         # Helper functions and extensions
+├── supabase_functions/    # Database functions and queries
+└── gympeople-storage-upload/  # Cloudflare Worker for R2 uploads
+```
+
+## Getting Started
+
+### Prerequisites
+- Xcode 15.0 or later
+- iOS 17.0 or later
+- Supabase account for backend services
+- Cloudflare account for storage
+
+### Setup
+1. Clone the repository
+2. Open `gympeople.xcodeproj` in Xcode
+3. Configure environment variables in `Info.plist`:
+   - SUPABASE_URL
+   - SUPABASE_ANON_KEY
+   - R2_API_ENDPOINT
+   - R2_UPLOAD_SECRET
+4. Build and run on simulator or device
+
+## Contributing
+
+GymPeople is currently in active development. Contributions, issues, and feature requests are welcome.
+
+## License
+
+This project is proprietary and not open for public distribution.
+
+## Contact
+
+For questions or feedback, please open an issue in the repository.
