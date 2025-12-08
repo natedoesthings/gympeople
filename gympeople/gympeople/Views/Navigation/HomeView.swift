@@ -114,25 +114,71 @@ extension HomeView {
                 .fontDesign(.rounded)
                 .foregroundColor(.primary)
 
-            HiddenScrollView(.horizontal, trackScrollForTabBar: false) {
-                HStack(spacing: 16) {
-                    ForEach(nearbyGymsVM.items, id: \.self) { gym in
-                        NavigationLink {
-                            GymView(gym: gym)
-                        } label: {
-                            GymCard(gym: gym)
-                                .frame(width: 280, height: 260, alignment: .top)
+            if nearbyGymsVM.isLoading {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .frame(height: 260)
+            } else if nearbyGymsVM.items.isEmpty {
+                // Empty State
+                VStack(spacing: 16) {
+                    Image(systemName: "dumbbell.fill")
+                        .font(.system(size: 48))
+                        .foregroundStyle(Color("BrandOrange").opacity(0.6))
+                    
+                    VStack(spacing: 8) {
+                        Text("No Gyms Nearby")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        
+                        Text("Explore the Discover tab to find gyms in your area")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    
+                    Button {
+                        tabSelected = .discover
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "magnifyingglass")
+                            Text("Discover Gyms")
                         }
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(Color("BrandOrange"))
+                        .clipShape(Capsule())
                     }
                 }
-                .scrollTargetLayout()
-                .padding(.vertical, 4)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+                .background(Color(.systemGray6).opacity(0.5))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            } else {
+                HiddenScrollView(.horizontal, trackScrollForTabBar: false) {
+                    HStack(spacing: 16) {
+                        ForEach(nearbyGymsVM.items, id: \.self) { gym in
+                            NavigationLink {
+                                GymView(gym: gym)
+                            } label: {
+                                GymCard(gym: gym)
+                                    .frame(width: 280, height: 260, alignment: .top)
+                            }
+                        }
+                    }
+                    .scrollTargetLayout()
+                    .padding(.vertical, 4)
+                }
+                .scrollTargetBehavior(.viewAligned)
+                .scrollClipDisabled()
+                .ignoresSafeArea(.container, edges: .horizontal)
             }
-            .scrollTargetBehavior(.viewAligned)
-            .scrollClipDisabled()
-            .ignoresSafeArea(.container, edges: .horizontal)
         }
-        .overlay { if nearbyGymsVM.isLoading { ProgressView() } }
         .listErrorAlert(vm: nearbyGymsVM, onRetry: { await nearbyGymsVM.refresh() })
         .task {
             if !nearbyGymsVM.fetched {
@@ -219,22 +265,67 @@ extension HomeView {
                 .fontDesign(.rounded)
                 .foregroundColor(.primary)
 
-            filterBar
-            
-            
-            VStack(spacing: 14) {
-                ForEach(nearbyUsersVM.items, id: \.self) { user in
-                    UserRow(profile: user)
-                        .padding(.vertical, 6)
-                        .padding(.horizontal, 10)
-                        .background(Color.standardPrimary)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 3)
+            if nearbyUsersVM.isLoading {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .frame(height: 200)
+            } else if nearbyUsersVM.items.isEmpty {
+                // Empty State
+                VStack(spacing: 16) {
+                    Image(systemName: "person.2.fill")
+                        .font(.system(size: 48))
+                        .foregroundStyle(Color("BrandOrange").opacity(0.6))
+                    
+                    VStack(spacing: 8) {
+                        Text("No Users Nearby")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        
+                        Text("Be the first in your area or check back later")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    
+                    Button {
+                        tabSelected = .discover
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "person.3.fill")
+                            Text("Discover People")
+                        }
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(Color("BrandOrange"))
+                        .clipShape(Capsule())
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+                .background(Color(.systemGray6).opacity(0.5))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            } else {
+                filterBar
+                
+                VStack(spacing: 14) {
+                    ForEach(nearbyUsersVM.items, id: \.self) { user in
+                        UserRow(profile: user)
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 10)
+                            .background(Color.standardPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 3)
+                    }
                 }
             }
         }
         .padding(.bottom, 40)
-        .overlay { if nearbyUsersVM.isLoading { ProgressView() } }
         .listErrorAlert(vm: nearbyUsersVM, onRetry: { await nearbyUsersVM.refresh() })
         .task {
             if !nearbyUsersVM.fetched {
