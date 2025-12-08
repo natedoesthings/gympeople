@@ -125,6 +125,7 @@ extension HomeView {
                         }
                     }
                 }
+                .scrollTargetLayout()
                 .padding(.vertical, 4)
             }
             .scrollTargetBehavior(.viewAligned)
