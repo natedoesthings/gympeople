@@ -8,6 +8,7 @@ import SwiftUI
 
 struct FeedView: View {
     @ObservedObject var userProfilesVM: ListViewModel<UserProfile>
+    @EnvironmentObject var tabBarManager: TabBarVisibilityManager
     
     @StateObject private var nearbyPostsVM = ListViewModel<Post>(fetcher: { try await SupabaseManager.shared.fetchNearbyPosts() })
     
@@ -64,6 +65,9 @@ struct FeedView: View {
             if !followingPostsVM.fetched {
                 await followingPostsVM.load()
             }
+        }
+        .onChange(of: feedTab) { _, _ in
+            tabBarManager.reset()
         }
         
     }

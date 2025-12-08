@@ -14,6 +14,7 @@ enum DiscoverCategory: String, CaseIterable {
 }
 
 struct DiscoverView: View {
+    @EnvironmentObject var tabBarManager: TabBarVisibilityManager
     @StateObject var nearbyGymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyGyms() })
     @StateObject var userGymsVM = ListViewModel<Gym>(fetcher: { try await SupabaseManager.shared.fetchMyGymMemberships() })
     @StateObject var nearbyUsersVM = ListViewModel<UserProfile>(fetcher: { try await SupabaseManager.shared.fetchMyNearbyUsers() })
@@ -68,6 +69,12 @@ struct DiscoverView: View {
                 }
             }
             .ignoresSafeArea(edges: .bottom)
+        }
+        .onChange(of: selectedCategory) { _, _ in
+            tabBarManager.reset()
+        }
+        .onChange(of: gymTab) { _, _ in
+            tabBarManager.reset()
         }
     }
     
