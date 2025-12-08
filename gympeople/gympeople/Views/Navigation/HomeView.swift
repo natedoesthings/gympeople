@@ -121,8 +121,7 @@ extension HomeView {
                             GymView(gym: gym)
                         } label: {
                             GymCard(gym: gym)
-                                .frame(width: 240)
-                                .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 3)
+                                .frame(width: 280, height: 260, alignment: .top)
                         }
                     }
                 }
