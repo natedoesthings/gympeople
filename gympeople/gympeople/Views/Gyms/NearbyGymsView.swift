@@ -15,51 +15,94 @@ struct NearbyGymsView: View {
     @FocusState private var isFocused: Bool
     
     var body: some View {
-        VStack {
-            HStack {
-                Image(systemName: "mappin")
-                    .foregroundColor(.gray)
-                    .padding(.leading, 10)
-                
-                TextField("Enter city or zip code", text: $searchText)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                    .padding(.vertical, 12)
-                    .focused($isFocused)
-                    .onChange(of: searchText) { _, newValue in
-                        gymSearch.update(query: newValue)
-                    }
-            }
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color(.systemGray4), lineWidth: 2)
-            )
-            
-            if !gymSearch.suggestions.isEmpty {
-                List {
-                    ForEach(gymSearch.suggestions, id: \.self) { suggestion in
-                        NavigationLink {
-                            GymSuggestionView(suggestion: suggestion)
+        VStack(spacing: 0) {
+            // Search Section
+            VStack(spacing: 16) {
+                HStack(spacing: 12) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 16))
+                        .foregroundColor(.secondary)
+                    
+                    TextField("Search by city or zip code", text: $searchText)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .focused($isFocused)
+                        .onChange(of: searchText) { _, newValue in
+                            gymSearch.update(query: newValue)
+                        }
+                    
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                            gymSearch.suggestions.removeAll()
                         } label: {
-                            VStack(alignment: .leading) {
-                                Text(suggestion.title)
-                                    .font(.body)
-                                if !suggestion.subtitle.isEmpty {
-                                    Text(suggestion.subtitle)
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
-                                }
-                            }
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(.secondary)
                         }
                     }
                 }
-                .frame(height: 200) // dropdown height
-                .listStyle(.plain)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(Color(.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                
+                // Search Suggestions
+                if !gymSearch.suggestions.isEmpty {
+                    VStack(spacing: 0) {
+                        ForEach(gymSearch.suggestions.prefix(5), id: \.self) { suggestion in
+                            NavigationLink {
+                                GymSuggestionView(suggestion: suggestion)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "mappin.circle.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundStyle(Color("BrandOrange"))
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(suggestion.title)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.primary)
+                                        
+                                        if !suggestion.subtitle.isEmpty {
+                                            Text(suggestion.subtitle)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                            }
+                            
+                            if suggestion != gymSearch.suggestions.prefix(5).last {
+                                Divider()
+                                    .padding(.leading, 48)
+                            }
+                        }
+                    }
+                    .background(Color(.systemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+                }
             }
+            .padding(.horizontal, 20)
+            .padding(.top, 16)
+            .padding(.bottom, 24)
+            .background(Color(.systemBackground))
             
+            Divider()
+            
+            // Gyms List
             HiddenScrollView {
-                LazyVStack {
+                LazyVStack(spacing: 16) {
                     if !nearbyGymsVM.items.isEmpty {
                         ForEach(nearbyGymsVM.items, id: \.self) { gym in
                             NavigationLink {
@@ -68,26 +111,45 @@ struct NearbyGymsView: View {
                                 GymCard(gym: gym)
                             }
                         }
-                        
-                    } else {
-                        Button {
-                            Task {
-                                await nearbyGymsVM.load()
-                                await SupabaseManager.shared.insertGyms(nearbyGymsVM.items)
-                            }
-                        } label: {
-                            Text("Load gyms...")
+                    } else if !nearbyGymsVM.isLoading {
+                        VStack(spacing: 16) {
+                            Image(systemName: "dumbbell.fill")
+                                .font(.system(size: 48))
+                                .foregroundStyle(Color("BrandOrange").opacity(0.6))
+                            
+                            Text("No gyms found nearby")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            Text("Try adjusting your search location")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 60)
                     }
-                    
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
             }
             .safeAreaInset(edge: .bottom) {
                 Color.clear.frame(height: 80)
             }
-            
         }
-        .padding()
+        .overlay {
+            if nearbyGymsVM.isLoading {
+                VStack {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                    Text("Finding gyms...")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 8)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(.systemBackground).opacity(0.8))
+            }
+        }
         .onChange(of: isFocused) { _, _ in
             if !isFocused {
                 searchText = ""
@@ -98,7 +160,6 @@ struct NearbyGymsView: View {
             if !nearbyGymsVM.fetched {
                 await nearbyGymsVM.load()
             }
-           
         }
         .refreshable {
             await nearbyGymsVM.refresh()

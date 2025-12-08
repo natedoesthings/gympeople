@@ -255,16 +255,25 @@ struct ProfileView: View {
     
     private func tabButton(_ tab: ProfileTab) -> some View {
         Button {
-            profileTab = tab
+            withAnimation(.spring(duration: 0.25)) {
+                profileTab = tab
+            }
         } label: {
             VStack(spacing: 6) {
                 Text(tab.rawValue)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(profileTab == tab ? .primary : .gray)
 
-                Capsule()
-                    .fill(profileTab == tab ? Color.brandOrange : Color.clear)
-                    .frame(width: 28, height: 3)
+                if profileTab == tab {
+                    Capsule()
+                        .fill(Color.brandOrange)
+                        .frame(width: 28, height: 3)
+                        .transition(.scale)
+                } else {
+                    Capsule()
+                        .fill(Color.clear)
+                        .frame(width: 28, height: 3)
+                }
             }
         }
     }

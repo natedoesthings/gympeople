@@ -152,6 +152,7 @@ struct InfoRow: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .lineLimit(2)
+                .multilineTextAlignment(.leading)
         }
     }
 }

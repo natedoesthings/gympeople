@@ -35,7 +35,7 @@ struct PostCard: View {
                 // Avatar
                 if feed {
                     NavigationLink {
-                        UserIdProfileView(userProfilesVM: userProfileVM)
+                        UserProfileView(userProfilesVM: userProfileVM)
                     } label: {
                         AvatarView(url: post.author_pfp_url)
                             .frame(width: 36, height: 36)
