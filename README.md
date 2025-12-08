@@ -4,17 +4,18 @@ The biggest and most intuitive social media gym app that allows users to connect
 
 # Updates 12/8/25!!!
 ## UI Refresh!
-<img width="590" height="1278" alt="IMG_6890" src="https://github.com/user-attachments/assets/b4d34957-717b-41f8-83ac-4bbf075e1cb7" />
-<img width="590" height="1278" alt="IMG_6891" src="https://github.com/user-attachments/assets/9f381ceb-c223-453d-9e94-2f165b5e5d5b" />
-<img width="590" height="1278" alt="IMG_6892" src="https://github.com/user-attachments/assets/3f1021df-0435-4ba1-80c5-771a110a1897" />
-
-## Commenting on Posts! w/ Replies!
-<img width="590" height="1278" alt="IMG_6893" src="https://github.com/user-attachments/assets/381945f6-3d6a-46cb-8aed-bc8396f5fda5" />
+<img width="147" height="319" alt="IMG_6890" src="https://github.com/user-attachments/assets/b4d34957-717b-41f8-83ac-4bbf075e1cb7" />
+<img width="147" height="319" alt="IMG_6891" src="https://github.com/user-attachments/assets/9f381ceb-c223-453d-9e94-2f165b5e5d5b" />
+<img width="147" height="319" alt="IMG_6892" src="https://github.com/user-attachments/assets/3f1021df-0435-4ba1-80c5-771a110a1897" />
 
 ## Gym Membership Verification!
-<img width="590" height="1278" alt="IMG_6889" src="https://github.com/user-attachments/assets/6d48b3e2-c800-4125-8a70-948014a9c511" />
-<img width="590" height="1278" alt="IMG_6888" src="https://github.com/user-attachments/assets/f0eb67f2-f854-4996-b008-8ff8f0e60954" />
-<img width="590" height="1278" alt="IMG_6894" src="https://github.com/user-attachments/assets/43578b63-fa4b-4e87-8b52-0abd58b9fc7d" />
+<img width="147" height="319" alt="IMG_6889" src="https://github.com/user-attachments/assets/6d48b3e2-c800-4125-8a70-948014a9c511" />
+<img width="147" height="319" alt="IMG_6888" src="https://github.com/user-attachments/assets/f0eb67f2-f854-4996-b008-8ff8f0e60954" />
+<img width="147" height="319" alt="IMG_6894" src="https://github.com/user-attachments/assets/43578b63-fa4b-4e87-8b52-0abd58b9fc7d" />
+
+## Commenting on Posts! w/ Replies!
+<img width="147" height="319" alt="IMG_6893" src="https://github.com/user-attachments/assets/381945f6-3d6a-46cb-8aed-bc8396f5fda5" />
+
 
 
 # Feature Set
